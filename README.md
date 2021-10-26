@@ -60,6 +60,58 @@ func main() {
 
 Here the handler — `hg.UserDirHandler` — operates similar to Apache's HTTP Server Project's `mod_userdir` — in that it enables user-specific directories such as `/home/username/mercury_public/` to be accessed over the **Mercury Protocol** using the tilde path `mercury://example.com/~username/`
 
+## Example Mercury Protocol Servers With Custom Handler
+
+And finally, here is a custom handler being used in a  ☿ **Mercury Protocol** server:
+```go
+package main
+
+import (
+	"github.com/reiver/go-hg"
+)
+
+func main() {
+
+	var handler hg.Handler = myCustomHandler{}
+
+	err := hg.ListenAndServe(":1961", handler)
+	if nil != err {
+		//@TODO: Handle this error better.
+		panic(err)
+	}
+}
+
+type myCustomHandler {}
+
+func (receiver myCustomHandler) ServeMercury(w hg.ResponseWriter, r *hg.Request) {
+	io.WriteString(w, "Hello world!")
+}
+```
+
+Alternatively, this could be made a bit simple it `hg.HandlerFunc()` is used:
+```go
+package main
+
+import (
+	"github.com/reiver/go-hg"
+)
+
+func main() {
+
+	var handler hg.Handler = hg.HandlerFunc(helloworld)
+
+	err := hg.ListenAndServe(":1961", handler)
+	if nil != err {
+		//@TODO: Handle this error better.
+		panic(err)
+	}
+}
+
+func helloworld(w hg.ResponseWriter, r *hg.Request) {
+	io.WriteString(w, "Hello world!")
+}
+```
+
 ## Package Name
 
 The package name of this Go package is **hg** rather than **mercury** because **Hg** is often used as a shorthard for **mercury**.
