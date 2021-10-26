@@ -1,6 +1,6 @@
 # go-hg
 
-Package **hg** provides **Mercury Protocol** ☿ client and server implementations, for the Go programming language.
+Package **hg** provides ☿ **Mercury Protocol** client and server implementations, for the Go programming language.
 
 The **hg** package provides an API in a style similar to the "net/http" library that is part of the Go standard library, including support for "middleware".
 
@@ -11,12 +11,11 @@ Online documentation, which includes examples, can be found at: http://godoc.org
 [![GoDoc](https://godoc.org/github.com/reiver/go-hg?status.svg)](https://godoc.org/github.com/reiver/go-hg)
 
 
-## Example Mercury Protoco Server
+## Example Mercury Protocol Server
 
-A very very simple Mercury Protocol ☿ server is shown in the following code.
+A very very simple ☿ **Mercury Protocol** server is shown in the following code.
 
-This particular Mercury Protocol ☿ server just responds to the client with the URI that was in the request, plus the remote address.
-
+This particular ☿ **Mercury Protocol** server just responds to the client with the URI that was in the request, plus the remote address.
 
 ```go
 package main
@@ -36,6 +35,32 @@ func main() {
 	}
 }
 ```
+
+With the handler that is used in this example — `hg.DebugHandler` — just returning debugging information.
+
+Another example might be:
+
+```go
+package main
+
+import (
+	"github.com/reiver/go-hg"
+)
+
+func main() {
+
+	var handler hg.Handler = hg.UserDirHandler
+
+	err := hg.ListenAndServe(":1961", handler)
+	if nil != err {
+		//@TODO: Handle this error better.
+		panic(err)
+	}
+}
+```
+
+Where this handler — `hg.UserDirHandler` — operates similar to Apache's HTTP Server Project's `mod_userdir` —
+in that it enables user-specific directories such as `/home/username/mercury_public/` to be accessed over the **Mercury Protocol** using the tilde path `mercury://example.com/~username/`
 
 ## Package Name
 
