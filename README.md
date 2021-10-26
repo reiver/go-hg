@@ -1,4 +1,4 @@
-# go-hg
+# go-hg ☿
 
 Package **hg** provides ☿ **Mercury Protocol** client and server implementations, for the Go programming language.
 
