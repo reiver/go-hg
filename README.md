@@ -11,7 +11,7 @@ Online documentation, which includes examples, can be found at: http://godoc.org
 [![GoDoc](https://godoc.org/github.com/reiver/go-hg?status.svg)](https://godoc.org/github.com/reiver/go-hg)
 
 
-## Example Mercury Protocol Server
+## Example Mercury Protocol Servers
 
 A very very simple ☿ **Mercury Protocol** server is shown in the following code.
 
@@ -36,9 +36,8 @@ func main() {
 }
 ```
 
-With the handler that is used in this example — `hg.DebugHandler` — just returning debugging information.
 
-Another example might be:
+Another example  ☿ **Mercury Protocol** server is shown in the following code:
 
 ```go
 package main
@@ -59,8 +58,7 @@ func main() {
 }
 ```
 
-Where this handler — `hg.UserDirHandler` — operates similar to Apache's HTTP Server Project's `mod_userdir` —
-in that it enables user-specific directories such as `/home/username/mercury_public/` to be accessed over the **Mercury Protocol** using the tilde path `mercury://example.com/~username/`
+Here the handler — `hg.UserDirHandler` — operates similar to Apache's HTTP Server Project's `mod_userdir` — in that it enables user-specific directories such as `/home/username/mercury_public/` to be accessed over the **Mercury Protocol** using the tilde path `mercury://example.com/~username/`
 
 ## Package Name
 
