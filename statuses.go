@@ -26,7 +26,25 @@ const (
 	StatusBadRequest         = 59
 )
 
-// 10
+// 10 INPUT
+//
+// This function sends a “10 INPUT” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var prompt string = "Pick a number between 1 and 10"
+//		
+//		hg.Input(w, prompt)
+//		
+//		// ...
+//		
+//	}
 func Input(w ResponseWriter, meta string) {
 	const statuscode = StatusInput
 
@@ -38,7 +56,25 @@ func Input(w ResponseWriter, meta string) {
 	w.WriteHeader(statuscode)
 }
 
-// 11
+// 11 SENSITIVE INPUT
+//
+// This function sends a “11 SENSITIVE INPUT” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var prompt string = "Pick enter your password"
+//		
+//		hg.SensitiveInput(w, prompt)
+//		
+//		// ...
+//		
+//	}
 func SensitiveInput(w ResponseWriter, meta string) {
 	const statuscode = StatusSensitiveInput
 
@@ -50,7 +86,27 @@ func SensitiveInput(w ResponseWriter, meta string) {
 	w.WriteHeader(statuscode)
 }
 
-// 30
+// 30 REDIRECT - TEMPORARY
+//
+// This function sends a “30 REDIRECT - TEMPORARY” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		//var url string = "/apple/banana/cherry.txt"
+//		//var url string = "documents/info.txt"
+//		var url string = "mercury://example.com/once/twice/thrice/fource.txt"
+//		
+//		hg.RedirectTemporary(w, url)
+//		
+//		// ...
+//		
+//	}
 func RedirectTemporary(w ResponseWriter, meta string) {
 	const statuscode = StatusRedirectTemporary
 
@@ -62,7 +118,27 @@ func RedirectTemporary(w ResponseWriter, meta string) {
 	w.WriteHeader(statuscode)
 }
 
-// 31
+// 31 REDIRECT - PERMANENT
+//
+// This function sends a “31 REDIRECT - PERMANENT” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		//var url string = "/apple/banana/cherry.txt"
+//		//var url string = "documents/info.txt"
+//		var url string = "mercury://example.com/once/twice/thrice/fource.txt"
+//		
+//		hg.RedirectPermanent(w, url)
+//		
+//		// ...
+//		
+//	}
 func RedirectPermanent(w ResponseWriter, meta string) {
 	const statuscode = StatusRedirectPermanent
 
