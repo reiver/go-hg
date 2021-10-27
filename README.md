@@ -2,7 +2,7 @@
 
 Package **hg** provides ☿ **Mercury Protocol** client and server implementations, for the Go programming language.
 
-The **hg** package provides an API in a style similar to the "net/http" library that is part of the Go standard library, including support for "middleware".
+The **hg** package provides an API in a style similar to the `"net/http"` library that is part of the Go standard library, including support for "middleware".
 
 ## Documention
 
