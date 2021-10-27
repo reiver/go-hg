@@ -83,7 +83,7 @@ func main() {
 
 type myCustomHandler {}
 
-func (receiver myCustomHandler) ServeMercury(w hg.ResponseWriter, r *hg.Request) {
+func (receiver myCustomHandler) ServeMercury(w hg.ResponseWriter, r hg.Request) {
 	io.WriteString(w, "Hello world!")
 }
 ```
