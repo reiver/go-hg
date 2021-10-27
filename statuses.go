@@ -19,11 +19,11 @@ const (
 	StatusProxyError         = 43
 	StatusSlowDown           = 44
 
-	StatusPermanentFailture  = 50
-	StatusNotFound           = 51
-	StatusGone               = 52
-	StatusProxyRequestFailed = 53
-	StatusBadRequest         = 59
+	StatusPermanentFailture   = 50
+	StatusNotFound            = 51
+	StatusGone                = 52
+	StatusProxyRequestRefused = 53
+	StatusBadRequest          = 59
 )
 
 // 10 INPUT
@@ -247,8 +247,8 @@ func Gone(w ResponseWriter, meta string) {
 }
 
 // 53
-func ProxyRequestFailed(w ResponseWriter, meta string) {
-	const statuscode = StatusProxyRequestFailed
+func ProxyRequestRefused(w ResponseWriter, meta string) {
+	const statuscode = StatusProxyRequestRefused
 
 	if nil == w {
 		return
