@@ -112,6 +112,20 @@ func helloworld(w hg.ResponseWriter, r *hg.Request) {
 }
 ```
 
+## Mercury Protocol Response Helpers
+
+This package provides a number of helper-functions that make responding to a ☿ Mercury Protocol request easier.
+The helper functions are:
+
+| Mercury Protocol Response | Function Name                  |
+| ------------------------- | ------------------------------ |
+| `10 INPUT`                | `hg.Input(w, prompt)`          |
+| `11 SENTITIVE INPUT`      | `hg.SensitiveInput(w, prompt)` |
+|                           |                                |
+| `30 REDIRECT - TEMPORARY` | `hg.RedirectTemporary(w, url)` |
+| `31 REDIRECT - PERMANENT` | `hg.RedirectPermanent(w, url)` |`
+
+
 ## Package Name
 
 The package name of this Go package is **hg** rather than **mercury** because **Hg** is often used as a shorthard for **mercury**.
@@ -147,4 +161,4 @@ And thus this, a package that implements the **Mercury Protocol**, is named  `hg
 ## See Also
 * [The Mercury protocol (gemini)](gemini://gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [The Mercury protocol (http proxy)](https://portal.mozz.us/gemini/gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
-* [Mailing List thread: Mercury](https://lists.orbitalfox.eu/archives/gemini/2020/thread.html#1842)
+* [Mailing List thread: “Mercury”](https://lists.orbitalfox.eu/archives/gemini/2020/thread.html#1842)
