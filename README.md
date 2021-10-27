@@ -117,13 +117,18 @@ func helloworld(w hg.ResponseWriter, r *hg.Request) {
 This package provides a number of helper-functions that make responding to a ☿ Mercury Protocol request easier.
 The helper functions are:
 
-| Mercury Protocol Response | Function Name                  |
-| ------------------------- | ------------------------------ |
-| `10 INPUT`                | `hg.Input(w, prompt)`          |
-| `11 SENTITIVE INPUT`      | `hg.SensitiveInput(w, prompt)` |
-|                           |                                |
-| `30 REDIRECT - TEMPORARY` | `hg.RedirectTemporary(w, url)` |
-| `31 REDIRECT - PERMANENT` | `hg.RedirectPermanent(w, url)` |`
+| Mercury Protocol Response | Function Name                   |
+| ------------------------- | ------------------------------- |
+| `10 INPUT`                | `hg.Input(w, prompt)`           |
+| `11 SENTITIVE INPUT`      | `hg.SensitiveInput(w, prompt)`  |
+| `20 SUCCESS`              |                                 |
+| `30 REDIRECT - TEMPORARY` | `hg.RedirectTemporary(w, url)`  |
+| `31 REDIRECT - PERMANENT` | `hg.RedirectPermanent(w, url)`  |
+| `40 TEMPORARY FAILURE`    | `hg.TemporaryFailure(w, info)`  |
+| `41 SERVER UNAVAILABLE`   | `hg.ServerUnavailable(w, info)` |
+| `42 CGI ERROR`            | `hg.CGIError(w, info)`          |
+| `43 PROXY ERROR`          | `hg.ProxyError(w, info)`        |
+| `44 SLOW DOWN`            | `hg.SlowDown(w, retryAfter)`    |
 
 
 ## Package Name
