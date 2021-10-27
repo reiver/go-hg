@@ -11,7 +11,7 @@ Online documentation, which includes examples, can be found at: http://godoc.org
 [![GoDoc](https://godoc.org/github.com/reiver/go-hg?status.svg)](https://godoc.org/github.com/reiver/go-hg)
 
 
-## Example Mercury Protocol Servers
+## Example Mercury Protocol Server
 
 A very very simple ☿ **Mercury Protocol** server is shown in the following code.
 
@@ -36,6 +36,7 @@ func main() {
 }
 ```
 
+## Tilde Example Mercury Protocol Server
 
 Another example  ☿ **Mercury Protocol** server is shown in the following code:
 
