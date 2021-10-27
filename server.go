@@ -10,3 +10,17 @@ type Server struct {
 	Handler Handler // handler to invoke; if nil defaults to hg.DebugServer
 	Logger Logger
 }
+
+func (server *Server) logger() Logger {
+
+	var lgr Logger
+	func(){
+		if nil == server {
+			return
+		}
+
+		lgr = server.Logger
+	}()
+
+	return mustlogger(lgr)
+}

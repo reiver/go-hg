@@ -4,12 +4,6 @@ import (
 	"testing"
 )
 
-type testLogger struct {}
-func (testLogger) Error(...interface{}) {}
-func (testLogger) Errorf(string, ...interface{}) {}
-func (testLogger) Log(...interface{}) {}
-func (testLogger) Logf(string, ...interface{}) {}
-
 func TestMustlogger_nil(t *testing.T) {
 
 	tests := []struct{
