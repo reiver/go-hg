@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -151,48 +152,56 @@ func RedirectPermanent(w ResponseWriter, meta string) {
 }
 
 // 40
-func TemporaryFailure(w ResponseWriter, meta string) {
+func TemporaryFailure(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusTemporaryFailure
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprint(a...)
+
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
 }
 
 // 41
-func ServerUnavailable(w ResponseWriter, meta string) {
+func ServerUnavailable(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusServerUnavailable
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprint(a...)
+
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
 }
 
 // 42
-func CGIError(w ResponseWriter, meta string) {
+func CGIError(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusCGIError
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprint(a...)
+
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
 }
 
 // 43
-func ProxyError(w ResponseWriter, meta string) {
+func ProxyError(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusProxyError
 
 	if nil == w {
 		return
 	}
+
+	var meta string = fmt.Sprint(a...)
 
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
@@ -211,60 +220,70 @@ func SlowDown(w ResponseWriter, meta string) {
 }
 
 // 50
-func PermanentFailture(w ResponseWriter, meta string) {
+func PermanentFailture(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusPermanentFailture
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprint(a...)
+
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
 }
 
 // 51
-func NotFound(w ResponseWriter, meta string) {
+func NotFound(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusNotFound
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprint(a...)
+
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
 }
 
 // 52
-func Gone(w ResponseWriter, meta string) {
+func Gone(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusGone
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprint(a...)
+
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
 }
 
 // 53
-func ProxyRequestRefused(w ResponseWriter, meta string) {
+func ProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusProxyRequestRefused
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprint(a...)
+
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
 }
 
 // 59
-func BadRequest(w ResponseWriter, meta string) {
+func BadRequest(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusBadRequest
 
 	if nil == w {
 		return
 	}
+
+	var meta string = fmt.Sprint(a...)
 
 	io.WriteString(w.Meta(), meta)
 	w.WriteHeader(statuscode)
