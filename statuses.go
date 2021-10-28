@@ -2,7 +2,6 @@ package hg
 
 import (
 	"fmt"
-	"io"
 )
 
 const (
@@ -53,8 +52,7 @@ func Input(w ResponseWriter, meta string) {
 		return
 	}
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 11 SENSITIVE INPUT
@@ -83,8 +81,7 @@ func SensitiveInput(w ResponseWriter, meta string) {
 		return
 	}
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 30 REDIRECT - TEMPORARY
@@ -115,8 +112,7 @@ func RedirectTemporary(w ResponseWriter, meta string) {
 		return
 	}
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 31 REDIRECT - PERMANENT
@@ -147,8 +143,7 @@ func RedirectPermanent(w ResponseWriter, meta string) {
 		return
 	}
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 40
@@ -161,8 +156,7 @@ func TemporaryFailure(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 41
@@ -175,8 +169,7 @@ func ServerUnavailable(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 42
@@ -189,8 +182,7 @@ func CGIError(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 43
@@ -203,8 +195,7 @@ func ProxyError(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 44
@@ -215,8 +206,7 @@ func SlowDown(w ResponseWriter, meta string) {
 		return
 	}
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 50
@@ -229,8 +219,7 @@ func PermanentFailture(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 51
@@ -243,8 +232,7 @@ func NotFound(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 52
@@ -257,8 +245,7 @@ func Gone(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 53
@@ -271,8 +258,7 @@ func ProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
 
 // 59
@@ -285,6 +271,5 @@ func BadRequest(w ResponseWriter, a ...interface{}) {
 
 	var meta string = fmt.Sprint(a...)
 
-	io.WriteString(w.Meta(), meta)
-	w.WriteHeader(statuscode)
+	w.WriteHeader(statuscode, meta)
 }
