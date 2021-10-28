@@ -11,6 +11,37 @@ type Server struct {
 	Logger Logger
 }
 
+// Serve accepts an incoming Mercury Protocol client connection on the net.Listener ‘listener’.
+func (server *Server) Serve(listener net.Listener) error {
+
+	defer listener.Close()
+
+	logger := server.logger()
+
+	handler := server.Handler
+	if nil == handler {
+		handler = DebugHandler
+		logger.Log("defaulted handler to DebugHandler.")
+	}
+
+	for {
+		// Wait for a new client connection.
+		logger.Logf("listening at %q.", listener.Addr())
+		conn, err := listener.Accept()
+		if err != nil {
+//@TODO: Could try to recover from certain kinds of errors. Maybe waiting a while before trying again.
+			logger.Errorf("error while listing at %q: %s", listener.Addr(), err)
+			return err
+		}
+		logger.Logf("received new connection from %q.", conn.RemoteAddr())
+
+		// Handle the new client connection by spawning
+		// a new goroutine.
+		go handle(logger, conn, handler)
+		logger.Logf("spawned handler to handle connection from %q.", conn.RemoteAddr())
+	}
+}
+
 func (server *Server) logger() Logger {
 
 	var lgr Logger
