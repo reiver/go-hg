@@ -19,9 +19,9 @@ In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Prot
 
 The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inpired by the _Gopher Protocol_.
 
-## Hypermedia
+## Hypermedia, Hypertext
 
-The ☿ **Mercury Protocol** (and the _Gemini Protocol_) are designed to work with a (specific) **hypermedia** file data format known as **gemtext**.
+The ☿ **Mercury Protocol** and the _Gemini Protocol_ are designed to work with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
 
 (The name “gemtext” is short for “gemini text”.)
 
@@ -194,3 +194,4 @@ And thus this, a package that implements the **Mercury Protocol**, is named  `hg
 * [The Mercury protocol (gemini)](gemini://gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [The Mercury protocol (http proxy)](https://portal.mozz.us/gemini/gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [Mailing List thread: “Mercury”](https://lists.orbitalfox.eu/archives/gemini/2020/thread.html#1842)
+* [Mailing List thread: “[spec] mercury highlights ☿️”](https://lists.orbitalfox.eu/archives/gemini/2021/thread.html#5737)
