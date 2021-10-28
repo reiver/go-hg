@@ -140,23 +140,23 @@ func helloworld(w hg.ResponseWriter, r *hg.Request) {
 This package provides a number of helper-functions that make responding to a ☿ Mercury Protocol request easier.
 The helper functions are:
 
-| Mercury Protocol Response  | Basic Usage                    | Intermediate Usage                |
-| -------------------------- | ------------------------------ | --------------------------------- |
-| `10 INPUT`                 | `hg.Input(w, prompt)`          |                                   |
-| `11 SENTITIVE INPUT`       | `hg.SensitiveInput(w, prompt)` |                                   |
-| `20 SUCCESS`               |                                |                                   |
-| `30 REDIRECT - TEMPORARY`  | `hg.RedirectTemporary(w, url)` |                                   |
-| `31 REDIRECT - PERMANENT`  | `hg.RedirectPermanent(w, url)` |                                   |
-| `40 TEMPORARY FAILURE`     | `hg.TemporaryFailure(w)`       | `hg.TemporaryFailure(w, info)`    |
-| `41 SERVER UNAVAILABLE`    | `hg.ServerUnavailable(w)`      | `hg.ServerUnavailable(w, info)`   |
-| `42 CGI ERROR`             | `hg.CGIError(w)`               | `hg.CGIError(w, info)`            |
-| `43 PROXY ERROR`           | `hg.ProxyError(w)`             | `hg.ProxyError(w, info)`          |
-| `44 SLOW DOWN`             | `hg.SlowDown(w, retryAfter)`   |                                   |
-| `50 PERMANENT FAILURE`     | `hg.PermanentFailure(w)`       | `hg.PermanentFail ure(w, info)`   |
-| `51 NOT FOUND`             | `hg.NotFound(w)`               | `hg.NotFound(w, info)`            |
-| `52 GONE`                  | `hg.Gone(w)`                   | `hg.Gone(w, info)`                |
-| `53 PROXY REQUEST REFUSED` | `hg.ProxyRequestRefused(w)`    | `hg.ProxyRequestRefused(w, info)` |
-| `59 BAD REQUEST`           | `hg.BadRequest(w)`             | `hg.BadRequest(w, info)`          |
+| Mercury Protocol Response  | Basic Usage                         | Intermediate Usage                     |
+| -------------------------- | ----------------------------------- | -------------------------------------- |
+| `10 INPUT`                 | `hg.ServeInput(w, prompt)`          |                                        |
+| `11 SENTITIVE INPUT`       | `hg.ServeSensitiveInput(w, prompt)` |                                        |
+| `20 SUCCESS`               |                                     |                                        |
+| `30 REDIRECT - TEMPORARY`  | `hg.ServeRedirectTemporary(w, url)` |                                        |
+| `31 REDIRECT - PERMANENT`  | `hg.ServeRedirectPermanent(w, url)` |                                        |
+| `40 TEMPORARY FAILURE`     | `hg.ServeTemporaryFailure(w)`       | `hg.ServeTemporaryFailure(w, info)`    |
+| `41 SERVER UNAVAILABLE`    | `hg.ServeServerUnavailable(w)`      | `hg.ServeServerUnavailable(w, info)`   |
+| `42 CGI ERROR`             | `hg.ServeCGIError(w)`               | `hg.ServeCGIError(w, info)`            |
+| `43 PROXY ERROR`           | `hg.ServeProxyError(w)`             | `hg.ServeProxyError(w, info)`          |
+| `44 SLOW DOWN`             | `hg.ServeSlowDown(w, retryAfter)`   |                                        |
+| `50 PERMANENT FAILURE`     | `hg.ServePermanentFailure(w)`       | `hg.ServePermanentFail ure(w, info)`   |
+| `51 NOT FOUND`             | `hg.ServeNotFound(w)`               | `hg.ServeNotFound(w, info)`            |
+| `52 GONE`                  | `hg.ServeGone(w)`                   | `hg.ServeGone(w, info)`                |
+| `53 PROXY REQUEST REFUSED` | `hg.ServeProxyRequestRefused(w)`    | `hg.ServeProxyRequestRefused(w, info)` |
+| `59 BAD REQUEST`           | `hg.ServeBadRequest(w)`             | `hg.ServeBadRequest(w, info)`          |
 
 ## Package Name
 
