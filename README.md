@@ -152,7 +152,7 @@ The helper functions are:
 | `42 CGI ERROR`             | `hg.CGIError(w)`               | `hg.CGIError(w, info)`            |
 | `43 PROXY ERROR`           | `hg.ProxyError(w)`             | `hg.ProxyError(w, info)`          |
 | `44 SLOW DOWN`             | `hg.SlowDown(w, retryAfter)`   |                                   |
-| `50 PERMANENT FAILURE`     | `hg.PermanentFailture(w)`      | `hg.PermanentFailture(w, info)`   |
+| `50 PERMANENT FAILURE`     | `hg.PermanentFailure(w)`       | `hg.PermanentFail ure(w, info)`   |
 | `51 NOT FOUND`             | `hg.NotFound(w)`               | `hg.NotFound(w, info)`            |
 | `52 GONE`                  | `hg.Gone(w)`                   | `hg.Gone(w, info)`                |
 | `53 PROXY REQUEST REFUSED` | `hg.ProxyRequestRefused(w)`    | `hg.ProxyRequestRefused(w, info)` |

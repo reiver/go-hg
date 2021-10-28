@@ -19,7 +19,7 @@ const (
 	StatusProxyError         = 43
 	StatusSlowDown           = 44
 
-	StatusPermanentFailture   = 50
+	StatusPermanentFailure    = 50
 	StatusNotFound            = 51
 	StatusGone                = 52
 	StatusProxyRequestRefused = 53
@@ -210,8 +210,8 @@ func SlowDown(w ResponseWriter, meta string) {
 }
 
 // 50
-func PermanentFailture(w ResponseWriter, a ...interface{}) {
-	const statuscode = StatusPermanentFailture
+func PermanentFailure(w ResponseWriter, a ...interface{}) {
+	const statuscode = StatusPermanentFailure
 
 	if nil == w {
 		return
