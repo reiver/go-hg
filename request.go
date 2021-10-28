@@ -40,6 +40,10 @@ func something(value string) Request {
 	}
 }
 
+func (receiver Request) RequestValue() string {
+	return receiver.value[:len(receiver.value)-2]
+}
+
 // Parse parses the input ‘value’ and if valid sets the value of the request.
 //
 // Note that ‘value’ should NOT include the trailing carriage-return and line-feed.
