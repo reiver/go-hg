@@ -10,6 +10,19 @@ Online documentation, which includes examples, can be found at: http://godoc.org
 
 [![GoDoc](https://godoc.org/github.com/reiver/go-hg?status.svg)](https://godoc.org/github.com/reiver/go-hg)
 
+## Mercury Protocol
+
+The ☿ **Mercury Protocol** is a simple client-server protocol.
+
+The ☿ **Mercury Protocol** is derived from the _Gemini Protocol_ — basically the _Mercury Protocol_ is the _Gemini Protocol_ without the TLS encryption.
+In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Protocol_.
+
+The _Gemini Protocol_ was inpired by the _Gopher Protocol_.
+And therefore, the ☿ _Mercury Protocol_ is (indirectly) inspired by the _Gopher Protocol_ (since the _Mercury Protocol_ is a derive from the _Gemini Protocol_).
+
+## Mercury Protocol + TLS = Gemini Protocol
+
+If one wants to have a _Gemini Protocol_ server, but handle the TLS encryption at another level from server, then (using this package and) setting up a _Mercury Protocol_ server can enable that.
 
 ## Example Mercury Protocol Server
 
