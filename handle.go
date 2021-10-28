@@ -7,6 +7,12 @@ import (
 // The handle() function handles an incoming Mercury request using the handler passed to it.
 func handle(logger Logger, conn net.Conn, handler Handler) {
 
+	defer func() {
+		err := conn.Close()
+		if nil != err {
+			logger.Errorf("Problem with closing network connection: %s", err)
+		}
+	}()
 
 	defer func(){
 		if r := recover(); nil != r {
