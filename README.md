@@ -20,6 +20,9 @@ In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Prot
 The _Gemini Protocol_ was inpired by the _Gopher Protocol_.
 And therefore, the ☿ _Mercury Protocol_ is (indirectly) inspired by the _Gopher Protocol_ (since the _Mercury Protocol_ is a derive from the _Gemini Protocol_).
 
+The ☿ _Mercury Protocol_ (and the _Gemini Protocol_) are designed to work with a (specific) **hypermedia** file data format known as **gemtext** (which is short for **gemini text**).
+**Gemtext** is a **formatted text** file data format similar to _markdown_ and inspired by the line typing convention in Gopher.
+
 ## Mercury Protocol + TLS = Gemini Protocol
 
 If one wants to have a _Gemini Protocol_ server, but handle the TLS encryption at another level from server, then (using this package and) setting up a _Mercury Protocol_ server can enable that.
