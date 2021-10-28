@@ -41,7 +41,18 @@ func (internalDebugHandler) ServeMercury(w ResponseWriter, r Request) {
 	storage.WriteString("```")
 	fmt.Fprintf(&storage, "%q", r)
 	storage.WriteString("```\r\n")
-	storage.WriteString("☿\r\n")
+
+	storage.WriteString("\r\n")
+
+	storage.WriteString("# Extra\r\n")
+	storage.WriteString("\r\n")
+
+	storage.WriteString("\x1B[1m")
+	storage.WriteString("\x1B[38;2;0;0;0m")
+	storage.WriteString("\x1B[48;2;255;199;6m")
+	storage.WriteString(" ☿ ")
+	storage.WriteString("\x1B[0m")
+	storage.WriteString("\r\n")
 
 	w.WriteHeader(StatusSuccess, "text/gemini")
 	io.WriteString(w, storage.String())
