@@ -19,9 +19,9 @@ In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Prot
 
 The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inpired by the _Gopher Protocol_.
 
-## Server Example
+## Example Server
 
-A very very very simple ☿ **Mercury Protocol** might look like this:
+A very simple ☿ **Mercury Protocol** server might look like this:
 ```go
 package main
 

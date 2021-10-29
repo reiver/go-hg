@@ -22,6 +22,10 @@ import (
 //	func (receiver Type) ServeMercury(w hg.ResponseWriter, r hg.Request) {
 //		// ...
 //	}
+//
+// NOTE that the .Parse() methods will accept non-mercury URIs. For example:
+//
+//	err := request.Parse("gemini://example.com/apple/banana/cherry.txt")
 type Request struct {
 	loaded bool
 	value string
