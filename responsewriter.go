@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// ResponseWriter is used by a Handler to construct a Mercury response.
+// ResponseWriter is used by a Handler to construct a Mercury Protocol response.
 type ResponseWriter interface {
 	io.Writer
 	WriteHeader(statusCode int, meta interface{}) (int, error)
@@ -26,7 +26,13 @@ func (receiver *internalResponseWriter) Write(data []byte) (n int, err error) {
 		return 0, errNilReceiver
 	}
 	if !receiver.headerwritten {
-		receiver.WriteHeader(StatusSuccess, "text/gemini")
+		var m int
+
+		m, err = receiver.WriteHeader(StatusSuccess, "text/gemini")
+		n += m
+		if nil != err {
+			return n, err
+		}
 	}
 	if len(data) <= 0 {
 		return 0, nil
@@ -37,7 +43,15 @@ func (receiver *internalResponseWriter) Write(data []byte) (n int, err error) {
 		return 0, errNilWriter
 	}
 
-	return writer.Write(data)
+	{
+		m, err := writer.Write(data)
+		n += m
+		if nil != err {
+			return n, err
+		}
+	}
+
+	return n, nil
 }
 
 func (receiver *internalResponseWriter) WriteHeader(statusCode int, meta interface{}) (int, error) {
