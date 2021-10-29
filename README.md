@@ -19,9 +19,42 @@ In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Prot
 
 The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inpired by the _Gopher Protocol_.
 
+## Server Example
+
+A very very very simple ☿ **Mercury Protocol** might look like this:
+```go
+package main
+
+import (
+	"github.com/reiver/go-hg"
+
+	"fmt"
+	"os"
+)
+
+func main() {
+
+	const addr = ":1961"
+
+	var handler hg.Handler = hg.HandlerFunc(helloworldHandler)
+
+	err := hg.ListenAndServe(addr, handler)
+
+	if nil != err {
+		fmt.Fprintln(os.Stderr, "problem with ☿ Mercury Protocol server:", err)
+		os.Exit(1)
+		return
+	}
+}
+
+func helloworldHandler(w hg.ResponseWriter, r hg.Request) {
+	fmt.Fprintln(w, "Hello world!")
+}
+```
+
 ## Hypermedia, Hypertext
 
-The ☿ **Mercury Protocol** and the _Gemini Protocol_ are designed to work with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
+The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used  with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
 
 (The name “gemtext” is short for “gemini text”.)
 
@@ -30,6 +63,8 @@ The ☿ **Mercury Protocol** and the _Gemini Protocol_ are designed to work with
 Some of the built-in handlers in this package will output **gemtext**.
 
 ## Mercury Protocol + TLS = Gemini Protocol
+
+One can turn a ☿ **Mercury Protocol** server into a _Gemini Protocol_ server by, very roughly, putting a TLS layer over top of it (and dealing the `6x` response status codes).
 
 If one wants to have a _Gemini Protocol_ server, but handle the TLS encryption at another level from server, then (using this package and) setting up a _Mercury Protocol_ server can enable that.
 
@@ -194,4 +229,3 @@ And thus this, a package that implements the **Mercury Protocol**, is named  `hg
 * [The Mercury protocol (gemini)](gemini://gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [The Mercury protocol (http proxy)](https://portal.mozz.us/gemini/gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [Mailing List thread: “Mercury”](https://lists.orbitalfox.eu/archives/gemini/2020/thread.html#1842)
-* [Mailing List thread: “[spec] mercury highlights ☿️”](https://lists.orbitalfox.eu/archives/gemini/2021/thread.html#5737)
