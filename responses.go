@@ -22,6 +22,8 @@ type ResponseGone                struct {meta string} // 52
 type ResponseProxyRequestRefused struct {meta string} // 53
 type ResponseBadRequest          struct {meta string} // 59
 
+type UnknownResponse             struct {meta string ; statusCode int}
+
 
 
 func (receiver ResponseInput)               Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 10
@@ -41,6 +43,8 @@ func (receiver ResponseNotFound)            Error() string {return fmt.Sprintf("
 func (receiver ResponseGone)                Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 52
 func (receiver ResponseProxyRequestRefused) Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 53
 func (receiver ResponseBadRequest)          Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 59
+
+func (receiver UnknownResponse)             Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.statusCode,   receiver.meta)}
 
 
 
@@ -62,6 +66,8 @@ func (receiver ResponseGone)                StatusCode() int {return 52}
 func (receiver ResponseProxyRequestRefused) StatusCode() int {return 53}
 func (receiver ResponseBadRequest)          StatusCode() int {return 59}
 
+func (receiver UnknownResponse)             StatusCode() int {return receiver.statusCode}
+
 
 
 func (receiver ResponseInput)               Meta() string {return receiver.meta}
@@ -81,3 +87,5 @@ func (receiver ResponseNotFound)            Meta() string {return receiver.meta}
 func (receiver ResponseGone)                Meta() string {return receiver.meta}
 func (receiver ResponseProxyRequestRefused) Meta() string {return receiver.meta}
 func (receiver ResponseBadRequest)          Meta() string {return receiver.meta}
+
+func (receiver UnknownResponse)             Meta() string {return receiver.meta}
