@@ -26,7 +26,7 @@ func (receiver *internalResponseWriter) Write(data []byte) (n int, err error) {
 		return 0, errNilReceiver
 	}
 	if !receiver.headerwritten {
-		return 0, errHeaderNotAlreadyWritten
+		receiver.WriteHeader(StatusSuccess, "text/gemini")
 	}
 	if len(data) <= 0 {
 		return 0, nil
