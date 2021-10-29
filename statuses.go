@@ -1,5 +1,14 @@
 package hg
 
+// Constants for the Mercury Protocol status codes.
+//
+// Can use, for example, with ResponseWriter's WriteHeader method.
+//
+// For example:
+//
+//	func ServerMercury(w hg.ResponseWriter, r hg.Request) {
+//		w.WriteHeader(hg.StatusNotFound, "uh oh!")
+//	}
 const (
 	StatusInput              = 10
 	StatusSensitiveInput     = 11
