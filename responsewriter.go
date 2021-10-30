@@ -7,6 +7,16 @@ import (
 )
 
 // ResponseWriter is used by a Handler to construct a Mercury Protocol response.
+//
+// For example:
+//
+//	func serveMercury(w hg.ResponseWriter, r hg.Request) {
+//
+//		// ...
+//
+//	}
+//
+// Notice that the first parameter is a ResponseWriter.
 type ResponseWriter interface {
 	io.Writer
 	WriteHeader(statusCode int, meta interface{}) (int, error)
