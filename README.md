@@ -52,6 +52,48 @@ func serveMercury(w hg.ResponseWriter, r hg.Request) {
 }
 ```
 
+In this example, the ☿ **Mercury Protocol** just outputs a _Gemtext_ file with the contents “Hello world!”.
+
+## Example Client
+
+A very simple ☿ **Mercury Protocol** client might look like this:
+```go
+package main
+
+import (
+	"github.com/reiver/go-hg"
+
+	"fmt"
+	"io"
+	"os"
+)
+
+func main() {
+
+	const address =       "example.com:1961"
+	const uri = "mercury://example.com/apple/banana/cherry.txt"
+
+	var request hg.Request
+	err := request.Parse(uri)
+
+	if nil != err {
+		fmt.Fprintln(os.Stderr, "problem parsing URI:", err)
+		os.Exit(1)
+		return
+	}
+
+	responsereader, err := hg.DialAndCall(address, request)
+	if nil != err {
+		fmt.Fprintln(os.Stderr, "problem with request:", err)
+		os.Exit(1)
+		return
+	}
+	defer responsereader.Close()
+
+	io.Copy(os.Stdout, responsereader)
+}
+```
+
 ## Hypermedia, Hypertext
 
 The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used  with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
