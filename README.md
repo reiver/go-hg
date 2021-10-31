@@ -108,6 +108,17 @@ The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used  with a (s
 
 **Gemtext** is a **formatted text** file data format similar to _markdown_, and inspired by the line typing convention in Gopher.
 
+Here is an example **gemtext** file:
+```
+# Joe Blow's Capsule
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nibh cras pulvinar mattis nunc sed blandit libero volutpat. Tellus mauris a diam maecenas. Quis enim lobortis scelerisque fermentum dui faucibus. Sed id semper risus in hendrerit gravida rutrum quisque non. Pretium vulputate sapien nec sagittis. Ut aliquam purus sit amet luctus venenatis lectus magna fringilla. Scelerisque eleifend donec pretium vulputate sapien. A lacus vestibulum sed arcu non odio. Lacus luctus accumsan tortor posuere ac. Vestibulum lectus mauris ultrices eros in cursus. Id nibh tortor id aliquet lectus proin nibh nisl. Fermentum et sollicitudin ac orci. Id faucibus nisl tincidunt eget nullam non nisi. Mi quis hendrerit dolor magna eget est lorem ipsum dolor. Hendrerit gravida rutrum quisque non tellus orci ac auctor augue. Ut enim blandit volutpat maecenas. Arcu dui vivamus arcu felis.
+
+Eget aliquet nibh praesent tristique magna sit amet. Mi bibendum neque egestas congue quisque egestas diam in. Massa eget egestas purus viverra accumsan in nisl nisi. Ultricies integer quis auctor elit sed vulputate. Sed odio morbi quis commodo odio aenean sed. Sed sed risus pretium quam vulputate. Feugiat in fermentum posuere urna. Tincidunt praesent semper feugiat nibh sed. Non sodales neque sodales ut etiam. Sapien eget mi proin sed libero enim. Vel facilisis volutpat est velit egestas. Purus viverra accumsan in nisl nisi scelerisque. Laoreet sit amet cursus sit amet dictum. Sollicitudin ac orci phasellus egestas tellus rutrum.
+
+=> mercury://example.com/once/twice/thrice/fource.txt Tortor aliquam nulla facilisi cras.
+```
+
 Some of the built-in handlers in this package will output **gemtext**.
 
 ## Mercury Protocol + TLS = Gemini Protocol
