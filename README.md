@@ -34,11 +34,11 @@ import (
 
 func main() {
 
-	const addr = ":1961"
+	const address = ":1961"
 
 	var handler hg.Handler = hg.HandlerFunc(serveMercury)
 
-	err := hg.ListenAndServe(addr, handler)
+	err := hg.ListenAndServe(address, handler)
 
 	if nil != err {
 		fmt.Fprintln(os.Stderr, "problem with ☿ Mercury Protocol server:", err)
@@ -53,6 +53,8 @@ func serveMercury(w hg.ResponseWriter, r hg.Request) {
 ```
 
 In this example, the ☿ **Mercury Protocol** just outputs a _Gemtext_ file with the contents “Hello world!”.
+
+If you wanted to write your own ☿ **Mercury Protocol** server based on this code, then you would change what is inside the `serveMercury()` function.
 
 ## Example Client
 
