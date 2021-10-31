@@ -36,7 +36,7 @@ func main() {
 
 	const addr = ":1961"
 
-	var handler hg.Handler = hg.HandlerFunc(helloworldHandler)
+	var handler hg.Handler = hg.HandlerFunc(serveMercury)
 
 	err := hg.ListenAndServe(addr, handler)
 
@@ -47,7 +47,7 @@ func main() {
 	}
 }
 
-func helloworldHandler(w hg.ResponseWriter, r hg.Request) {
+func serveMercury(w hg.ResponseWriter, r hg.Request) {
 	fmt.Fprintln(w, "Hello world!")
 }
 ```
