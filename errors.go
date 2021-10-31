@@ -9,7 +9,6 @@ var (
 	errExpectedLineFeed        = errors.New("hg: expected line-feed character")
 	errHeaderAlreadyRead       = errors.New("hg: header already read")
 	errHeaderAlreadyWritten    = errors.New("hg: header already written")
-	errNilCaller               = errors.New("hg: nil caller")
 	errNilNetworkConnection    = errors.New("hg: nil network connection")
 	errNilReader               = errors.New("hg: nil reader")
 	errNilReceiver             = errors.New("hg: nil receiver")
