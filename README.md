@@ -272,7 +272,14 @@ So ὑδράργυρος” (hydrargyros) is **water-silver**, although perhaps 
 “Hg” is the chemical-symbol for the chemical-element _mercury_ because “Hg” is short for “hydrargyrum”.
 
 And thus this, a package that implements the **Mercury Protocol**, is named  `hg`.
-
+```
+██╗░░██╗██╗░░░██╗██████╗░██████╗░░█████╗░██████╗░░██████╗░██╗░░░██╗██████╗░██╗░░░██╗███╗░░░███╗
+██║░░██║╚██╗░██╔╝██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝░╚██╗░██╔╝██╔══██╗██║░░░██║████╗░████║
+███████║░╚████╔╝░██║░░██║██████╔╝███████║██████╔╝██║░░██╗░░╚████╔╝░██████╔╝██║░░░██║██╔████╔██║
+██╔══██║░░╚██╔╝░░██║░░██║██╔══██╗██╔══██║██╔══██╗██║░░╚██╗░░╚██╔╝░░██╔══██╗██║░░░██║██║╚██╔╝██║
+██║░░██║░░░██║░░░██████╔╝██║░░██║██║░░██║██║░░██║╚██████╔╝░░░██║░░░██║░░██║╚██████╔╝██║░╚═╝░██║
+╚═╝░░╚═╝░░░╚═╝░░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░░░░╚═╝
+```
 ## See Also
 * [The Mercury protocol (gemini)](gemini://gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [The Mercury protocol (http proxy)](https://portal.mozz.us/gemini/gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
