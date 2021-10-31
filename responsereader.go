@@ -11,6 +11,7 @@ import (
 
 // ResponseReader is used by a Handler to read a Mercury Protocol response.
 type ResponseReader interface {
+	io.Closer
 	io.Reader
 	ReadHeader(statusCode *int, meta interface{}) (int, error)
 }
@@ -19,8 +20,23 @@ var _ ResponseReader = &internalResponseReader{}
 
 // internalResponseReader is used to create a ResponseReader around a io.Reader (such as a net.Conn).
 type internalResponseReader struct {
-	reader io.Reader
+	rc io.ReadCloser
 	headerread bool
+}
+
+func (receiver *internalResponseReader) Close() error {
+	if nil == receiver {
+		return errNilReceiver
+	}
+
+	var rc io.ReadCloser = receiver.rc
+	{
+		if nil == rc {
+			return nil
+		}
+	}
+
+	return rc.Close()
 }
 
 func (receiver *internalResponseReader) Read(data []byte) (n int, err error) {
@@ -28,7 +44,7 @@ func (receiver *internalResponseReader) Read(data []byte) (n int, err error) {
 		return 0, errNilReceiver
 	}
 
-	var reader io.Reader = receiver.reader
+	var reader io.Reader = receiver.rc
 	if nil == reader {
 		return 0, errNilReader
 	}
@@ -69,7 +85,7 @@ func (receiver *internalResponseReader) ReadHeader(statusCode *int, meta interfa
 		return 0, errNilReceiver
 	}
 
-	var reader io.Reader = receiver.reader
+	var reader io.Reader = receiver.rc
 	if nil == reader {
 		return 0, errNilReader
 	}

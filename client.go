@@ -5,45 +5,31 @@ import (
 	"net"
 )
 
-type Client struct {
-	Caller Caller
-}
+func DialAndCall(addr string, request Request) (ResponseReader, error) {
 
-func (client *Client) Call(conn net.Conn, request Request) error {
-	if nil == client {
-		return errNilReceiver
+	conn, err := net.Dial("tcp", addr)
+	if nil != err {
+		return nil, err
 	}
 
-	var caller Caller = client.Caller
-	if nil == caller {
-		return errNilCaller
+	return Call(conn, request)
+}
+
+func Call(conn net.Conn, request Request) (ResponseReader, error) {
+
+	if nil == conn {
+		return nil, errNilNetworkConnection
 	}
 
 	_, err := io.WriteString(conn, request.String())
 	if nil != err {
-		return err
+		return nil, err
 	}
 
 	var rr internalResponseReader
 	{
-		rr.reader = conn
+		rr.rc = conn
 	}
 
-	caller.CallMercury(&rr, request)
-
-	return nil
-}
-
-func (client *Client) DialAndCall(addr string, request Request) error {
-	if nil == client {
-		return errNilReceiver
-	}
-
-	conn, err := net.Dial("tcp", addr)
-	if nil != err {
-		return err
-	}
-	defer conn.Close()
-
-	return client.Call(conn, request)
+	return &rr, nil
 }
