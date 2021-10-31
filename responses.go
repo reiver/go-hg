@@ -4,24 +4,39 @@ import (
 	"fmt"
 )
 
+// ResponseInput represents a Mercury Protocol “10 INPUT” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseInput               struct {meta string} // 10
+// ResponseSensitiveInput represents a Mercury Protocol “11 SENSITIVE INPUT” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseSensitiveInput      struct {meta string} // 11
 
+// ResponseRedirectTemporary represents a Mercury Protocol “30 REDIRECT - TEMPORARY” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseRedirectTemporary   struct {meta string} // 30
+// ResponseRedirectPermanent represents a Mercury Protocol “31 REDIRECT - PERMANENT” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseRedirectPermanent   struct {meta string} // 31
 
+// ResponseTemporaryFailure represents a Mercury Protocol “40 TEMPORARY FAILURE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseTemporaryFailure    struct {meta string} // 40
+// ResponseServerUnavailable represents a Mercury Protocol “41 SERVER UNAVAILABLE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseServerUnavailable   struct {meta string} // 41
+// ResponseCGIError represents a Mercury Protocol “42 CGI ERROR” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseCGIError            struct {meta string} // 42
+// ResponseProxyError represents a Mercury Protocol “43 PROXY ERROR” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseProxyError          struct {meta string} // 43
+// ResponseSlowDown represents a Mercury Protocol “44 SLOW DOWN” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseSlowDown            struct {meta string} // 44
 
+// ResponsePermanentFailure represents a Mercury Protocol “50 PERMANENT FAILURE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponsePermanentFailure    struct {meta string} // 50
+// ResponseNotFound represents a Mercury Protocol “51 NOT FOUND” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseNotFound            struct {meta string} // 51
+// ResponseGone represents a Mercury Protocol “52 GONE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseGone                struct {meta string} // 52
+// ResponseProxyRequestRefused represents a Mercury Protocol “53 PROXY REQUEST REFUSED” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseProxyRequestRefused struct {meta string} // 53
+// ResponseBadRequest represents a Mercury Protocol “59 BAD REQUEST” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type ResponseBadRequest          struct {meta string} // 59
 
+// UnknownResponse represents a Mercury Protocol unknown response that this package doesn't have a type for. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
 type UnknownResponse             struct {meta string ; statusCode int}
 
 
