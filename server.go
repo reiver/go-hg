@@ -138,6 +138,35 @@ func (server *Server) ListenAndServe() error {
 }
 
 // Serve accepts an incoming Mercury Protocol client connection on the net.Listener ‘listener’.
+//
+// For a simple example:
+//
+//	package main
+//	
+//	import (
+//		"github.com/reiver/go-hg"
+//	)
+//	
+//	func main() {
+//	
+//		listener, err := net.Listen("tcp", ":1961")
+//		if nil != err {
+//			//@TODO: Handle this error better.
+//			panic(err)
+//		}
+//	
+//		var handler hg.Handler = hg.EchoHandler
+//	
+//		server := &telnet.Server{
+//			Handler:handler,
+//		}
+//	
+//		err := server.Serve(listener)
+//		if nil != err {
+//			//@TODO: Handle this error better.
+//			panic(err)
+//		}
+//	}
 func (server *Server) Serve(listener net.Listener) error {
 
 	defer listener.Close()
