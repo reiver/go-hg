@@ -4,8 +4,7 @@ import (
 	"net"
 )
 
-// ListenAndServe listens on the TCP network address `addr` and then spawns a call to the ServeMercuary
-// method on the `handler` to serve each incoming connection.
+// ListenAndServe listens on the TCP network address `addr` and then spawns a call to the ServeMercuary method on the `handler` to serve each incoming connection.
 //
 // For a very simple example:
 //
@@ -16,10 +15,10 @@ import (
 //	)
 //	
 //	func main() {
-//	
+//		
 //		//@TODO: In your code, you would probably want to use a different handler.
 //		var handler hg.Handler = hg.DebugHandler
-//	
+//		
 //		err := hg.ListenAndServe(":1961", handler)
 //		if nil != err {
 //			//@TODO: Handle this error better.
@@ -32,6 +31,34 @@ func ListenAndServe(addr string, handler Handler) error {
 }
 
 // Serve accepts an incoming Mercuary Protocol client connection on the net.Listener `listener`.
+//
+// For a very simple example:
+//
+//	package main
+//	
+//	import (
+//		"github.com/reiver/go-hg"
+//
+//		"net"
+//	)
+//	
+//	func main() {
+//		
+//		listener, err := net.Listen("tcp", ":1961")
+//		if nil != err {
+//			//@TODO: Handle this error better.
+//			panic(err)
+//		}
+//		
+//		//@TODO: In your code, you would probably want to use a different handler.
+//		var handler hg.Handler = hg.DebugHandler
+//		
+//		err := hg.Serve(listener, handler)
+//		if nil != err {
+//			//@TODO: Handle this error better.
+//			panic(err)
+//		}
+//	}
 func Serve(listener net.Listener, handler Handler) error {
 
 	server := &Server{Handler: handler}
