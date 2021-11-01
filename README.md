@@ -27,7 +27,7 @@ and then put a _TLS proxy_ server in front of it (listening at ":1965") that mod
 
 (Or modify your handlers to accept both "mercury://..." and "gemini://..." URIs.)
 
-## Example Server
+## Example ☿ Mercury Protocol Server
 
 A very simple ☿ **Mercury Protocol** server might look like this:
 ```go
@@ -64,7 +64,7 @@ In this example, the ☿ **Mercury Protocol** just outputs a _Gemtext_ file with
 
 If you wanted to write your own ☿ **Mercury Protocol** server based on this code, then you would change what is inside the `serveMercury()` function.
 
-## Example Client
+## Example ☿ *Mercury Protocol Client
 
 A very simple ☿ **Mercury Protocol** client might look like this:
 ```go
@@ -97,6 +97,88 @@ func main() {
 		fmt.Fprintln(os.Stderr, "problem with request:", err)
 		os.Exit(1)
 		return
+	}
+	defer responsereader.Close()
+
+	io.Copy(os.Stdout, responsereader)
+}
+```
+
+In this code, the download file is just outputted to STDOUT. You could modify this code to do whatever you want.
+
+Note that we can do more sophisticated things by inspecting the error that was returned.
+To deal with redirects, etc.
+
+So, we could do tha with code like the following:
+```go
+package main
+
+import (
+	"github.com/reiver/go-hg"
+
+	"fmt"
+	"io"
+	"os"
+)
+
+func main() {
+
+	const address =       "example.com:1961"
+	const uri = "mercury://example.com/apple/banana/cherry.txt"
+
+	var request hg.Request
+	err := request.Parse(uri)
+
+	if nil != err {
+		fmt.Fprintln(os.Stderr, "problem parsing URI:", err)
+		os.Exit(1)
+		return
+	}
+
+	responsereader, err := hg.DialAndCall(address, request)
+	if nil != err {
+
+		switch casted: err.(type) {
+		case hg.ResponseInput:
+			//@TODO
+		case hg.ResponseSensitiveInput:
+			//@TODO
+
+		case hg.ResponseRedirectTemporary:
+			//@TODO
+		case hg.ResponseRedirectPermanent:
+			//@TODO
+
+		case hg.ResponseTemporaryFailure:
+			//@TODO
+		case hg.ResponseServerUnavailable:
+			//@TODO
+		case hg.ResponseCGIError:
+			//@TODO
+		case hg.ResponseProxyError:
+			//@TODO
+		case hg.ResponseSlowDown:
+			//@TODO
+
+		case hg.ResponsePermanentFailure:
+			//@TODO
+		case hg.ResponseNotFound :
+			//@TODO
+		case hg.ResponseGone:
+			//@TODO
+		case hg.ResponseProxyRequestRefused:
+			//@TODO
+		case hg.ResponseBadRequest:
+			//@TODO
+
+		case hg.UnknownResponse:
+			//@TODO
+
+		default:
+			fmt.Fprintln(os.Stderr, "problem with request:", err)
+			os.Exit(1)
+			return
+		}
 	}
 	defer responsereader.Close()
 
