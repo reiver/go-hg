@@ -4,7 +4,6 @@ import (
 	"github.com/reiver/go-utf8s"
 
 	"bytes"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -85,7 +84,7 @@ func (receiver *Request) Parse(src interface{}) error {
 	case []rune:
 		reader = strings.NewReader(string(casted))
 	default:
-		return fmt.Errorf("hg: cannot parse from type %T", src)
+		return errorf("cannot parse from type %T", src)
 	}
 
 	return receiver.parse(reader)
@@ -131,7 +130,7 @@ func (receiver *Request) parse(reader io.Reader) error {
 					break
 				}
 
-				return fmt.Errorf("hg: expected a line-feed character but instead got %q", string(r))
+				return errorf("expected a line-feed character but instead got %q", string(r))
 			}
 
 			storage.WriteRune(r)
