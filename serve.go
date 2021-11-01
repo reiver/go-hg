@@ -124,7 +124,25 @@ func ServeRedirectPermanent(w ResponseWriter, meta string) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 40
+// 40 TEMPORARY FAILURE
+//
+// This function sends a “40 TEMPORARY FAILURE” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "try again later"
+//		
+//		hg.ServeTemporaryFailure(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusTemporaryFailure
 
@@ -137,7 +155,25 @@ func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 41
+// 41 SERVER UNAVAILABLE
+//
+// This function sends a “41 SERVER UNAVAILABLE” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "we are upgrading the server"
+//		
+//		hg.ServeServerUnavailable(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusServerUnavailable
 
@@ -150,7 +186,25 @@ func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 42
+// 42 CGI ERROR
+//
+// This function sends a “42 CGI ERROR” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "the program being run just had an unexpected fatal error"
+//		
+//		hg.ServeCGIError(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeCGIError(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusCGIError
 
@@ -163,7 +217,25 @@ func ServeCGIError(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 43
+// 43 PROXY ERROR
+//
+// This function sends a “43 PROXY ERROR” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "the proxy server providing TLS encryption errored out"
+//		
+//		hg.ServeProxyError(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeProxyError(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusProxyError
 
@@ -176,18 +248,56 @@ func ServeProxyError(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 44
-func ServeSlowDown(w ResponseWriter, meta string) {
+// 44 SLOW DOWN
+//
+// This function sends a “44 SLOW DOWN” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var numberOfSecondsToWait uint = 8
+//		
+//		hg.ServeSlowDown(w, numberOfSecondsToWait)
+//		
+//		// ...
+//		
+//	}
+func ServeSlowDown(w ResponseWriter, numberOfSecondsToWait uint) {
 	const statuscode = StatusSlowDown
 
 	if nil == w {
 		return
 	}
 
+	var meta string = fmt.Sprintf("%d", numberOfSecondsToWait)
+
 	w.WriteHeader(statuscode, meta)
 }
 
-// 50
+// 50 PERMANENT FAILURE
+//
+// This function sends a “50 PERMANENT FAILURE” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "someone deleted the database"
+//		
+//		hg.ServePermanentFailure(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusPermanentFailure
 
@@ -200,7 +310,25 @@ func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 51
+// 51 NOT FOUND
+//
+// This function sends a “51 NOT FOUND” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "this is not the gem-page you are looking for"
+//		
+//		hg.ServeNotFound(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeNotFound(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusNotFound
 
@@ -213,7 +341,25 @@ func ServeNotFound(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 52
+// 52 GONE
+//
+// This function sends a “52 GONE” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "he's dead jim"
+//		
+//		hg.ServeGone(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeGone(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusGone
 
@@ -226,7 +372,25 @@ func ServeGone(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 53
+// 53 PROXY REQUEST REFUSED
+//
+// This function sends a “53 PROXY REQUEST REFUSED” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "you did not enter a number"
+//		
+//		hg.ServeProxyRequestRefused(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusProxyRequestRefused
 
@@ -239,7 +403,25 @@ func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 	w.WriteHeader(statuscode, meta)
 }
 
-// 59
+// 59 BAD REQUEST
+//
+// This function sends a “59 BAD REQUEST” Mercury Protocol response.
+//
+// Example Usage
+//
+// This is how one might is this helper-function:
+//
+//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//		
+//		// ...
+//		
+//		var message string = "you did not enter a number"
+//		
+//		hg.ServeBadRequest(w, message)
+//		
+//		// ...
+//		
+//	}
 func ServeBadRequest(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusBadRequest
 
