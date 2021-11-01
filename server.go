@@ -126,7 +126,7 @@ func (server *Server) ListenAndServe() error {
 
 	addr := server.Addr
 	if "" == addr {
-		addr = ":1961"
+		addr = fmt.Sprintf(":%d", DefaultTCPPort)
 	}
 
 	listener, err := net.Listen("tcp", addr)
