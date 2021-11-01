@@ -4,14 +4,6 @@ Package **hg** provides ☿ **Mercury Protocol** client and server implementatio
 
 The **hg** package provides an API in a style similar to the `"net/http"` library that is part of the Go standard library, including support for "middleware".
 
-## Gemini Protocol Server from a ☿ Mercury Protocol Server
-
-► To turn a ☿ **Mercury Protocol** server into a **Gemini Protocol** server,
-launch the ☿ **Mercury Protocol** server on the address `"localhost:1961"` (rather than the usual `":1961"`),
-and then put a _TLS proxy_ server in front of it (listening at ":1965") that modifies any "gemini://..." URI in the **Gemini Protocol** request into a "mercury://..." URI before sending it to the ☿ **Mercury Protocol** server.
-
-(Or modify your handlers to accept both "mercury://..." and "gemini://..." URIs.)
-
 ## Documention
 
 Online documentation, which includes examples, can be found at: http://godoc.org/github.com/reiver/go-hg
@@ -26,6 +18,14 @@ The ☿ **Mercury Protocol** is derived from the _Gemini Protocol_ — basically
 In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Protocol_.
 
 The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inpired by the _Gopher Protocol_.
+
+## Gemini Protocol Server from a ☿ Mercury Protocol Server
+
+► To turn a ☿ **Mercury Protocol** server into a **Gemini Protocol** server,
+launch the ☿ **Mercury Protocol** server on the address `"localhost:1961"` (rather than the usual `":1961"`),
+and then put a _TLS proxy_ server in front of it (listening at ":1965") that modifies any "gemini://..." URI in the **Gemini Protocol** request into a "mercury://..." URI before sending it to the ☿ **Mercury Protocol** server.
+
+(Or modify your handlers to accept both "mercury://..." and "gemini://..." URIs.)
 
 ## Example Server
 
