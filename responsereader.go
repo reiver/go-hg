@@ -4,7 +4,6 @@ import (
 	"github.com/reiver/go-utf8s"
 
 	"encoding"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -207,7 +206,7 @@ func (receiver *internalResponseReader) ReadHeader(statusCode *int, meta interfa
 
 				*casted = p
 			default:
-				return n, fmt.Errorf("hg: cannot load value for meta into type %T", meta)
+				return n, errorf("cannot load value for meta into type %T", meta)
 			}
 		}
 	}
