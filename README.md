@@ -10,6 +10,8 @@ The **hg** package provides an API in a style similar to the `"net/http"` librar
 launch the ☿ **Mercury Protocol** server on the address `"localhost:1961"` (rather than the usual `":1961"`),
 and then put a _TLS proxy_ server in front of it (listening at ":1965") that modifies any "gemini://..." URI in the **Gemini Protocol** request into a "mercury://..." URI before sending it to the ☿ **Mercury Protocol** server.
 
+(Or modify your handlers to accept both "mercury://..." and "gemini://..." URIs.)
+
 ## Documention
 
 Online documentation, which includes examples, can be found at: http://godoc.org/github.com/reiver/go-hg
