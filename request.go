@@ -44,6 +44,15 @@ func something(value string) Request {
 	}
 }
 
+// RequestValue returns the of the request without the trailing "\r\n"
+//
+// For example, if the full value of the request was:
+//
+//	"mercury://example.com/path/to/file.txt\r\n"
+//
+// Then RequestValue would return:
+//
+//	"mercury://example.com/path/to/file.txt"
 func (receiver Request) RequestValue() string {
 	return receiver.value[:len(receiver.value)-2]
 }
@@ -81,7 +90,6 @@ func (receiver *Request) Parse(src interface{}) error {
 
 	return receiver.parse(reader)
 }
-
 
 func (receiver *Request) parse(reader io.Reader) error {
 	if nil == receiver {
