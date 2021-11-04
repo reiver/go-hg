@@ -155,7 +155,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 				return
 			}
 
-			targetpath = path.Join(targetpath, "default.gmni")
+			targetpath = path.Join(targetpath, defaultfilename)
 
 		case mode.IsRegular():
 			// Nothing here.
