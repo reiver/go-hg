@@ -7,37 +7,49 @@ import (
 // The handle() function handles an incoming Mercury request using the handler passed to it.
 func handle(logger Logger, conn net.Conn, handler Handler) {
 
-	defer func() {
+	logger.Trace("hg.handle: BEGIN")
+	defer logger.Trace("hg.handle: END")
+
+	defer func(logger Logger) {
+		logger.Tracef("hg.handle: will close conn %T %#v", conn, conn)
 		err := conn.Close()
 		if nil != err {
-			logger.Errorf("Problem with closing network connection: %s", err)
+			logger.Errorf("hg.handle: problem with closing network connection: %s", err)
 		}
-	}()
+		logger.Tracef("hg.handle: closed connection %T %#v", conn, conn)
+	}(logger)
 
-	defer func(){
+	var request Request // This is set later; but need it here for the panic()-recover().
+
+	defer func(logger Logger){
 		if r := recover(); nil != r {
 			if nil != logger {
-				logger.Errorf("Recovered from panic(): (%T) %v", r, r)
+				logger.Errorf("hg.handle: recovered from panic() from request %q: (%T) %v", request, r, r)
 			}
 		}
-	}()
+	}(logger)
 
-	var r Request
 	{
-		err := r.Parse(conn)
+		err := request.Parse(conn)
 		if nil != err {
-			logger.Errorf("problem parsing request: %s", err)
+			logger.Errorf("hg.handle: problem parsing request: %s", err)
 			return
 		}
 	}
-	logger.Logf("request = %q", r)
+	logger.Logf("hg.handle: request = %q", request)
 
 	var rw internalResponseWriter
 	{
-		rw.writer = conn
+		rw.Writer = conn
+		rw.Logger = logger
 	}
 
 	var w ResponseWriter = &rw
 
-	handler.ServeMercury(w, r)
+
+	if nil == handler {
+		ServeTemporaryFailure(w, request)
+		return
+	}
+	handler.ServeMercury(w, request)
 }
