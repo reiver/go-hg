@@ -6,6 +6,7 @@ import (
 
 var (
 	errBadResponse             = errors.New("hg: bad response")
+	errBadStatusCode           = errors.New("hg: bad status code")
 	errExpectedLineFeed        = errors.New("hg: expected line-feed character")
 	errHeaderAlreadyRead       = errors.New("hg: header already read")
 	errHeaderAlreadyWritten    = errors.New("hg: header already written")
