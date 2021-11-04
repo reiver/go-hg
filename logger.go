@@ -6,4 +6,7 @@ type Logger interface {
 
 	Log(...interface{})
 	Logf(string, ...interface{})
+
+	Trace(...interface{})
+	Tracef(string, ...interface{})
 }
