@@ -23,11 +23,21 @@ import (
 //		// ...
 //		
 //	}
-func ServeInput(w ResponseWriter, meta string) {
+func ServeInput(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusInput
 
 	if nil == w {
 		return
+	}
+
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaInput
+		}
 	}
 
 	w.WriteHeader(statuscode, meta)
@@ -52,11 +62,21 @@ func ServeInput(w ResponseWriter, meta string) {
 //		// ...
 //		
 //	}
-func ServeSensitiveInput(w ResponseWriter, meta string) {
+func ServeSensitiveInput(w ResponseWriter, a ...interface{}) {
 	const statuscode = StatusSensitiveInput
 
 	if nil == w {
 		return
+	}
+
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaSensitiveInput
+		}
 	}
 
 	w.WriteHeader(statuscode, meta)
@@ -83,14 +103,14 @@ func ServeSensitiveInput(w ResponseWriter, meta string) {
 //		// ...
 //		
 //	}
-func ServeRedirectTemporary(w ResponseWriter, meta string) {
+func ServeRedirectTemporary(w ResponseWriter, target string) {
 	const statuscode = StatusRedirectTemporary
 
 	if nil == w {
 		return
 	}
 
-	w.WriteHeader(statuscode, meta)
+	w.WriteHeader(statuscode, target)
 }
 
 // 31 REDIRECT - PERMANENT
@@ -114,14 +134,14 @@ func ServeRedirectTemporary(w ResponseWriter, meta string) {
 //		// ...
 //		
 //	}
-func ServeRedirectPermanent(w ResponseWriter, meta string) {
+func ServeRedirectPermanent(w ResponseWriter, target string) {
 	const statuscode = StatusRedirectPermanent
 
 	if nil == w {
 		return
 	}
 
-	w.WriteHeader(statuscode, meta)
+	w.WriteHeader(statuscode, target)
 }
 
 // 40 TEMPORARY FAILURE
@@ -150,7 +170,15 @@ func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaTemporaryFailure
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -181,7 +209,15 @@ func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaServerUnavailable
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -212,7 +248,15 @@ func ServeCGIError(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaCGIError
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -243,7 +287,15 @@ func ServeProxyError(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaProxyError
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -305,7 +357,15 @@ func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaPermanentFailure
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -336,7 +396,15 @@ func ServeNotFound(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaNotFound
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -367,7 +435,15 @@ func ServeGone(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaGone
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -398,7 +474,15 @@ func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaProxyRequestRefused
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
@@ -429,7 +513,15 @@ func ServeBadRequest(w ResponseWriter, a ...interface{}) {
 		return
 	}
 
-	var meta string = fmt.Sprint(a...)
+	var meta string
+	{
+		switch {
+		case 0 < len(a):
+			meta = fmt.Sprint(a...)
+		default:
+			meta = DefaultMetaBadRequest
+		}
+	}
 
 	w.WriteHeader(statuscode, meta)
 }
