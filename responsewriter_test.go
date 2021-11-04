@@ -278,3 +278,74 @@ func TestResponseWriter_WriteHeader_success(t *testing.T) {
 		}
 	}
 }
+
+func TestResponseWriter_WriteHeader_failure(t *testing.T) {
+
+	tests := []struct{
+		StatusCode int
+		Meta interface{}
+	}{
+		{
+			StatusCode: 100,
+			Meta:         "👾 💙",
+		},
+
+		{
+			StatusCode:  -1,
+			Meta:         "👾 💙",
+		},
+	}
+
+	for testNumber, test := range tests {
+
+		var storage strings.Builder
+
+		var rw internalResponseWriter
+		{
+			rw.Writer = &storage
+		}
+
+		var responsewriter ResponseWriter = &rw
+
+		{
+			var statusCode int = test.StatusCode
+			var meta string = fmt.Sprint(test.Meta)
+
+			var n int
+			var err error
+
+			n, err = responsewriter.WriteHeader(statusCode, meta)
+
+			if nil == err {
+				t.Errorf("For test #%d, expected an error but did not actually get one.", testNumber)
+				t.Logf("STATUS-CODE:       %d", test.StatusCode)
+				t.Logf("META:                %q", test.Meta)
+				t.Logf("ACTUAL   WRITTEN: %q", storage.String())
+				t.Logf("ACTUAL   N: %d", n)
+				t.Logf("ERROR: (%T) %s", err, err)
+				continue
+			}
+
+			if expected, actual := 0, n; expected != actual {
+				t.Errorf("For test #%d, the actual number of bytes written is not what was expected.", testNumber)
+				t.Logf("STATUS-CODE:       %d", test.StatusCode)
+				t.Logf("META:                %q", test.Meta)
+				t.Logf("ACTUAL   WRITTEN: %q", storage.String())
+				t.Logf("ACTUAL   N: %d", n)
+				t.Logf("ERROR: (%T) %s", err, err)
+				continue
+			}
+
+			if expected, actual := "", storage.String(); expected != actual {
+				t.Errorf("For test #%d, the value of what was actually written is not what was expected. (Nothing should have been written!)", testNumber)
+				t.Logf("STATUS-CODE:       %d", test.StatusCode)
+				t.Logf("META:                %q", test.Meta)
+				t.Logf("EXPECTED WRITTEN: %q", expected)
+				t.Logf("ACTUAL   WRITTEN: %q", storage.String())
+				t.Logf("EXPECTED N: %d", len(expected))
+				t.Logf("ACTUAL   N: %d", n)
+				continue
+			}
+		}
+	}
+}
