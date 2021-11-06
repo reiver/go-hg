@@ -19,7 +19,7 @@ import (
 //	var request hg.Request
 //	err := request.Parse(uri)
 //	if nil != err {
-		return err
+//		return err
 //	}
 //	
 //	var addr string = "example.com:1961"
