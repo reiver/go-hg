@@ -8,6 +8,16 @@ import (
 	"path/filepath"
 )
 
+// FileSystemHandler is used to create a Mercury Protocol server that serves files from a fs.FS file system.
+//
+// For example usage:
+//
+//	var fshandler hg.FileSystemHandler
+//	fshandler.Root = os.DirFS("/path/to/mercury/root")
+//	
+//	var handler hg.Handler = &fshandler
+//	
+//	err := hg.ListenAndServe(":1961", handler)
 type FileSystemHandler struct {
 	Root fs.FS
 	Logger Logger
