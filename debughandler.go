@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+// The DebugHandler can be used as:
+//
+// • a demo Mercury Protocol server,
+//
+// • a debugging tool to use with Mercury Protocol clients.
+//
+// You can use it with code similar to:
+//
+//	const address = ":1961"
+//	
+//	err := hg.ListenAndServe(address, hg.DebugHandler)
 const DebugHandler internalDebugHandler = internalDebugHandler(0)
 
 type internalDebugHandler int
