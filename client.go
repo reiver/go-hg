@@ -10,7 +10,21 @@ import (
 //
 // What is given by ‘addr’ might be something like: "11.22.33.44:1961", or "example.com:1961"
 //
-// What is given by ‘request’ might be a Request containing something like: "mercury://example.com/path/to/file.txt"
+// What is given by ‘request’ might be a Request containing something like: "mercury://example.com/path/to/file.txt\r\n"
+//
+// A example of using might be:
+//
+//	var uri string = "mercury://example.com/once/twice/thrice/fource.gmni"
+//	
+//	var request hg.Request
+//	err := request.Parse(uri)
+//	if nil != err {
+		return err
+//	}
+//	
+//	var addr string = "example.com:1961"
+//	
+//	rr, err := hg.DialAndCall(addr, request)
 func DialAndCall(addr string, request Request) (ResponseReader, error) {
 
 	conn, err := net.Dial("tcp", addr)
