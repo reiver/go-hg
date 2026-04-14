@@ -8,9 +8,8 @@ import (
 
 // The DebugHandler can be used as:
 //
-// • a demo Mercury Protocol server,
-//
-// • a debugging tool to use with Mercury Protocol clients.
+//	• a demo Mercury Protocol server,
+//	• a debugging tool to use with Mercury Protocol clients.
 //
 // You can use it with code similar to:
 //

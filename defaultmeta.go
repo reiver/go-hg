@@ -26,25 +26,16 @@ package hg
 // And possibly, no human will ever see them (depending on whether the client software presents them to the user or not).
 // The following constants provide useful default values for these cosmetic meta value's, that can make a programmer's life easier when developing a Mercury Protcol client or server:
 //
-// • DefaultMetaSuccess             = "success"               // 20
-//
-// • DefaultMetaTemporaryFailure    = "temporary‐failure"     // 40
-//
-// • DefaultMetaServerUnavailable   = "server‐unavailable"    // 41
-//
-// • DefaultMetaCGIError            = "cgi‐error"             // 42
-//
-// • DefaultMetaProxyError          = "proxy‐error"           // 43
-//
-// • DefaultMetaPermanentFailure    = "permanent‐failure"     // 50
-//
-// • DefaultMetaNotFound            = "not‐found"             // 51
-//
-// • DefaultMetaGone                = "gone"                  // 52
-//
-// • DefaultMetaProxyRequestRefused = "proxy‐request‐refused" // 53
-//
-// • DefaultMetaBadRequest          = "bad‐request"           // 59
+//	• DefaultMetaSuccess             = "success"               // 20
+//	• DefaultMetaTemporaryFailure    = "temporary‐failure"     // 40
+//	• DefaultMetaServerUnavailable   = "server‐unavailable"    // 41
+//	• DefaultMetaCGIError            = "cgi‐error"             // 42
+//	• DefaultMetaProxyError          = "proxy‐error"           // 43
+//	• DefaultMetaPermanentFailure    = "permanent‐failure"     // 50
+//	• DefaultMetaNotFound            = "not‐found"             // 51
+//	• DefaultMetaGone                = "gone"                  // 52
+// 	• DefaultMetaProxyRequestRefused = "proxy‐request‐refused" // 53
+//	• DefaultMetaBadRequest          = "bad‐request"           // 59
 //
 // Two of the of these default response‐header's ‘meta’ are (not cosmetic but are) shown to the user.
 // The programmer SHOULD create their own message; but just in case the don't, these default values exist:
