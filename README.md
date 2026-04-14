@@ -1,8 +1,8 @@
 # go-hg ☿
 
-Package **hg** provides ☿ **Mercury Protocol** client and server implementations, for the Go programming language.
+Package **hg** provides ☿ **Mercury Protocol** client and server implementations, for the Go programming-language (golang).
 
-The **hg** package provides an API in a style similar to the `"net/http"` library that is part of the Go standard library, including support for "middleware".
+The **hg** package provides an API in a style similar to the `"net/http"` package that is part of the Go standard library, including support for "middleware".
 
 ## Documention
 
@@ -30,6 +30,7 @@ and then put a _TLS proxy_ server in front of it (listening at ":1965") that mod
 ## Example ☿ Mercury Protocol Server
 
 A very simple ☿ **Mercury Protocol** server might look like this:
+
 ```go
 package main
 
@@ -67,6 +68,7 @@ If you wanted to write your own ☿ **Mercury Protocol** server based on this co
 ## Example ☿ *Mercury Protocol Client
 
 A very simple ☿ **Mercury Protocol** client might look like this:
+
 ```go
 package main
 
@@ -110,6 +112,7 @@ Note that we can do more sophisticated things by inspecting the error that was r
 To deal with redirects, etc.
 
 So, we could do tha with code like the following:
+
 ```go
 package main
 
@@ -195,6 +198,7 @@ The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used  with a (s
 **Gemtext** is a **formatted text** file data format similar to _markdown_, and inspired by the line typing convention in Gopher.
 
 Here is an example **gemtext** file:
+
 ```
 # Joe Blow's Capsule
 
@@ -266,6 +270,7 @@ Here the handler — `hg.UserDirHandler` — operates similar to Apache's HTTP S
 ## Example Mercury Protocol Servers With Custom Handler
 
 And finally, here is a custom handler being used in a  ☿ **Mercury Protocol** server:
+
 ```go
 package main
 
@@ -292,6 +297,7 @@ func (receiver myCustomHandler) ServeMercury(w hg.ResponseWriter, r hg.Request) 
 ```
 
 Alternatively, this could be made a bit simple it `hg.HandlerFunc()` is used:
+
 ```go
 package main
 
@@ -338,6 +344,24 @@ The helper functions are:
 | `53 PROXY REQUEST REFUSED` | `hg.ServeProxyRequestRefused(w)`    | `hg.ServeProxyRequestRefused(w, info)` |
 | `59 BAD REQUEST`           | `hg.ServeBadRequest(w)`             | `hg.ServeBadRequest(w, info)`          |
 
+## Import
+
+To import package **hg** use `import` code like the following:
+```
+import "github.com/reiver/go-hg"
+```
+
+## Installation
+
+To install package **hg** do the following:
+```
+GOPROXY=direct go get github.com/reiver/go-hg
+```
+
+## Author
+
+Package **hg** was written by [Charles Iliya Krempeaux](http://reiver.link)
+
 ## Package Name
 
 The package name of this Go package is **hg** rather than **mercury** because **Hg** is often used as a shorthard for **mercury**.
@@ -377,6 +401,7 @@ And thus this, a package that implements the **Mercury Protocol**, is named  `hg
 ██║░░██║░░░██║░░░██████╔╝██║░░██║██║░░██║██║░░██║╚██████╔╝░░░██║░░░██║░░██║╚██████╔╝██║░╚═╝░██║
 ╚═╝░░╚═╝░░░╚═╝░░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░░░░╚═╝
 ```
+
 ## See Also
 * [The Mercury protocol (gemini)](gemini://gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [The Mercury protocol (http proxy)](https://portal.mozz.us/gemini/gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
