@@ -3,7 +3,7 @@ module github.com/reiver/go-hg
 go 1.24.3
 
 require (
-	codeberg.org/reiver/go-erorr v0.0.0-20260414031000-22208f15edda
+	codeberg.org/reiver/go-erorr v0.0.0-20260414214747-7b76f85a93ac
 	codeberg.org/reiver/go-field v0.0.0-20260414030601-d901062f0b09
 	github.com/reiver/go-utf8s v1.0.1
 )

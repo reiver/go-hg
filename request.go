@@ -1,11 +1,13 @@
 package hg
 
 import (
-	"github.com/reiver/go-utf8s"
-
 	"bytes"
 	"io"
 	"strings"
+
+	"codeberg.org/reiver/go-erorr"
+	"codeberg.org/reiver/go-field"
+	"github.com/reiver/go-utf8s"
 )
 
 // Request represents a Mercury Protocol request — either received by a server, or being sent by a client.
@@ -84,7 +86,10 @@ func (receiver *Request) Parse(src any) error {
 	case []rune:
 		reader = strings.NewReader(string(casted))
 	default:
-		return errorf("cannot parse from type %T", src)
+		var err error = ErrCannotParse
+		return erorr.Wrap(err, "mercury request value cannot be parsed",
+			field.FormattedString("type", "%T", src),
+		)
 	}
 
 	return receiver.parse(reader)
@@ -130,7 +135,9 @@ func (receiver *Request) parse(reader io.Reader) error {
 					break
 				}
 
-				return errorf("expected a line-feed character but instead got %q", string(r))
+				return erorr.Stamp("expected a line-feed character but instead got something else",
+					field.String("character", string(r)),
+				)
 			}
 
 			storage.WriteRune(r)

@@ -1,11 +1,13 @@
 package hg
 
 import (
-	"github.com/reiver/go-utf8s"
-
 	"encoding"
 	"io"
 	"strings"
+
+	"codeberg.org/reiver/go-erorr"
+	"codeberg.org/reiver/go-field"
+	"github.com/reiver/go-utf8s"
 )
 
 // ResponseReader is used by a Handler to read a Mercury Protocol response.
@@ -177,7 +179,10 @@ func (receiver *internalResponseReader) ReadHeader(statusCode *int, meta any) (n
 				break
 			}
 			if maxmeta < storage.Len() {
-				return n, errorf("response header meta too big — max=%d", maxmeta)
+				var err error = ErrResponseHeaderMetaTooBig
+				return n, erorr.Wrap(err, "response header meta too big",
+					field.Uint64("max", maxmeta),
+				)
 			}
 
 			storage.WriteRune(r)
@@ -206,7 +211,11 @@ func (receiver *internalResponseReader) ReadHeader(statusCode *int, meta any) (n
 
 				*casted = p
 			default:
-				return n, errorf("cannot load value for meta into type %T", meta)
+				var err error = ErrTargetTypeUnsupported
+				return n, erorr.Wrap(err, "cannot load value for meta into variable of provided type",
+					field.FormattedString("meta-type", "%T", meta),
+					field.Any("meta", meta),
+				)
 			}
 		}
 	}

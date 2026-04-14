@@ -5,6 +5,12 @@ import (
 )
 
 const (
+	ErrCannotParse              = erorr.Error("cannot parse")
+	ErrResponseHeaderMetaTooBig = erorr.Error("response header meta too big")
+	ErrTargetTypeUnsupported    = erorr.Error("target type unsupported")
+)
+
+const (
 	errBadResponse             = erorr.Error("hg: bad response")
 	errBadStatusCode           = erorr.Error("hg: bad status code")
 	errExpectedLineFeed        = erorr.Error("hg: expected line-feed character")
