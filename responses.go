@@ -63,25 +63,25 @@ func (receiver UnknownResponse)             Error() string {return fmt.Sprintf("
 
 
 
-func (receiver ResponseInput)               StatusCode() int {return 10}
-func (receiver ResponseSensitiveInput)      StatusCode() int {return 11}
+func (receiver ResponseInput)               StatusCode() int {return StatusInput               } // 10
+func (receiver ResponseSensitiveInput)      StatusCode() int {return StatusSensitiveInput      } // 11
 
-func (receiver ResponseRedirectTemporary)   StatusCode() int {return 30}
-func (receiver ResponseRedirectPermanent)   StatusCode() int {return 31}
+func (receiver ResponseRedirectTemporary)   StatusCode() int {return StatusRedirectTemporary   } // 30
+func (receiver ResponseRedirectPermanent)   StatusCode() int {return StatusRedirectPermanent   } // 31
 
-func (receiver ResponseTemporaryFailure)    StatusCode() int {return 40}
-func (receiver ResponseServerUnavailable)   StatusCode() int {return 41}
-func (receiver ResponseCGIError)            StatusCode() int {return 42}
-func (receiver ResponseProxyError)          StatusCode() int {return 43}
-func (receiver ResponseSlowDown)            StatusCode() int {return 44}
+func (receiver ResponseTemporaryFailure)    StatusCode() int {return StatusTemporaryFailure    } // 40
+func (receiver ResponseServerUnavailable)   StatusCode() int {return StatusServerUnavailable   } // 41
+func (receiver ResponseCGIError)            StatusCode() int {return StatusCGIError            } // 42
+func (receiver ResponseProxyError)          StatusCode() int {return StatusProxyError          } // 43
+func (receiver ResponseSlowDown)            StatusCode() int {return StatusSlowDown            } // 44
 
-func (receiver ResponsePermanentFailure)    StatusCode() int {return 50}
-func (receiver ResponseNotFound)            StatusCode() int {return 51}
-func (receiver ResponseGone)                StatusCode() int {return 52}
-func (receiver ResponseProxyRequestRefused) StatusCode() int {return 53}
-func (receiver ResponseBadRequest)          StatusCode() int {return 59}
+func (receiver ResponsePermanentFailure)    StatusCode() int {return StatusPermanentFailure    } // 50
+func (receiver ResponseNotFound)            StatusCode() int {return StatusNotFound            } // 51
+func (receiver ResponseGone)                StatusCode() int {return StatusGone                } // 52
+func (receiver ResponseProxyRequestRefused) StatusCode() int {return StatusProxyRequestRefused } // 53
+func (receiver ResponseBadRequest)          StatusCode() int {return StatusBadRequest          } // 59
 
-func (receiver UnknownResponse)             StatusCode() int {return receiver.statusCode}
+func (receiver UnknownResponse)             StatusCode() int {return receiver.statusCode       }
 
 
 
