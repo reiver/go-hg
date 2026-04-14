@@ -1,20 +1,20 @@
 package hg
 
 import (
-	"errors"
+	"codeberg.org/reiver/go-erorr"
 )
 
-var (
-	errBadResponse             = errors.New("hg: bad response")
-	errBadStatusCode           = errors.New("hg: bad status code")
-	errExpectedLineFeed        = errors.New("hg: expected line-feed character")
-	errHeaderAlreadyRead       = errors.New("hg: header already read")
-	errHeaderAlreadyWritten    = errors.New("hg: header already written")
-	errNilNetworkConnection    = errors.New("hg: nil network connection")
-	errNilReader               = errors.New("hg: nil reader")
-	errNilReceiver             = errors.New("hg: nil receiver")
-	errNilWriter               = errors.New("hg: nil io.Writer")
-	errNilSource               = errors.New("hg: nil source")
-	errNothing                 = errors.New("hg: nothing")
-	errRuneError               = errors.New("hg: rune error")
+const (
+	errBadResponse             = erorr.Error("hg: bad response")
+	errBadStatusCode           = erorr.Error("hg: bad status code")
+	errExpectedLineFeed        = erorr.Error("hg: expected line-feed character")
+	errHeaderAlreadyRead       = erorr.Error("hg: header already read")
+	errHeaderAlreadyWritten    = erorr.Error("hg: header already written")
+	errNilNetworkConnection    = erorr.Error("hg: nil network connection")
+	errNilReader               = erorr.Error("hg: nil reader")
+	errNilReceiver             = erorr.Error("hg: nil receiver")
+	errNilWriter               = erorr.Error("hg: nil io.Writer")
+	errNilSource               = erorr.Error("hg: nil source")
+	errNothing                 = erorr.Error("hg: nothing")
+	errRuneError               = erorr.Error("hg: rune error")
 )
