@@ -59,20 +59,20 @@ package hg
 //
 // This also SHOULD be chosen by the programmer; but again just in case the don't, a default values exists.
 const (
-	DefaultMetaInput               = "input"                 // 10
-	DefaultMetaSensitiveInput      = "sensitive‐input"       // 11
+	DefaultMetaInput               = StatusTextInput               // 10
+	DefaultMetaSensitiveInput      = StatusTextSensitiveInput      // 11
 
-	DefaultMetaSuccess             = "success"               // 20
+	DefaultMetaSuccess             = StatusTextSuccess             // 20
 
-	DefaultMetaTemporaryFailure    = "temporary‐failure"     // 40
-	DefaultMetaServerUnavailable   = "server‐unavailable"    // 41
-	DefaultMetaCGIError            = "cgi‐error"             // 42
-	DefaultMetaProxyError          = "proxy‐error"           // 43
-	DefaultMetaSlowDown            = "3"                     // 44
+	DefaultMetaTemporaryFailure    = StatusTextTemporaryFailure    // 40
+	DefaultMetaServerUnavailable   = StatusTextServerUnavailable   // 41
+	DefaultMetaCGIError            = StatusTextCGIError            // 42
+	DefaultMetaProxyError          = StatusTextProxyError          // 43
+	DefaultMetaSlowDown            = "3"                           // 44
 
-	DefaultMetaPermanentFailure    = "permanent‐failure"     // 50
-	DefaultMetaNotFound            = "not‐found"             // 51
-	DefaultMetaGone                = "gone"                  // 52
-	DefaultMetaProxyRequestRefused = "proxy‐request‐refused" // 53
-	DefaultMetaBadRequest          = "bad‐request"           // 59
+	DefaultMetaPermanentFailure    = StatusTextPermanentFailure    // 50
+	DefaultMetaNotFound            = StatusTextNotFound            // 51
+	DefaultMetaGone                = StatusTextGone                // 52
+	DefaultMetaProxyRequestRefused = StatusTextProxyRequestRefused // 53
+	DefaultMetaBadRequest          = StatusTextBadRequest          // 59
 )
