@@ -5,7 +5,7 @@ import (
 )
 
 // errorf is similar to fmt.Errorf(), except it prefixes the error with the name of this package.
-func errorf(format string, a ...interface{}) error {
+func errorf(format string, a ...any) error {
 	const prefix = "hg: "
 
 	format = prefix + format

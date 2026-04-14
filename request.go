@@ -65,7 +65,7 @@ func (receiver Request) RequestValue() string {
 //	var request hg.Request
 //	
 //	err := request.Parse("mercury://example.com/apple/banana/cherry.txt")
-func (receiver *Request) Parse(src interface{}) error {
+func (receiver *Request) Parse(src any) error {
 	if nil == receiver {
 		return errNilReceiver
 	}

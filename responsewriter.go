@@ -21,7 +21,7 @@ import (
 // Notice that the first parameter is a ResponseWriter.
 type ResponseWriter interface {
 	io.Writer
-	WriteHeader(statusCode int, meta interface{}) (int, error)
+	WriteHeader(statusCode int, meta any) (int, error)
 }
 
 var _ ResponseWriter = &internalResponseWriter{}
@@ -71,7 +71,7 @@ func (receiver *internalResponseWriter) Write(data []byte) (n int, err error) {
 	return n, nil
 }
 
-func (receiver *internalResponseWriter) WriteHeader(statusCode int, meta interface{}) (int, error) {
+func (receiver *internalResponseWriter) WriteHeader(statusCode int, meta any) (int, error) {
 
 	if nil == receiver {
 		return 0, errNilReceiver

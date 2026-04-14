@@ -12,7 +12,7 @@ import (
 type ResponseReader interface {
 	io.Closer
 	io.Reader
-	ReadHeader(statusCode *int, meta interface{}) (int, error)
+	ReadHeader(statusCode *int, meta any) (int, error)
 }
 
 var _ ResponseReader = &internalResponseReader{}
@@ -74,7 +74,7 @@ func (receiver *internalResponseReader) Read(data []byte) (n int, err error) {
 	return n, nil
 }
 
-func (receiver *internalResponseReader) ReadHeader(statusCode *int, meta interface{}) (n int, err error) {
+func (receiver *internalResponseReader) ReadHeader(statusCode *int, meta any) (n int, err error) {
 
 	// The Gemini Protocol spec (which the Mercury Protocol is based on) says the meta SHOULD be a maximum of 1024 bytes.
 	// We are allowing more than that.

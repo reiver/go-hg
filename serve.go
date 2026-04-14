@@ -23,7 +23,7 @@ import (
 //		// ...
 //		
 //	}
-func ServeInput(w ResponseWriter, a ...interface{}) {
+func ServeInput(w ResponseWriter, a ...any) {
 	const statuscode = StatusInput
 
 	if nil == w {
@@ -62,7 +62,7 @@ func ServeInput(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeSensitiveInput(w ResponseWriter, a ...interface{}) {
+func ServeSensitiveInput(w ResponseWriter, a ...any) {
 	const statuscode = StatusSensitiveInput
 
 	if nil == w {
@@ -163,7 +163,7 @@ func ServeRedirectPermanent(w ResponseWriter, target string) {
 //		// ...
 //		
 //	}
-func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
+func ServeTemporaryFailure(w ResponseWriter, a ...any) {
 	const statuscode = StatusTemporaryFailure
 
 	if nil == w {
@@ -202,7 +202,7 @@ func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
+func ServeServerUnavailable(w ResponseWriter, a ...any) {
 	const statuscode = StatusServerUnavailable
 
 	if nil == w {
@@ -241,7 +241,7 @@ func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeCGIError(w ResponseWriter, a ...interface{}) {
+func ServeCGIError(w ResponseWriter, a ...any) {
 	const statuscode = StatusCGIError
 
 	if nil == w {
@@ -280,7 +280,7 @@ func ServeCGIError(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeProxyError(w ResponseWriter, a ...interface{}) {
+func ServeProxyError(w ResponseWriter, a ...any) {
 	const statuscode = StatusProxyError
 
 	if nil == w {
@@ -350,7 +350,7 @@ func ServeSlowDown(w ResponseWriter, numberOfSecondsToWait uint) {
 //		// ...
 //		
 //	}
-func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
+func ServePermanentFailure(w ResponseWriter, a ...any) {
 	const statuscode = StatusPermanentFailure
 
 	if nil == w {
@@ -389,7 +389,7 @@ func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeNotFound(w ResponseWriter, a ...interface{}) {
+func ServeNotFound(w ResponseWriter, a ...any) {
 	const statuscode = StatusNotFound
 
 	if nil == w {
@@ -428,7 +428,7 @@ func ServeNotFound(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeGone(w ResponseWriter, a ...interface{}) {
+func ServeGone(w ResponseWriter, a ...any) {
 	const statuscode = StatusGone
 
 	if nil == w {
@@ -467,7 +467,7 @@ func ServeGone(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
+func ServeProxyRequestRefused(w ResponseWriter, a ...any) {
 	const statuscode = StatusProxyRequestRefused
 
 	if nil == w {
@@ -506,7 +506,7 @@ func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 //		// ...
 //		
 //	}
-func ServeBadRequest(w ResponseWriter, a ...interface{}) {
+func ServeBadRequest(w ResponseWriter, a ...any) {
 	const statuscode = StatusBadRequest
 
 	if nil == w {
