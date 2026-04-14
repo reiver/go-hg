@@ -2,41 +2,62 @@ package hg
 
 import (
 	"net"
+
+	"codeberg.org/reiver/go-field"
 )
 
 // The handle() function handles an incoming Mercury request using the handler passed to it.
 func handle(logger Logger, conn net.Conn, handler Handler) {
 
-	logger.Trace("hg.handle: BEGIN")
-	defer logger.Trace("hg.handle: END")
+	log := logger.Begin()
+	defer log.End()
 
-	defer func(logger Logger) {
-		logger.Tracef("hg.handle: will close conn %T %#v", conn, conn)
+	defer func(log Logger) {
+		log.Trace(
+			field.S("will close conn"),
+			field.FormattedString("connection-type", "%T", conn),
+			field.FormattedString("connection", "%#v", conn),
+		)
 		err := conn.Close()
 		if nil != err {
-			logger.Errorf("hg.handle: problem with closing network connection: %s", err)
+			log.Error(
+				field.S("problem with closing network connection"),
+				field.E(err),
+			)
 		}
-		logger.Tracef("hg.handle: closed connection %T %#v", conn, conn)
-	}(logger)
+		log.Trace(
+			field.S("closed connection"),
+			field.FormattedString("connection-type", "%T", conn),
+			field.FormattedString("connection", "%#v", conn),
+		)
+	}(log)
 
 	var request Request // This is set later; but need it here for the panic()-recover().
 
-	defer func(logger Logger){
+	defer func(log Logger){
 		if r := recover(); nil != r {
-			if nil != logger {
-				logger.Errorf("hg.handle: recovered from panic() from request %q: (%T) %v", request, r, r)
+			if nil != log {
+				log.Error(
+					field.S("recovered from panic() from request"),
+					field.Stringer("request", request),
+					field.FormattedString("recovered-type", "%T", r),
+					field.FormattedString("recovered", "%v", r),
+				)
 			}
 		}
-	}(logger)
+	}(log)
 
 	{
 		err := request.Parse(conn)
 		if nil != err {
-			logger.Errorf("hg.handle: problem parsing request: %s", err)
+			log.Error(
+				field.S("problem parsing request"),
+				field.E(err),
+			)
 			return
 		}
 	}
-	logger.Logf("hg.handle: request = %q", request)
+	log.Debug(field.Stringer("request", request))
 
 	var rw internalResponseWriter
 	{

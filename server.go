@@ -3,6 +3,8 @@ package hg
 import (
 	"fmt"
 	"net"
+
+	"codeberg.org/reiver/go-field"
 )
 
 // ListenAndServe listens on the TCP network address `addr` and then spawns a call to the ServeMercuary method on the `handler` to serve each incoming connection.
@@ -172,29 +174,43 @@ func (server *Server) Serve(listener net.Listener) error {
 
 	defer listener.Close()
 
-	logger := server.logger()
+	log := server.logger().Begin()
+	defer log.End()
 
 	handler := server.Handler
 	if nil == handler {
 		handler = DebugHandler
-		logger.Log("defaulted handler to DebugHandler.")
+		log.Debug(field.S("defaulted handler to DebugHandler."))
 	}
 
 	for {
 		// Wait for a new client connection.
-		logger.Logf("listening at %q.", listener.Addr())
+		log.Debug(
+			field.S("listening"),
+			field.Stringer("addr", listener.Addr()),
+		)
 		conn, err := listener.Accept()
 		if err != nil {
 //@TODO: Could try to recover from certain kinds of errors. Maybe waiting a while before trying again.
-			logger.Errorf("error while listing at %q: %s", listener.Addr(), err)
+			log.Error(
+				field.S("error while listing"),
+				field.Stringer("addr", listener.Addr()),
+				field.E(err),
+			)
 			return err
 		}
-		logger.Logf("received new connection from %q.", conn.RemoteAddr())
+		log.Debug(
+			field.S("received new connection"),
+			field.Stringer("remote-addr", conn.RemoteAddr()),
+		)
 
 		// Handle the new client connection by spawning
 		// a new goroutine.
-		go handle(logger, conn, handler)
-		logger.Logf("spawned handler to handle connection from %q.", conn.RemoteAddr())
+		go handle(log, conn, handler)
+		log.Debug(
+			field.S("spawned handler to handle connection"),
+			field.Stringer("remote-addr", conn.RemoteAddr()),
+		)
 	}
 }
 

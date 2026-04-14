@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+
+	"codeberg.org/reiver/go-field"
 )
 
 // FileSystemHandler is used to create a Mercury Protocol server that serves files from a fs.FS file system.
@@ -25,29 +27,32 @@ type FileSystemHandler struct {
 
 func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 
-	var logger Logger = mustlogger(receiver.Logger)
-
-	logger.Trace("hg.FileSystemHandler.ServeMercury: BEGIN")
-	defer logger.Trace("hg.FileSystemHandler.ServeMercury: END")
+	log := mustlogger(receiver.Logger).Begin()
+	defer log.End()
 
 	var root fs.FS
 	{
 		root = receiver.Root
 
 		if nil == root {
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: nil root fs.FS (file system)")
+			log.Error(field.S("nil root fs.FS (file system)"))
 			ServeTemporaryFailure(w)
 			return
 		}
 
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: have root fs.FS (file system) of type %T", root)
+		log.Trace(
+			field.S("have root fs.FS (file system)"),
+			field.FormattedString("file-system-type", "%T", root),
+		)
 	}
 
 	var requestValue string
 	{
 		requestValue = r.RequestValue()
 
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: request-value=%q", requestValue)
+		log.Trace(
+			field.String("request-value", requestValue),
+		)
 	}
 
 	var uri *url.URL
@@ -56,27 +61,47 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 
 		uri, err = url.Parse(requestValue)
 		if nil != err {
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: could not parse request-value %q as URL: %s", requestValue, err)
+			log.Error(
+				field.S("could not parse request-value as URL"),
+				field.String("request-value", requestValue),
+				field.E(err),
+			)
 			ServeBadRequest(w, "could not parse URL")
 			return
 		}
 
-		logger.Trace("hg.FileSystemHandler.ServeMercury: URL parsed")
+		log.Trace(
+			field.S("URL parsed"),
+			field.String("request-value", requestValue),
+		)
 	}
 
 	{
 		const expectedScheme = "mercury"
 		actualScheme := uri.Scheme
 
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: expected-URL-scheme=%q actual-URL-scheme=%q", expectedScheme, actualScheme)
+		log.Trace(
+			field.String("expected-URL-scheme", expectedScheme),
+			field.String("actual-URL-scheme", actualScheme),
+			field.Stringer("uri", uri),
+		)
 
 		if expectedScheme != actualScheme  {
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: the actual scheme in the URL from the request (%q) is not what was expected — expected=%q actual=%q", r, expectedScheme, actualScheme)
+			log.Error(
+				field.S("the actual scheme in the URL from the request (%q) is not what was expected"),
+				field.String("expected-scheme", expectedScheme),
+				field.String("actual-scheme", actualScheme),
+				field.Stringer("uri", uri),
+			)
 			ServeBadRequest(w, "unsupported URL scheme")
 			return
 		}
 
-		logger.Trace("hg.FileSystemHandler.ServeMercury: URL scheme accepted")
+		log.Trace(
+			field.S("URL scheme accepted"),
+			field.String("scheme", actualScheme),
+			field.Stringer("uri", uri),
+		)
 	}
 
 	var reqpath string
@@ -84,12 +109,18 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 		reqpath = uri.Path
 
 		if "" == reqpath {
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: the path (%q) from the request (%q) is empty", reqpath, r)
+			log.Error(
+				field.S("the path from the request is empty"),
+				field.String("path", reqpath),
+				field.Stringer("request", r),
+			)
 			ServeBadRequest(w, "empty request path")
 			return
 		}
 
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: request-path=%q", reqpath)
+		log.Trace(
+			field.String("request-path", reqpath),
+		)
 	}
 
 	var fspath string
@@ -99,19 +130,30 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 
 		fspath, valid = reqpath2fspath(reqpath)
 		if !valid {
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: request-path (%q) is invalid.", reqpath)
+			log.Error(
+				field.S("request-path is invalid."),
+				field.String("request-path", reqpath),
+			)
 			ServeBadRequest(w, "invalid URL path")
 			return
 		}
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: filesystem-path=%q", fspath)
+		log.Trace(
+			field.String("filesystem-path", fspath),
+		)
 
 		{
 			var err error
 			file, err = root.Open(fspath)
 			if nil != err {
 				var notfound bool = os.IsNotExist(err)
-				logger.Errorf("hg.FileSystemHandler.ServeMercury: could not open file: (%T) %s", err, err)
-				logger.Errorf("hg.FileSystemHandler.ServeMercury: does-not-exists=%t: ", notfound)
+				log.Error(
+					field.S("could not open file"),
+					field.FormattedString("error-type", "%T", err),
+					field.E(err),
+				)
+				log.Error(
+					field.Bool("does-not-exists", notfound),
+				)
 
 				switch {
 				case notfound:
@@ -124,37 +166,63 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 				return
 			}
 			if nil == file || fs.File(nil) == file {
-				logger.Errorf("hg.FileSystemHandler.ServeMercury: file is nil: %#v", file)
+				log.Error(
+					field.S("file is nil"),
+					field.FormattedString("file", "%#v", file),
+				)
 				ServeTemporaryFailure(w)
 				return
 			}
 		}
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: file %q opened", fspath)
+		log.Trace(
+			field.S("file opened"),
+			field.String("path", fspath),
+		)
 		defer func(f fs.File, path string) {
 			err := f.Close()
 			if nil != err {
-				logger.Errorf("hg.FileSystemHandler.ServeMercury: could not close path (%q) from request (%q): %s", path, r, err)
+				log.Error(
+					field.S("could not close path from request"),
+					field.String("path", path),
+					field.Stringer("request", r),
+					field.E(err),
+				)
 			}
 		}(file, fspath)
 
 		fileinfo, err := file.Stat()
 		if nil != err {
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: could not get the file-status of the filesystem-path (%q) from the request (%q): %s", fspath, r, err)
+			log.Error(
+				field.S("could not get the file-status of the filesystem-path from the request:"),
+				field.String("filesystem-path", fspath),
+				field.Stringer("request", r),
+				field.E(err),
+			)
 			ServeTemporaryFailure(w)
 			return
 		}
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: fileinfo=%v", fileinfo)
+		log.Trace(field.FormattedString("fileinfo", "%#v", fileinfo))
 
 		if fileinfo.IsDir() {
-			logger.Tracef("hg.FileSystemHandler.ServeMercury: filesystem-path %q is a directory", fspath)
+			log.Trace(
+				field.S("filesystem-path is a directory"),
+				field.String("filesystem-path", fspath),
+			)
 
 			defaultpath := filepath.Join(fspath, defaultfilename)
 
 			defaultfile, err := root.Open(defaultpath)
 			if nil != err {
 				var notfound bool = os.IsNotExist(err)
-				logger.Errorf("hg.FileSystemHandler.ServeMercury: could not open defaulted file: (%T) %s", err, err)
-				logger.Errorf("hg.FileSystemHandler.ServeMercury: does-not-exists=%t: ", notfound)
+				log.Error(
+					field.S("could not open defaulted file"),
+					field.String("default-path", defaultpath),
+					field.FormattedString("error-type", "%T", err),
+					field.E(err),
+				)
+				log.Error(
+					field.Bool("does-not-exists", notfound),
+				)
 
 				switch {
 				case notfound:
@@ -169,14 +237,22 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 			defer func() {
 				err := file.Close()
 				if nil != err {
-					logger.Errorf("hg.FileSystemHandler.ServeMercury: could not close default file (%q) from request (%q): %s", defaultpath, r, err)
+					log.Error(
+						field.S("could not close default file from request"),
+						field.String("default-path", defaultpath),
+						field.Stringer("request", r),
+						field.E(err),
+					)
 				}
 			}()
 
 			file = defaultfile
 			fspath = defaultpath
 		} else {
-			logger.Tracef("hg.FileSystemHandler.ServeMercury: filesystem-path %q is NOT a directory", fspath)
+			log.Trace(
+				field.S("filesystem-path s NOT a directory"),
+				field.String("filesystem-path", fspath),
+			)
 		}
 	}
 
@@ -184,29 +260,46 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 	{
 		mediatype = infermediatype(fspath)
 
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: media-type = %q", mediatype)
+		log.Trace(field.String("media-type", mediatype))
 	}
 
 	{
 		_, err := w.WriteHeader(StatusSuccess, mediatype)
 		if nil != err {
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: problem writing Mercury Protocol header: %s", err)
+			log.Error(
+				field.S("problem writing Mercury Protocol header"),
+				field.E(err),
+			)
 			// intentially not returning here.
 		}
-		logger.Trace("hg.FileSystemHandler.ServeMercury: Mercury Protocol header written")
+		log.Trace(field.S("Mercury Protocol header written"))
 	}
 
 	{
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: filesystem-path %q BEGIN copying", fspath)
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: w = (%T) %#v", w, w)
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: file = (%T) %#v", file, file)
+		log.Trace(
+			field.S("BEGIN copying"),
+			field.String("filesystem-path", fspath),
+		)
+		log.Trace(
+			field.FormattedString("response-writer-type", "%T", w),
+			field.FormattedString("response-writer", "%#v", w),
+			field.FormattedString("file-type", "%T", file),
+			field.FormattedString("file", "%#v", file),
+		)
 		_, err := io.Copy(w, file)
 		if nil != err{
-			logger.Errorf("hg.FileSystemHandler.ServeMercury: could not copy file inferred from request (%q): %s", r,  err)
+			log.Error(
+				field.S("could not copy file inferred from request"),
+				field.Stringer("request", r),
+				field.E(err),
+			)
 			return
 		}
-		logger.Tracef("hg.FileSystemHandler.ServeMercury: filesystem-path %q END copying", fspath)
+		log.Trace(
+			field.S("END copying"),
+			field.String("filesystem-path", fspath),
+		)
 
-		logger.Log("%q %q",r, fspath)
+		log.Debug(field.F("%q %q", r, fspath))
 	}
 }

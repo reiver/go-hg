@@ -1,12 +1,15 @@
 package hg
 
+import (
+	"codeberg.org/reiver/go-field"
+)
+
+type Field = field.StringlyField
+
 type Logger interface {
-	Error(...interface{})
-	Errorf(string, ...interface{})
-
-	Log(...interface{})
-	Logf(string, ...interface{})
-
-	Trace(...interface{})
-	Tracef(string, ...interface{})
+	Begin(fields ...Field) Logger
+	End(fields ...Field)
+	Error(fields ...Field)
+	Debug(fields ...Field)
+	Trace(fields ...Field)
 }

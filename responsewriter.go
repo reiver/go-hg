@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	"codeberg.org/reiver/go-field"
 )
 
 // ResponseWriter is used by a Handler to construct a Mercury Protocol response.
@@ -37,10 +39,8 @@ func (receiver *internalResponseWriter) Write(data []byte) (n int, err error) {
 		return 0, errNilReceiver
 	}
 
-	logger := mustlogger(receiver.Logger)
-
-	logger.Trace("hg.internalResponseWriter.Write: BEGIN")
-	defer logger.Trace("hg.internalResponseWriter.Write: END")
+	log := mustlogger(receiver.Logger).Begin()
+	defer log.End()
 
 	if !receiver.headerwritten {
 		var m int
@@ -77,30 +77,28 @@ func (receiver *internalResponseWriter) WriteHeader(statusCode int, meta interfa
 		return 0, errNilReceiver
 	}
 
-	logger := mustlogger(receiver.Logger)
-
-	logger.Trace("hg.internalResponseWriter.WriteHeader: BEGIN")
-	defer logger.Trace("hg.internalResponseWriter.WriteHeader: END")
+	log := mustlogger(receiver.Logger).Begin()
+	defer log.End()
 
 	if statusCode < 0 || 100 <= statusCode {
 		return 0, errBadStatusCode
 	}
 
 	if receiver.headerwritten {
-		logger.Error("hg.internalResponseWriter.WriteHeader: header already written")
+		log.Error(field.S("header already written"))
 		return 0, errHeaderAlreadyWritten
 	}
 
 	var writer io.Writer = receiver.Writer
 	if nil == writer {
-		logger.Error("hg.internalResponseWriter.WriteHeader: nil writer")
+		log.Error(field.S("nil writer"))
 		return 0, errNilWriter
 	}
 
 	var header strings.Builder
 	{
 		fmt.Fprintf(&header, "%02d %s\r\n", statusCode, meta)
-		logger.Trace("hg.internalResponseWriter.WriteHeader: wrote header")
+		log.Trace(field.S("wrote header"))
 	}
 
 	var n int
@@ -109,7 +107,10 @@ func (receiver *internalResponseWriter) WriteHeader(statusCode int, meta interfa
 
 		n, err = io.WriteString(writer, header.String())
 		if nil != err {
-			logger.Error("hg.internalResponseWriter.WriteHeader: error writing string:", err)
+			log.Error(
+				field.S("error writing string"),
+				field.E(err),
+			)
 			return n, err
 		}
 		receiver.headerwritten = true

@@ -2,11 +2,14 @@ package hg
 
 type internalDiscardLogger struct{}
 
-func (internalDiscardLogger) Log(...interface{}) {}
-func (internalDiscardLogger) Logf(string, ...interface{}) {}
+var _ Logger = internalDiscardLogger{}
 
-func (internalDiscardLogger) Error(...interface{}) {}
-func (internalDiscardLogger) Errorf(string, ...interface{}) {}
+func (internalDiscardLogger) Begin(fields ...Field) Logger {return internalDiscardLogger{}}
 
-func (internalDiscardLogger) Trace(...interface{}) {}
-func (internalDiscardLogger) Tracef(string, ...interface{}) {}
+func (internalDiscardLogger) Debug(fields ...Field) {}
+
+func (internalDiscardLogger) End(fields ...Field) {}
+
+func (internalDiscardLogger) Error(fields ...Field) {}
+
+func (internalDiscardLogger) Trace(fields ...Field) {}

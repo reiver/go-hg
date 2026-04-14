@@ -1,2 +1,6 @@
+codeberg.org/reiver/go-field v0.0.0-20260414030601-d901062f0b09 h1:LzvEazstwY7uljtWGgubz2a/H4Vk65BR9Y63VLXE8M0=
+codeberg.org/reiver/go-field v0.0.0-20260414030601-d901062f0b09/go.mod h1:752EzuARz/8LnYzfPcxBFIIKstqok9fyTUmi5qnjn+Q=
 github.com/reiver/go-utf8s v1.0.1 h1:vFthDb1tAMYiKy9bK+2QxMqw6/tdWrvelFHGbtHheZM=
 github.com/reiver/go-utf8s v1.0.1/go.mod h1:icyCK1U+2V7fJJPWTQfWfoE3hVo65EA1dut5f+9Zwjc=
+golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39 h1:DHNhtq3sNNzrvduZZIiFyXWOL9IWaDPHqTnLJp+rCBY=
+golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39/go.mod h1:46edojNIoXTNOhySWIWdix628clX9ODXwPsQuG6hsK0=
