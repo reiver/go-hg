@@ -3,6 +3,7 @@ package hg
 import (
 	"io"
 	"net"
+	"time"
 )
 
 // DialAndCall makes a TCP connection to the TCP address given given by ‘addr’,
@@ -12,7 +13,7 @@ import (
 //
 // What is given by ‘request’ might be a Request containing something like: "mercury://example.com/path/to/file.txt\r\n"
 //
-// A example of using might be:
+// A example of using this might be:
 //
 //	var uri string = "mercury://example.com/once/twice/thrice/fource.gmni"
 //	
@@ -25,9 +26,49 @@ import (
 //	var addr string = "example.com:1961"
 //	
 //	rr, err := hg.DialAndCall(addr, request)
+//
+// See also:
+//
+//	• [Call]
+//	• [DialTimeoutAndCall]
 func DialAndCall(addr string, request Request) (ResponseReader, error) {
 
 	conn, err := net.Dial("tcp", addr)
+	if nil != err {
+		return nil, err
+	}
+
+	return Call(conn, request)
+}
+
+// DialTimeoutAndCall makes a TCP connection to the TCP address given given by ‘addr’ with a timeout,
+// and (speaking the Mercury Protocol) sends the request given by ‘request’.
+//
+// What is given by ‘addr’ might be something like: "11.22.33.44:1961", or "example.com:1961"
+//
+// What is given by ‘request’ might be a Request containing something like: "mercury://example.com/path/to/file.txt\r\n"
+//
+// A example of using this might be:
+//
+//	var uri string = "mercury://example.com/once/twice/thrice/fource.gmni"
+//	
+//	var request hg.Request
+//	err := request.Parse(uri)
+//	if nil != err {
+//		return err
+//	}
+//	
+//	var addr string = "example.com:1961"
+//	
+//	rr, err := hg.DialTimeoutAndCall(addr, 1*time.Minute, request)
+//
+// See also:
+//
+//	• [Call]
+//	• [DialAndCall]
+func DialTimeoutAndCall(addr string, timeout time.Duration, request Request) (ResponseReader, error) {
+
+	conn, err := net.DialTimeout("tcp", addr, timeout)
 	if nil != err {
 		return nil, err
 	}
@@ -44,6 +85,11 @@ func DialAndCall(addr string, request Request) (ResponseReader, error) {
 //	conn, err := net.Dial("tcp", addr)
 //
 // Where what is given by ‘addr’ might be something like: "11.22.33.44:1961", or "example.com:1961"
+//
+// See also:
+//
+//	• [DialAndCall]
+//	• [DialTimeoutAndCall]
 func Call(conn net.Conn, request Request) (ResponseReader, error) {
 
 	if nil == conn {
