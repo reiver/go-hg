@@ -100,9 +100,10 @@ type Server struct {
 	Handler Handler // handler to invoke; if nil defaults to hg.DebugServer
 	Logger Logger
 
-	shutdownOnce sync.Once
-	shutdownCh   chan struct{}
-	activeConns  sync.WaitGroup
+	shutdownChOnce sync.Once
+	shutdownOnce   sync.Once
+	shutdownCh     chan struct{}
+	activeConns    sync.WaitGroup
 
 	connsMu sync.Mutex
 	conns   map[net.Conn]struct{}
@@ -181,6 +182,8 @@ func (server *Server) ListenAndServe() error {
 //	}
 func (server *Server) Serve(listener net.Listener) error {
 
+	server.initShutdownChannel()
+
 	defer listener.Close() // Safety net for non-shutdown exits. During shutdown, listener is also closed by the shutdown goroutine to unblock Accept(); the double-close is harmless.
 
 	log := server.logger().Begin()
@@ -198,7 +201,7 @@ func (server *Server) Serve(listener net.Listener) error {
 	// When Shutdown is called, cancel the server context and close the listener to unblock Accept.
 	go func() {
 		select {
-		case <-server.shutdownChannel():
+		case <-server.shutdownCh:
 			cancel()
 			listener.Close()
 		case <-ctx.Done():
@@ -215,7 +218,7 @@ func (server *Server) Serve(listener net.Listener) error {
 		if nil != err {
 			// If shutdown was requested, this is a clean exit.
 			select {
-			case <-server.shutdownChannel():
+			case <-server.shutdownCh:
 				log.Debug(field.S("shutting down"))
 				return nil
 			default:
@@ -250,11 +253,10 @@ func (server *Server) Serve(listener net.Listener) error {
 	}
 }
 
-func (server *Server) shutdownChannel() chan struct{} {
-	if nil == server.shutdownCh {
+func (server *Server) initShutdownChannel() {
+	server.shutdownChOnce.Do(func() {
 		server.shutdownCh = make(chan struct{})
-	}
-	return server.shutdownCh
+	})
 }
 
 // Shutdown gracefully shuts down the server.
@@ -265,8 +267,10 @@ func (server *Server) shutdownChannel() chan struct{} {
 //
 // Shutdown is safe to call multiple times — only the first call triggers the shutdown.
 func (server *Server) Shutdown(ctx context.Context) error {
+	server.initShutdownChannel()
+
 	server.shutdownOnce.Do(func() {
-		close(server.shutdownChannel())
+		close(server.shutdownCh)
 	})
 
 	done := make(chan struct{})
