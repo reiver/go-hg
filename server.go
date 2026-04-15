@@ -298,6 +298,30 @@ func (receiver *Server) Shutdown(ctx context.Context) error {
 	}
 }
 
+// Wait blocks until all active connection handlers have finished.
+//
+// When Shutdown's context expires, Shutdown force-closes all connections and returns
+// immediately — but the handler goroutines may still be running their cleanup (defers,
+// logging, untracking). Wait blocks until those goroutines have fully exited.
+//
+// Typical usage:
+//
+//	err := server.Shutdown(ctx)
+//	if err != nil {
+//		// Shutdown timed out, but goroutines are still unwinding.
+//		server.Wait()
+//	}
+//
+// If Shutdown completed without error (all connections drained before the context
+// expired), Wait returns immediately.
+func (receiver *Server) Wait() {
+	if nil == receiver {
+		return
+	}
+
+	receiver.activeConns.Wait()
+}
+
 func (receiver *Server) trackConn(conn net.Conn) {
 	receiver.connsMu.Lock()
 	defer receiver.connsMu.Unlock()
