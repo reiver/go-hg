@@ -55,6 +55,9 @@ func something(value string) Request {
 //
 //	"mercury://example.com/path/to/file.txt"
 func (receiver Request) RequestValue() string {
+	if receiver.IsNothing() {
+		return ""
+	}
 	return receiver.value[:len(receiver.value)-2]
 }
 
