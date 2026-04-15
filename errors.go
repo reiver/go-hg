@@ -6,6 +6,7 @@ import (
 
 const (
 	ErrCannotParse              = erorr.Error("cannot parse")
+	ErrContextDone              = erorr.Error("context done")
 	ErrResponseHeaderMetaTooBig = erorr.Error("response header meta too big")
 	ErrTargetTypeUnsupported    = erorr.Error("target type unsupported")
 )

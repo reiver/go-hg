@@ -75,6 +75,7 @@ package main
 import (
 	"github.com/reiver/go-hg"
 
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -94,7 +95,7 @@ func main() {
 		return
 	}
 
-	responsereader, err := hg.DialAndCall(address, request)
+	responsereader, err := hg.DialAndCall(context.Background(), address, request)
 	if nil != err {
 		fmt.Fprintln(os.Stderr, "problem with request:", err)
 		os.Exit(1)
@@ -119,6 +120,7 @@ package main
 import (
 	"github.com/reiver/go-hg"
 
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -138,10 +140,10 @@ func main() {
 		return
 	}
 
-	responsereader, err := hg.DialAndCall(address, request)
+	responsereader, err := hg.DialAndCall(context.Background(), address, request)
 	if nil != err {
 
-		switch casted: err.(type) {
+		switch casted := err.(type) {
 		case hg.ResponseInput:
 			//@TODO
 		case hg.ResponseSensitiveInput:
