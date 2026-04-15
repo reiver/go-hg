@@ -186,8 +186,8 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 		{
 			var magic [512]byte
 
-			_, err := file.Read(magic[:])
-			if nil != err {
+			n, err := file.Read(magic[:])
+			if nil != err && err != io.EOF {
 				ServeTemporaryFailure(ctx, w)
 				return
 			}
@@ -199,7 +199,7 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 				}
 			}
 
-			mediatype = http.DetectContentType(magic[:])
+			mediatype = http.DetectContentType(magic[:n])
 
 			switch mediatype {
 			case "application/octet-stream":
