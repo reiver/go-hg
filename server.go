@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"sync"
+	"time"
 
 	"codeberg.org/reiver/go-field"
 )
@@ -99,6 +100,11 @@ type Server struct {
 	Addr string // TCP address to listen on; if empty defaults to ":1961"
 	Handler Handler // handler to invoke; if nil defaults to hg.DebugServer
 	Logger Logger
+
+	// ReadTimeout is the maximum duration for reading the request line.
+	// If zero, no timeout is applied and a slow client can hold a
+	// connection open indefinitely (slowloris DoS vector).
+	ReadTimeout time.Duration
 
 	shutdownChOnce sync.Once
 	shutdownOnce   sync.Once
@@ -250,7 +256,7 @@ func (receiver *Server) Serve(listener net.Listener) error {
 		go func() {
 			defer receiver.activeConns.Done()
 			defer receiver.untrackConn(conn)
-			handle(ctx, log, conn, handler)
+			handle(ctx, log, conn, handler, receiver.ReadTimeout)
 		}()
 		log.Debug(
 			field.S("spawned handler to handle connection"),

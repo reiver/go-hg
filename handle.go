@@ -11,7 +11,7 @@ import (
 )
 
 // The handle() function handles an incoming Mercury request using the handler passed to it.
-func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) {
+func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, readTimeout time.Duration) {
 	if nil == ctx {
 		ctx = context.Background()
 	}
@@ -74,7 +74,14 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) 
 	}(log)
 
 	{
-		reader := io2.ClassicReader(ctx, io2.CreateReader(conn))
+		readCtx := ctx
+		if readTimeout > 0 {
+			var readCancel context.CancelFunc
+			readCtx, readCancel = context.WithTimeout(ctx, readTimeout)
+			defer readCancel()
+		}
+
+		reader := io2.ClassicReader(readCtx, io2.CreateReader(conn))
 
 		err := request.Parse(reader)
 		if nil != err {
