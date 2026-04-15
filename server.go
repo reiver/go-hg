@@ -106,6 +106,10 @@ type Server struct {
 	// connection open indefinitely (slowloris DoS vector).
 	ReadTimeout time.Duration
 
+	// MaxConnections limits the number of concurrent connections the server will handle.
+	// If zero or negative, no limit is applied.
+	MaxConnections int
+
 	shutdownChOnce sync.Once
 	shutdownOnce   sync.Once
 	shutdownCh     chan struct{}
@@ -217,6 +221,12 @@ func (receiver *Server) Serve(listener net.Listener) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// Set up a semaphore to limit concurrent connections, if configured.
+	var sem chan struct{}
+	if 0 < receiver.MaxConnections {
+		sem = make(chan struct{}, receiver.MaxConnections)
+	}
+
 	// When Shutdown is called, cancel the server context and close the listener to unblock Accept.
 	go func() {
 		select {
@@ -233,8 +243,25 @@ func (receiver *Server) Serve(listener net.Listener) error {
 			field.S("listening"),
 			field.Stringer("addr", listener.Addr()),
 		)
+
+		// If MaxConnections is set, wait for a slot before accepting.
+		if nil != sem {
+			select {
+			case sem <- struct{}{}:
+				// acquired a slot
+			case <-receiver.shutdownCh:
+				log.Debug(field.S("shutting down"))
+				return nil
+			}
+		}
+
 		conn, err := listener.Accept()
 		if nil != err {
+			// Release the semaphore slot since we didn't spawn a handler.
+			if nil != sem {
+				<-sem
+			}
+
 			// If shutdown was requested, this is a clean exit.
 			select {
 			case <-receiver.shutdownCh:
@@ -263,6 +290,9 @@ func (receiver *Server) Serve(listener net.Listener) error {
 		go func() {
 			defer receiver.activeConns.Done()
 			defer receiver.untrackConn(conn)
+			if nil != sem {
+				defer func(){ <-sem }()
+			}
 			handle(ctx, log, conn, handler, receiver.ReadTimeout)
 		}()
 		log.Debug(
