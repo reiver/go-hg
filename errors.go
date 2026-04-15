@@ -27,5 +27,6 @@ const (
 	errNilWriter               = erorr.Error("hg: nil io.Writer")
 	errNilSource               = erorr.Error("hg: nil source")
 	errNothing                 = erorr.Error("hg: nothing")
+	errRequestTooLong          = erorr.Error("hg: request too long")
 	errRuneError               = erorr.Error("hg: rune error")
 )
