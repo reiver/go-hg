@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
 	"unicode/utf8"
 )
 
@@ -128,9 +129,9 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 	{
 		const publicDir = "mercury_public"
 
-		targetpath = path.Join(homedir, publicDir, subpath)
+		targetpath = filepath.Join(homedir, publicDir, subpath)
 
-		targetpath = path.Clean(targetpath)
+		targetpath = filepath.Clean(targetpath)
 
 		if "" == targetpath {
 			ServeTemporaryFailure(ctx, w)
@@ -155,7 +156,7 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 				return
 			}
 
-			targetpath = path.Join(targetpath, defaultfilename)
+			targetpath = filepath.Join(targetpath, defaultfilename)
 
 		case mode.IsRegular():
 			// Nothing here.
@@ -203,7 +204,7 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 			switch mediatype {
 			case "application/octet-stream":
 
-				extension := path.Ext(targetpath)
+				extension := filepath.Ext(targetpath)
 
 				switch extension {
 				case ".gmi", ".gmni":
