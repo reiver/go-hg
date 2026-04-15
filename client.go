@@ -65,7 +65,11 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 				field.Stringer("request", request),
 			)
 		}
-		return nil, err
+		var errs error = erorr.Errors{ErrDialError, err}
+		return nil, erorr.Wrap(errs, "could not dial for mercury protocol call",
+			field.String("addr", addr),
+			field.Stringer("request", request),
+		)
 	}
 
 	rr, err := Call(ctx, conn, request)
@@ -74,7 +78,10 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 		// so nothing else will close it. Intentionally discarding the error
 		// from Close().
 		conn.Close()
-		return nil, err
+		return nil, erorr.Wrap(err, "could not dial and call for mercury protocol",
+			field.String("addr", addr),
+			field.Stringer("request", request),
+		)
 	}
 	return rr, nil
 }
@@ -138,7 +145,11 @@ func Call(ctx context.Context, conn net.Conn, request Request) (ResponseReader, 
 				field.Stringer("conn-remote-addr", conn.RemoteAddr()),
 			)
 		}
-		return nil, err
+		var errs error = erorr.Errors{ErrWriteError, err}
+		return nil, erorr.Wrap(errs, "could not write mercury protocol request",
+			field.Stringer("request", request),
+			field.Stringer("conn-remote-addr", conn.RemoteAddr()),
+		)
 	}
 
 	var rr internalResponseReader

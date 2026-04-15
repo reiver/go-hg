@@ -7,10 +7,12 @@ import (
 const (
 	ErrCannotParse              = erorr.Error("cannot parse")
 	ErrContextDone              = erorr.Error("context done")
+	ErrDialError                = erorr.Error("dial error")
 	ErrNilNetworkConnection     = erorr.Error("nil network connection")
 	ErrRequestIsNothing         = erorr.Error("request is nothing")
 	ErrResponseHeaderMetaTooBig = erorr.Error("response header meta too big")
 	ErrTargetTypeUnsupported    = erorr.Error("target type unsupported")
+	ErrWriteError               = erorr.Error("write error")
 )
 
 const (

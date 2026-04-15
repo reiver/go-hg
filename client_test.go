@@ -232,9 +232,10 @@ func TestCall_WriteFailureWithContextDoneWrapsErrContextDone(t *testing.T) {
 	}
 }
 
-// TestCall_WriteFailureWithoutContextDoneReturnsRawError verifies that when
-// the write fails but the context is NOT done, the raw write error is returned.
-func TestCall_WriteFailureWithoutContextDoneReturnsRawError(t *testing.T) {
+// TestCall_WriteFailureWithoutContextDoneWrapsErrWriteError verifies that when
+// the write fails but the context is NOT done, the error wraps ErrWriteError
+// (not ErrContextDone) and the original write error is still unwrappable.
+func TestCall_WriteFailureWithoutContextDoneWrapsErrWriteError(t *testing.T) {
 
 	server, client := net.Pipe()
 	// Close server so client write fails.
@@ -253,9 +254,19 @@ func TestCall_WriteFailureWithoutContextDoneReturnsRawError(t *testing.T) {
 		t.Fatal("expected error, got nil")
 	}
 
+	// Should be wrapped with ErrWriteError.
+	if !errors.Is(err, ErrWriteError) {
+		t.Fatalf("expected errors.Is(err, ErrWriteError) to be true, got false; err=%v", err)
+	}
+
 	// Should NOT be wrapped with ErrContextDone since context is fine.
 	if errors.Is(err, ErrContextDone) {
 		t.Fatalf("expected error NOT to be ErrContextDone, got: %v", err)
+	}
+
+	// Original write error should still be unwrappable.
+	if !errors.Is(err, io.ErrClosedPipe) {
+		t.Fatalf("expected errors.Is(err, io.ErrClosedPipe) to be true, got false; err=%v", err)
 	}
 }
 
@@ -345,6 +356,35 @@ func TestDialAndCall_DialFailureWithContextDoneWrapsErrContextDone(t *testing.T)
 
 	if !errors.Is(err, ErrContextDone) {
 		t.Fatalf("expected errors.Is(err, ErrContextDone) to be true, got false; err=%v", err)
+	}
+}
+
+// TestDialAndCall_DialFailureWithoutContextDoneWrapsErrDialError verifies that
+// when dialing fails but the context is NOT done, the error wraps ErrDialError
+// (not ErrContextDone).
+func TestDialAndCall_DialFailureWithoutContextDoneWrapsErrDialError(t *testing.T) {
+
+	var request Request
+	err := request.Parse("mercury://example.com/test\r\n")
+	if nil != err {
+		t.Fatalf("unexpected error parsing request: %v", err)
+	}
+
+	// Use a port that is not listening — dial will fail with connection refused.
+	// 127.0.0.1:1 is almost certainly not listening.
+	_, err = DialAndCall(context.Background(), "127.0.0.1:1", request)
+	if nil == err {
+		t.Fatal("expected error dialing refused port, got nil")
+	}
+
+	// Should be wrapped with ErrDialError.
+	if !errors.Is(err, ErrDialError) {
+		t.Fatalf("expected errors.Is(err, ErrDialError) to be true, got false; err=%v", err)
+	}
+
+	// Should NOT be wrapped with ErrContextDone since context is fine.
+	if errors.Is(err, ErrContextDone) {
+		t.Fatalf("expected error NOT to be ErrContextDone, got: %v", err)
 	}
 }
 
