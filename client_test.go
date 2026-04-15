@@ -494,3 +494,473 @@ func TestErrorUnwrap_MidOperationUnwrapsToAll(t *testing.T) {
 		t.Fatalf("expected original write error (io.ErrClosedPipe) to be unwrappable; err=%v", err)
 	}
 }
+
+// ---------------------------------------------------------------------------
+// ResponseReader context-aware Read / ReadHeader / Reader tests
+// ---------------------------------------------------------------------------
+
+// newTestPipe sets up a Call over net.Pipe, drains the request on the server
+// side, and returns (server, ResponseReader). The caller must close both.
+func newTestPipe(t *testing.T) (net.Conn, ResponseReader) {
+	t.Helper()
+
+	server, client := net.Pipe()
+
+	var request Request
+	err := request.Parse("mercury://example.com/test\r\n")
+	if nil != err {
+		server.Close()
+		client.Close()
+		t.Fatalf("unexpected error parsing request: %v", err)
+	}
+
+	// drain the request bytes on the server side
+	go func() {
+		buf := make([]byte, 4096)
+		_, _ = server.Read(buf)
+	}()
+
+	rr, err := Call(context.Background(), client, request)
+	if nil != err {
+		server.Close()
+		client.Close()
+		t.Fatalf("unexpected error from Call: %v", err)
+	}
+
+	return server, rr
+}
+
+// TestRead_AlreadyCancelledContext verifies that Read with an already-cancelled
+// context returns ErrContextDone.
+func TestRead_AlreadyCancelledContext(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer server.Close()
+	defer rr.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	buf := make([]byte, 256)
+	_, err := rr.Read(ctx, buf)
+	if nil == err {
+		t.Fatal("expected error with cancelled context, got nil")
+	}
+
+	if !errors.Is(err, ErrContextDone) {
+		t.Fatalf("expected errors.Is(err, ErrContextDone) to be true; err=%v", err)
+	}
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("expected errors.Is(err, context.Canceled) to be true; err=%v", err)
+	}
+}
+
+// TestReadHeader_AlreadyCancelledContext verifies that ReadHeader with an
+// already-cancelled context returns ErrContextDone.
+func TestReadHeader_AlreadyCancelledContext(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer server.Close()
+	defer rr.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	var statusCode int
+	var meta string
+	_, err := rr.ReadHeader(ctx, &statusCode, &meta)
+	if nil == err {
+		t.Fatal("expected error with cancelled context, got nil")
+	}
+
+	if !errors.Is(err, ErrContextDone) {
+		t.Fatalf("expected errors.Is(err, ErrContextDone) to be true; err=%v", err)
+	}
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("expected errors.Is(err, context.Canceled) to be true; err=%v", err)
+	}
+}
+
+// TestRead_WithDeadlineSucceeds verifies that Read with a future deadline
+// succeeds and clears the deadline afterward.
+func TestRead_WithDeadlineSucceeds(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	// Server sends a success response with body.
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "20 text/gemini\r\nHello, world!")
+	}()
+
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+	defer cancel()
+
+	buf := make([]byte, 256)
+	n, err := rr.Read(ctx, buf)
+	if nil != err {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if n == 0 {
+		t.Fatal("expected to read some bytes, got 0")
+	}
+
+	got := string(buf[:n])
+	if got != "Hello, world!" {
+		t.Fatalf("expected %q, got %q", "Hello, world!", got)
+	}
+}
+
+// TestReadHeader_WithDeadlineSucceeds verifies that ReadHeader with a future
+// deadline succeeds and clears the deadline afterward.
+func TestReadHeader_WithDeadlineSucceeds(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "20 text/gemini\r\nHello")
+	}()
+
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+	defer cancel()
+
+	var statusCode int
+	var meta string
+	_, err := rr.ReadHeader(ctx, &statusCode, &meta)
+	if nil != err {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if StatusSuccess != statusCode {
+		t.Fatalf("expected status code %d, got %d", StatusSuccess, statusCode)
+	}
+	if "text/gemini" != meta {
+		t.Fatalf("expected meta %q, got %q", "text/gemini", meta)
+	}
+}
+
+// TestRead_MidReadCancellation verifies that cancelling a context during a
+// blocked read actually interrupts the read and returns ErrContextDone.
+func TestRead_MidReadCancellation(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer server.Close()
+	defer rr.Close()
+
+	// Server sends a success header but then blocks (no body data sent).
+	go func() {
+		fmt.Fprint(server, "20 text/gemini\r\n")
+		// Don't send body, don't close — read will block.
+	}()
+
+	// First, read header explicitly so auto-read doesn't interfere.
+	ctx := context.Background()
+	var statusCode int
+	var meta string
+	_, err := rr.ReadHeader(ctx, &statusCode, &meta)
+	if nil != err {
+		t.Fatalf("expected no error reading header, got: %v", err)
+	}
+
+	// Now try to Read body with a context that we cancel after a short delay.
+	ctx2, cancel2 := context.WithCancel(context.Background())
+
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		cancel2()
+	}()
+
+	buf := make([]byte, 256)
+	_, err = rr.Read(ctx2, buf)
+	if nil == err {
+		t.Fatal("expected error from cancelled read, got nil")
+	}
+
+	if !errors.Is(err, ErrContextDone) {
+		t.Fatalf("expected errors.Is(err, ErrContextDone) to be true; err=%v", err)
+	}
+}
+
+// TestReadHeader_MidReadCancellation verifies that cancelling a context during
+// a blocked ReadHeader actually interrupts the read.
+func TestReadHeader_MidReadCancellation(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer server.Close()
+	defer rr.Close()
+
+	// Server never sends anything — ReadHeader will block.
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		cancel()
+	}()
+
+	var statusCode int
+	var meta string
+	_, err := rr.ReadHeader(ctx, &statusCode, &meta)
+	if nil == err {
+		t.Fatal("expected error from cancelled ReadHeader, got nil")
+	}
+
+	if !errors.Is(err, ErrContextDone) {
+		t.Fatalf("expected errors.Is(err, ErrContextDone) to be true; err=%v", err)
+	}
+}
+
+// TestReader_IoReadAll verifies that Reader(ctx) returns an io.Reader that
+// works with io.ReadAll.
+func TestReader_IoReadAll(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "20 text/gemini\r\nHello from Reader!")
+	}()
+
+	ctx := context.Background()
+	reader := rr.Reader(ctx)
+
+	data, err := io.ReadAll(reader)
+	if nil != err {
+		t.Fatalf("expected no error from io.ReadAll, got: %v", err)
+	}
+
+	got := string(data)
+	if "Hello from Reader!" != got {
+		t.Fatalf("expected %q, got %q", "Hello from Reader!", got)
+	}
+}
+
+// TestRead_NilContext verifies that Read with nil context behaves as
+// context.Background().
+func TestRead_NilContext(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "20 text/gemini\r\nnil ctx body")
+	}()
+
+	buf := make([]byte, 256)
+	n, err := rr.Read(nil, buf)
+	if nil != err {
+		t.Fatalf("expected no error with nil context, got: %v", err)
+	}
+	if 0 == n {
+		t.Fatal("expected to read some bytes, got 0")
+	}
+
+	got := string(buf[:n])
+	if "nil ctx body" != got {
+		t.Fatalf("expected %q, got %q", "nil ctx body", got)
+	}
+}
+
+// TestReadHeader_NilContext verifies that ReadHeader with nil context behaves
+// as context.Background().
+func TestReadHeader_NilContext(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "20 text/gemini\r\nHello")
+	}()
+
+	var statusCode int
+	var meta string
+	_, err := rr.ReadHeader(nil, &statusCode, &meta)
+	if nil != err {
+		t.Fatalf("expected no error with nil context, got: %v", err)
+	}
+	if StatusSuccess != statusCode {
+		t.Fatalf("expected status code %d, got %d", StatusSuccess, statusCode)
+	}
+}
+
+// TestReader_NilContext verifies that Reader with nil context behaves as
+// context.Background().
+func TestReader_NilContext(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "20 text/gemini\r\nnil reader ctx")
+	}()
+
+	reader := rr.Reader(nil)
+
+	data, err := io.ReadAll(reader)
+	if nil != err {
+		t.Fatalf("expected no error from io.ReadAll, got: %v", err)
+	}
+
+	got := string(data)
+	if "nil reader ctx" != got {
+		t.Fatalf("expected %q, got %q", "nil reader ctx", got)
+	}
+}
+
+// TestReader_MidReadCancellation verifies that cancelling a context while
+// Reader(ctx).Read() is blocked actually interrupts the read.
+func TestReader_MidReadCancellation(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer server.Close()
+	defer rr.Close()
+
+	// Server sends header but then blocks.
+	go func() {
+		fmt.Fprint(server, "20 text/gemini\r\n")
+	}()
+
+	// Read header first.
+	var statusCode int
+	var meta string
+	_, err := rr.ReadHeader(context.Background(), &statusCode, &meta)
+	if nil != err {
+		t.Fatalf("expected no error reading header, got: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	reader := rr.Reader(ctx)
+
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		cancel()
+	}()
+
+	buf := make([]byte, 256)
+	_, err = reader.Read(buf)
+	if nil == err {
+		t.Fatal("expected error from cancelled Reader.Read, got nil")
+	}
+
+	if !errors.Is(err, ErrContextDone) {
+		t.Fatalf("expected errors.Is(err, ErrContextDone) to be true; err=%v", err)
+	}
+}
+
+// TestClose_WhileReaderBlocked verifies that calling Close() while
+// Reader(ctx).Read() is blocked does not deadlock or panic.
+func TestClose_WhileReaderBlocked(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer server.Close()
+
+	// Server sends header but then blocks.
+	go func() {
+		fmt.Fprint(server, "20 text/gemini\r\n")
+	}()
+
+	// Read header first.
+	var statusCode int
+	var meta string
+	_, err := rr.ReadHeader(context.Background(), &statusCode, &meta)
+	if nil != err {
+		t.Fatalf("expected no error reading header, got: %v", err)
+	}
+
+	ctx := context.Background()
+	reader := rr.Reader(ctx)
+
+	done := make(chan error, 1)
+	go func() {
+		buf := make([]byte, 256)
+		_, err := reader.Read(buf)
+		done <- err
+	}()
+
+	// Give the read goroutine time to block.
+	time.Sleep(50 * time.Millisecond)
+
+	// Close the ResponseReader — should unblock the read.
+	rr.Close()
+
+	select {
+	case err := <-done:
+		// We expect an error (connection closed), just not a panic or deadlock.
+		if nil == err {
+			t.Fatal("expected error after Close, got nil")
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for read to unblock after Close")
+	}
+}
+
+// TestRead_AutoReadHeaderNonSuccessStatus verifies that Read with a
+// non-success status code auto-reads the header and returns the
+// appropriate ErrorResponse type.
+func TestRead_AutoReadHeaderNonSuccessStatus(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "51 not found\r\n")
+	}()
+
+	ctx := context.Background()
+	buf := make([]byte, 256)
+	_, err := rr.Read(ctx, buf)
+	if nil == err {
+		t.Fatal("expected error from non-success status, got nil")
+	}
+
+	var notFound ResponseNotFound
+	if !errors.As(err, &notFound) {
+		t.Fatalf("expected ResponseNotFound, got: %T %v", err, err)
+	}
+	if "not found" != notFound.Meta() {
+		t.Fatalf("expected meta %q, got %q", "not found", notFound.Meta())
+	}
+}
+
+// TestRead_SecondCallAfterAutoReadHeader verifies that a second Read
+// call correctly skips the auto-read header path and reads body data.
+func TestRead_SecondCallAfterAutoReadHeader(t *testing.T) {
+
+	server, rr := newTestPipe(t)
+	defer rr.Close()
+
+	go func() {
+		defer server.Close()
+		fmt.Fprint(server, "20 text/gemini\r\nfirst chunk, second chunk")
+	}()
+
+	ctx := context.Background()
+
+	// First Read — triggers auto-read header.
+	buf := make([]byte, 12)
+	n, err := rr.Read(ctx, buf)
+	if nil != err {
+		t.Fatalf("expected no error on first Read, got: %v", err)
+	}
+	first := string(buf[:n])
+
+	// Second Read — header already read, should go straight to body.
+	buf2 := make([]byte, 256)
+	n2, err := rr.Read(ctx, buf2)
+	if nil != err {
+		t.Fatalf("expected no error on second Read, got: %v", err)
+	}
+	second := string(buf2[:n2])
+
+	combined := first + second
+	if "first chunk, second chunk" != combined {
+		t.Fatalf("expected %q, got %q", "first chunk, second chunk", combined)
+	}
+}

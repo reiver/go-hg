@@ -143,7 +143,7 @@ func Call(ctx context.Context, conn net.Conn, request Request) (ResponseReader, 
 
 	var rr internalResponseReader
 	{
-		rr.rc = conn
+		rr.conn = conn
 	}
 
 	return &rr, nil

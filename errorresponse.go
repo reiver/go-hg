@@ -43,10 +43,10 @@ package hg
 //		
 //		// ...
 //		
-//		p, err := ioutil.ReadAll(rr)
+//		p, err := io.ReadAll(rr.Reader(ctx))
 //		
 //		if nil != err {
-//			switch casted: err.(type) {
+//			switch casted := err.(type) {
 //			case hg.ResponseInput:
 //				//@TODO
 //			case hg.ResponseSensitiveInput:
