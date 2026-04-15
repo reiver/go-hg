@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
 
 	"github.com/reiver/go-hg/internal/io2"
@@ -95,38 +96,61 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 	log := mustlogger(receiver.logger).Begin()
 	defer log.End()
 
-	if statusCode < 0 || 100 <= statusCode {
-		var err error = ErrBadStatusCode
+	if nil == ctx {
+		ctx = context.Background()
+	}
+
+	if ctxErr := ctx.Err(); nil != ctxErr {
+		var err error = erorr.Errors{ErrContextDone, ctxErr}
+
+		const msg string = "failed to write Mercury Protocol response header"
 
 		log.Error(
-			field.S("failed to write Mercury Protocol response header"),
+			field.S(msg),
 			field.E(err),
 		)
 
-		return 0, err
+		return 0, erorr.Wrap(err, msg)
+	}
+
+	if statusCode < 0 || 100 <= statusCode {
+		var err error = ErrBadStatusCode
+
+		const msg string = "failed to write Mercury Protocol response header"
+
+		log.Error(
+			field.S(msg),
+			field.E(err),
+		)
+
+		return 0, erorr.Wrap(err, msg)
 	}
 
 	if receiver.headerwritten {
 		var err error = errHeaderAlreadyWritten
 
+		const msg string = "failed to write Mercury Protocol response header (again)"
+
 		log.Error(
-			field.S("failed to write Mercury Protocol response header (again)"),
+			field.S(msg),
 			field.E(err),
 		)
 
-		return 0, err
+		return 0, erorr.Wrap(err, msg)
 	}
 
 	var writer io2.Writer = receiver.writer
 	if nil == writer {
 		var err error = errNilWriter
 
+		const msg string = "failed to write Mercury Protocol response header"
+
 		log.Error(
-			field.S("failed to write Mercury Protocol response header"),
+			field.S(msg),
 			field.E(err),
 		)
 
-		return 0, err
+		return 0, erorr.Wrap(err, msg)
 	}
 
 	var header strings.Builder
@@ -141,11 +165,13 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 
 		n, err = io.WriteString(receiver.Writer(ctx), header.String())
 		if nil != err {
+			const msg string = "failed to write Mercury Protocol response header"
+
 			log.Error(
-				field.S("failed to write Mercury Protocol response header"),
+				field.S(msg),
 				field.E(err),
 			)
-			return n, err
+			return n, erorr.Wrap(err, msg)
 		}
 		receiver.headerwritten = true
 	}

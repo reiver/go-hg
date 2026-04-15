@@ -135,9 +135,12 @@ type Server struct {
 //			panic(err)
 //		}
 //	}
-func (server *Server) ListenAndServe() error {
+func (receiver *Server) ListenAndServe() error {
+	if nil == receiver {
+		return ErrNilReceiver
+	}
 
-	addr := server.Addr
+	addr := receiver.Addr
 	if "" == addr {
 		addr = fmt.Sprintf(":%d", DefaultTCPPort)
 	}
@@ -147,7 +150,7 @@ func (server *Server) ListenAndServe() error {
 		return err
 	}
 
-	return server.Serve(listener)
+	return receiver.Serve(listener)
 }
 
 // Serve accepts an incoming Mercury Protocol client connection on the net.Listener ‘listener’.
@@ -180,16 +183,19 @@ func (server *Server) ListenAndServe() error {
 //			panic(err)
 //		}
 //	}
-func (server *Server) Serve(listener net.Listener) error {
+func (receiver *Server) Serve(listener net.Listener) error {
+	if nil == receiver {
+		return ErrNilReceiver
+	}
 
-	server.initShutdownChannel()
+	receiver.initShutdownChannel()
 
 	defer listener.Close() // Safety net for non-shutdown exits. During shutdown, listener is also closed by the shutdown goroutine to unblock Accept(); the double-close is harmless.
 
-	log := server.logger().Begin()
+	log := receiver.logger().Begin()
 	defer log.End()
 
-	handler := server.Handler
+	handler := receiver.Handler
 	if nil == handler {
 		handler = DebugHandler
 		log.Debug(field.S("defaulted handler to DebugHandler."))
@@ -201,7 +207,7 @@ func (server *Server) Serve(listener net.Listener) error {
 	// When Shutdown is called, cancel the server context and close the listener to unblock Accept.
 	go func() {
 		select {
-		case <-server.shutdownCh:
+		case <-receiver.shutdownCh:
 			cancel()
 			listener.Close()
 		case <-ctx.Done():
@@ -218,7 +224,7 @@ func (server *Server) Serve(listener net.Listener) error {
 		if nil != err {
 			// If shutdown was requested, this is a clean exit.
 			select {
-			case <-server.shutdownCh:
+			case <-receiver.shutdownCh:
 				log.Debug(field.S("shutting down"))
 				return nil
 			default:
@@ -239,11 +245,11 @@ func (server *Server) Serve(listener net.Listener) error {
 
 		// Handle the new client connection by spawning
 		// a new goroutine.
-		server.trackConn(conn)
-		server.activeConns.Add(1)
+		receiver.trackConn(conn)
+		receiver.activeConns.Add(1)
 		go func() {
-			defer server.activeConns.Done()
-			defer server.untrackConn(conn)
+			defer receiver.activeConns.Done()
+			defer receiver.untrackConn(conn)
 			handle(ctx, log, conn, handler)
 		}()
 		log.Debug(
@@ -253,9 +259,9 @@ func (server *Server) Serve(listener net.Listener) error {
 	}
 }
 
-func (server *Server) initShutdownChannel() {
-	server.shutdownChOnce.Do(func() {
-		server.shutdownCh = make(chan struct{})
+func (receiver *Server) initShutdownChannel() {
+	receiver.shutdownChOnce.Do(func() {
+		receiver.shutdownCh = make(chan struct{})
 	})
 }
 
@@ -266,16 +272,20 @@ func (server *Server) initShutdownChannel() {
 // expires before all connections are done, Shutdown returns the context's error.
 //
 // Shutdown is safe to call multiple times — only the first call triggers the shutdown.
-func (server *Server) Shutdown(ctx context.Context) error {
-	server.initShutdownChannel()
+func (receiver *Server) Shutdown(ctx context.Context) error {
+	if nil == receiver {
+		return ErrNilReceiver
+	}
 
-	server.shutdownOnce.Do(func() {
-		close(server.shutdownCh)
+	receiver.initShutdownChannel()
+
+	receiver.shutdownOnce.Do(func() {
+		close(receiver.shutdownCh)
 	})
 
 	done := make(chan struct{})
 	go func() {
-		server.activeConns.Wait()
+		receiver.activeConns.Wait()
 		close(done)
 	}()
 
@@ -283,46 +293,46 @@ func (server *Server) Shutdown(ctx context.Context) error {
 	case <-done:
 		return nil
 	case <-ctx.Done():
-		server.closeAllConns()
+		receiver.closeAllConns()
 		return ctx.Err()
 	}
 }
 
-func (server *Server) trackConn(conn net.Conn) {
-	server.connsMu.Lock()
-	defer server.connsMu.Unlock()
+func (receiver *Server) trackConn(conn net.Conn) {
+	receiver.connsMu.Lock()
+	defer receiver.connsMu.Unlock()
 
-	if nil == server.conns {
-		server.conns = make(map[net.Conn]struct{})
+	if nil == receiver.conns {
+		receiver.conns = make(map[net.Conn]struct{})
 	}
-	server.conns[conn] = struct{}{}
+	receiver.conns[conn] = struct{}{}
 }
 
-func (server *Server) untrackConn(conn net.Conn) {
-	server.connsMu.Lock()
-	defer server.connsMu.Unlock()
+func (receiver *Server) untrackConn(conn net.Conn) {
+	receiver.connsMu.Lock()
+	defer receiver.connsMu.Unlock()
 
-	delete(server.conns, conn)
+	delete(receiver.conns, conn)
 }
 
-func (server *Server) closeAllConns() {
-	server.connsMu.Lock()
-	defer server.connsMu.Unlock()
+func (receiver *Server) closeAllConns() {
+	receiver.connsMu.Lock()
+	defer receiver.connsMu.Unlock()
 
-	for conn := range server.conns {
+	for conn := range receiver.conns {
 		conn.Close()
 	}
 }
 
-func (server *Server) logger() Logger {
+func (receiver *Server) logger() Logger {
 
 	var lgr Logger
 	func(){
-		if nil == server {
+		if nil == receiver {
 			return
 		}
 
-		lgr = server.Logger
+		lgr = receiver.Logger
 	}()
 
 	return mustlogger(lgr)
