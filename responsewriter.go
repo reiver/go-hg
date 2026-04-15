@@ -1,18 +1,21 @@
 package hg
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
 
 	"codeberg.org/reiver/go-field"
+
+	"github.com/reiver/go-hg/internal/io2"
 )
 
 // ResponseWriter is used by a Handler to construct a Mercury Protocol response.
 //
 // For example:
 //
-//	func serveMercury(w hg.ResponseWriter, r hg.Request) {
+//	func serveMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //
 //		// ...
 //
@@ -20,50 +23,63 @@ import (
 //
 // Notice that the first parameter is a ResponseWriter.
 type ResponseWriter interface {
-	io.Writer
-	WriteHeader(statusCode int, meta any) (int, error)
+	Write(ctx context.Context, p []byte) (n int, err error)
+	Writer(ctx context.Context) io.Writer
+	WriteHeader(ctx context.Context, statusCode int, meta any) (int, error)
 }
 
 var _ ResponseWriter = &internalResponseWriter{}
 
 // internalResponseWriter is used to create a ResponseWriter around a io.Writer (such as a net.Conn).
 type internalResponseWriter struct {
-	Writer io.Writer
-	Logger Logger
+	writer io2.Writer
+	logger Logger
 	headerwritten bool
 }
 
-func (receiver *internalResponseWriter) Write(data []byte) (n int, err error) {
+func (receiver *internalResponseWriter) Writer(ctx context.Context) io.Writer {
+	return io2.ClassicWriter(ctx, receiver.writer)
+}
+
+func (receiver *internalResponseWriter) Write(ctx context.Context, data []byte) (n int, err error) {
 
 	if nil == receiver {
-		return 0, errNilReceiver
+		return 0, ErrNilReceiver
 	}
 
-	log := mustlogger(receiver.Logger).Begin()
+	log := mustlogger(receiver.logger).Begin()
 	defer log.End()
 
 	if !receiver.headerwritten {
-		var m int
-
-		m, err = receiver.WriteHeader(StatusSuccess, "application/octet-stream")
-		n += m
+		_, err = receiver.WriteHeader(ctx, StatusSuccess, "application/octet-stream")
 		if nil != err {
-			return n, err
+			return 0, err
 		}
 	}
 	if len(data) <= 0 {
 		return 0, nil
 	}
 
-	var writer io.Writer = receiver.Writer
+	var writer io2.Writer = receiver.writer
 	if nil == writer {
-		return 0, errNilWriter
+		var err error = errNilWriter
+
+		log.Error(
+			field.S("failed to write Mercury Protocol response body"),
+			field.E(err),
+		)
+
+		return 0, err
 	}
 
 	{
-		m, err := writer.Write(data)
+		m, err := writer.Write(ctx, data)
 		n += m
 		if nil != err {
+			log.Error(
+				field.S("failed to write Mercury Protocol response body"),
+				field.E(err),
+			)
 			return n, err
 		}
 	}
@@ -71,28 +87,46 @@ func (receiver *internalResponseWriter) Write(data []byte) (n int, err error) {
 	return n, nil
 }
 
-func (receiver *internalResponseWriter) WriteHeader(statusCode int, meta any) (int, error) {
-
+func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusCode int, meta any) (int, error) {
 	if nil == receiver {
-		return 0, errNilReceiver
+		return 0, ErrNilReceiver
 	}
 
-	log := mustlogger(receiver.Logger).Begin()
+	log := mustlogger(receiver.logger).Begin()
 	defer log.End()
 
 	if statusCode < 0 || 100 <= statusCode {
-		return 0, errBadStatusCode
+		var err error = ErrBadStatusCode
+
+		log.Error(
+			field.S("failed to write Mercury Protocol response header"),
+			field.E(err),
+		)
+
+		return 0, err
 	}
 
 	if receiver.headerwritten {
-		log.Error(field.S("header already written"))
-		return 0, errHeaderAlreadyWritten
+		var err error = errHeaderAlreadyWritten
+
+		log.Error(
+			field.S("failed to write Mercury Protocol response header (again)"),
+			field.E(err),
+		)
+
+		return 0, err
 	}
 
-	var writer io.Writer = receiver.Writer
+	var writer io2.Writer = receiver.writer
 	if nil == writer {
-		log.Error(field.S("nil writer"))
-		return 0, errNilWriter
+		var err error = errNilWriter
+
+		log.Error(
+			field.S("failed to write Mercury Protocol response header"),
+			field.E(err),
+		)
+
+		return 0, err
 	}
 
 	var header strings.Builder
@@ -105,10 +139,10 @@ func (receiver *internalResponseWriter) WriteHeader(statusCode int, meta any) (i
 	{
 		var err error
 
-		n, err = io.WriteString(writer, header.String())
+		n, err = io.WriteString(receiver.Writer(ctx), header.String())
 		if nil != err {
 			log.Error(
-				field.S("error writing string"),
+				field.S("failed to write Mercury Protocol response header"),
 				field.E(err),
 			)
 			return n, err

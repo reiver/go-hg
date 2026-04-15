@@ -37,6 +37,7 @@ package main
 import (
 	"github.com/reiver/go-hg"
 
+	"context"
 	"fmt"
 	"os"
 )
@@ -56,7 +57,7 @@ func main() {
 	}
 }
 
-func serveMercury(w hg.ResponseWriter, r hg.Request) {
+func serveMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 	fmt.Fprintln(w, "Hello world!")
 }
 ```
@@ -278,6 +279,8 @@ package main
 
 import (
 	"github.com/reiver/go-hg"
+
+	"context"
 )
 
 func main() {
@@ -293,7 +296,7 @@ func main() {
 
 type myCustomHandler {}
 
-func (receiver myCustomHandler) ServeMercury(w hg.ResponseWriter, r hg.Request) {
+func (receiver myCustomHandler) ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 	io.WriteString(w, "Hello world!")
 }
 ```
@@ -305,6 +308,8 @@ package main
 
 import (
 	"github.com/reiver/go-hg"
+
+	"context"
 )
 
 func main() {
@@ -318,7 +323,7 @@ func main() {
 	}
 }
 
-func helloworld(w hg.ResponseWriter, r *hg.Request) {
+func helloworld(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 	io.WriteString(w, "Hello world!")
 }
 ```

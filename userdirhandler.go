@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"context"
 	"net/url"
 	"io"
 	"net/http"
@@ -33,7 +34,7 @@ type internalUserDirHandler int
 
 var _ Handler = internalUserDirHandler(0)
 
-func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
+func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
 
 	requestValue := r.RequestValue()
 
@@ -43,12 +44,12 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 
 		uri, err = url.Parse(requestValue)
 		if nil != err {
-			ServeBadRequest(w)
+			ServeBadRequest(ctx, w)
 			return
 		}
 
 		if nil == uri {
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 	}
@@ -61,7 +62,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		{
 			r, _ := utf8.DecodeLastRuneInString(uri.Path)
 			if utf8.RuneError == r {
-				ServeBadRequest(w)
+				ServeBadRequest(ctx, w)
 				return
 			}
 
@@ -73,7 +74,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		requestpath = path.Clean(uri.Path)
 
 		if "" == requestpath {
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 	}
@@ -87,16 +88,16 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 
 		username, subpath, valid = parsetildedir(requestpath)
 		if !valid {
-			ServeNotFound(w)
+			ServeNotFound(ctx, w)
 			return
 		}
 
 		if "" == username {
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 		if "" == subpath {
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 	}
@@ -107,19 +108,18 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		if nil != err {
 			switch err.(type) {
 			case user.UnknownUserError:
-				ServeNotFound(w)
+				ServeNotFound(ctx, w)
 				return
 			default:
-				ServeTemporaryFailure(w)
+				ServeTemporaryFailure(ctx, w)
 				return
 			}
-			return
 		}
 
 		homedir = u.HomeDir
 
 		if "" == homedir {
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 	}
@@ -133,7 +133,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		targetpath = path.Clean(targetpath)
 
 		if "" == targetpath {
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 	}
@@ -141,7 +141,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 	{
 		fi, err := os.Stat(targetpath)
 		if nil != err {
-			ServeNotFound(w)
+			ServeNotFound(ctx, w)
 			return
 		}
 
@@ -151,7 +151,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		case mode.IsDir():
 			if !explicitDir {
 				uri.Path += "/"
-				ServeRedirectTemporary(w, uri.String())
+				ServeRedirectTemporary(ctx, w, uri.String())
 				return
 			}
 
@@ -160,7 +160,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		case mode.IsRegular():
 			// Nothing here.
 		default:
-			ServeNotFound(w)
+			ServeNotFound(ctx, w)
 			return
 		}
 
@@ -170,7 +170,7 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 
 			file, err = os.Open(targetpath)
 			if nil != err {
-				ServeTemporaryFailure(w)
+				ServeTemporaryFailure(ctx, w)
 				return
 			}
 			defer func() {
@@ -187,13 +187,13 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 
 			_, err := file.Read(magic[:])
 			if nil != err {
-				ServeTemporaryFailure(w)
+				ServeTemporaryFailure(ctx, w)
 				return
 			}
 			{
 				_, err := file.Seek(0,0)
 				if nil != err {
-					ServeTemporaryFailure(w)
+					ServeTemporaryFailure(ctx, w)
 					return
 				}
 			}
@@ -212,8 +212,8 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 			}
 		}
 
-		w.WriteHeader(StatusSuccess, mediatype)
-		io.Copy(w, file)
+		w.WriteHeader(ctx, StatusSuccess, mediatype)
+		io.Copy(w.Writer(ctx), file)
 		return
 	}
 }

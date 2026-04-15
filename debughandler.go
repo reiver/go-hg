@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -22,7 +23,7 @@ type internalDebugHandler int
 
 var _ Handler = internalDebugHandler(0)
 
-func (internalDebugHandler) ServeMercury(w ResponseWriter, r Request) {
+func (internalDebugHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
 	var storage strings.Builder
 
 	storage.WriteString("```")
@@ -64,6 +65,6 @@ func (internalDebugHandler) ServeMercury(w ResponseWriter, r Request) {
 	storage.WriteString("\x1B[0m")
 	storage.WriteString("\r\n")
 
-	w.WriteHeader(StatusSuccess, "text/gemini")
-	io.WriteString(w, storage.String())
+	w.WriteHeader(ctx, StatusSuccess, "text/gemini")
+	io.WriteString(w.Writer(ctx), storage.String())
 }

@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"context"
 	"fmt"
 	"net"
 
@@ -206,7 +207,7 @@ func (server *Server) Serve(listener net.Listener) error {
 
 		// Handle the new client connection by spawning
 		// a new goroutine.
-		go handle(log, conn, handler)
+		go handle(context.Background(), log, conn, handler)
 		log.Debug(
 			field.S("spawned handler to handle connection"),
 			field.Stringer("remote-addr", conn.RemoteAddr()),

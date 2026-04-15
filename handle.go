@@ -1,16 +1,27 @@
 package hg
 
 import (
+	"context"
 	"net"
+	"time"
 
 	"codeberg.org/reiver/go-field"
+
+	"github.com/reiver/go-hg/internal/io2"
 )
 
 // The handle() function handles an incoming Mercury request using the handler passed to it.
-func handle(logger Logger, conn net.Conn, handler Handler) {
+func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) {
 
 	log := logger.Begin()
 	defer log.End()
+
+	if nil == conn {
+		log.Error(
+			field.S("nil net.Conn"),
+		)
+		return
+	}
 
 	defer func(log Logger) {
 		log.Trace(
@@ -61,16 +72,31 @@ func handle(logger Logger, conn net.Conn, handler Handler) {
 
 	var rw internalResponseWriter
 	{
-		rw.Writer = conn
-		rw.Logger = logger
+		writer := io2.CreateWriter(conn)
+		if nil == writer {
+			log.Error(
+				field.S("nil writer"),
+			)
+			return
+		}
+
+		rw.writer = writer
+		rw.logger = logger
 	}
 
 	var w ResponseWriter = &rw
 
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	if nil == handler {
-		ServeTemporaryFailure(w, request)
+		var timeout time.Duration = 1*time.Minute
+
+		ctxWithTimeout, _ := context.WithTimeout(ctx, timeout)
+
+		ServeTemporaryFailure(ctxWithTimeout, w, request)
 		return
 	}
-	handler.ServeMercury(w, request)
+
+	handler.ServeMercury(ctx, w, request)
 }

@@ -31,7 +31,7 @@ type internalResponseReader struct {
 
 func (receiver *internalResponseReader) Close() error {
 	if nil == receiver {
-		return errNilReceiver
+		return ErrNilReceiver
 	}
 
 	var conn net.Conn = receiver.conn
@@ -46,7 +46,7 @@ func (receiver *internalResponseReader) Close() error {
 
 func (receiver *internalResponseReader) Read(ctx context.Context, data []byte) (n int, err error) {
 	if nil == receiver {
-		return 0, errNilReceiver
+		return 0, ErrNilReceiver
 	}
 
 	if nil == ctx {
@@ -134,7 +134,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 	const maxmeta = 1024 * 2
 
 	if nil == receiver {
-		return 0, errNilReceiver
+		return 0, ErrNilReceiver
 	}
 
 	var reader io.Reader = receiver.conn
@@ -296,7 +296,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 // ReadHeader is the public context-aware wrapper.
 func (receiver *internalResponseReader) ReadHeader(ctx context.Context, statusCode *int, meta any) (n int, err error) {
 	if nil == receiver {
-		return 0, errNilReceiver
+		return 0, ErrNilReceiver
 	}
 
 	if nil == ctx {

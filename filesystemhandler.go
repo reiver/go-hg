@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"context"
 	"io"
 	"io/fs"
 	"net/url"
@@ -25,7 +26,7 @@ type FileSystemHandler struct {
 	Logger Logger
 }
 
-func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
+func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
 
 	log := mustlogger(receiver.Logger).Begin()
 	defer log.End()
@@ -36,7 +37,7 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 
 		if nil == root {
 			log.Error(field.S("nil root fs.FS (file system)"))
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 
@@ -66,7 +67,7 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 				field.String("request-value", requestValue),
 				field.E(err),
 			)
-			ServeBadRequest(w, "could not parse URL")
+			ServeBadRequest(ctx, w, "could not parse URL")
 			return
 		}
 
@@ -93,7 +94,7 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 				field.String("actual-scheme", actualScheme),
 				field.Stringer("uri", uri),
 			)
-			ServeBadRequest(w, "unsupported URL scheme")
+			ServeBadRequest(ctx, w, "unsupported URL scheme")
 			return
 		}
 
@@ -114,7 +115,7 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 				field.String("path", reqpath),
 				field.Stringer("request", r),
 			)
-			ServeBadRequest(w, "empty request path")
+			ServeBadRequest(ctx, w, "empty request path")
 			return
 		}
 
@@ -134,7 +135,7 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 				field.S("request-path is invalid."),
 				field.String("request-path", reqpath),
 			)
-			ServeBadRequest(w, "invalid URL path")
+			ServeBadRequest(ctx, w, "invalid URL path")
 			return
 		}
 		log.Trace(
@@ -157,20 +158,19 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 
 				switch {
 				case notfound:
-					ServeNotFound(w)
+					ServeNotFound(ctx, w)
 					return
 				default:
-					ServeTemporaryFailure(w)
+					ServeTemporaryFailure(ctx, w)
 					return
 				}
-				return
 			}
 			if nil == file || fs.File(nil) == file {
 				log.Error(
 					field.S("file is nil"),
 					field.FormattedString("file", "%#v", file),
 				)
-				ServeTemporaryFailure(w)
+				ServeTemporaryFailure(ctx, w)
 				return
 			}
 		}
@@ -198,7 +198,7 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 				field.Stringer("request", r),
 				field.E(err),
 			)
-			ServeTemporaryFailure(w)
+			ServeTemporaryFailure(ctx, w)
 			return
 		}
 		log.Trace(field.FormattedString("fileinfo", "%#v", fileinfo))
@@ -226,13 +226,12 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 
 				switch {
 				case notfound:
-					ServeNotFound(w)
+					ServeNotFound(ctx, w)
 					return
 				default:
-					ServeTemporaryFailure(w)
+					ServeTemporaryFailure(ctx, w)
 					return
 				}
-				return
 			}
 			defer func() {
 				err := file.Close()
@@ -264,7 +263,7 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 	}
 
 	{
-		_, err := w.WriteHeader(StatusSuccess, mediatype)
+		_, err := w.WriteHeader(ctx, StatusSuccess, mediatype)
 		if nil != err {
 			log.Error(
 				field.S("problem writing Mercury Protocol header"),
@@ -286,7 +285,8 @@ func (receiver FileSystemHandler) ServeMercury(w ResponseWriter, r Request) {
 			field.FormattedString("file-type", "%T", file),
 			field.FormattedString("file", "%#v", file),
 		)
-		_, err := io.Copy(w, file)
+
+		_, err := io.Copy(w.Writer(ctx), file)
 		if nil != err{
 			log.Error(
 				field.S("could not copy file inferred from request"),

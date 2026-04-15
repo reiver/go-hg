@@ -20,7 +20,7 @@ import (
 //
 // A server would receive the request as a parameter to the ServeMercury method:
 //
-//	func (receiver Type) ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func (receiver Type) ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		// ...
 //	}
 //
@@ -69,7 +69,7 @@ func (receiver Request) RequestValue() string {
 //	err := request.Parse("mercury://example.com/apple/banana/cherry.txt")
 func (receiver *Request) Parse(src any) error {
 	if nil == receiver {
-		return errNilReceiver
+		return ErrNilReceiver
 	}
 	if nil == src {
 		return errNilSource
@@ -97,7 +97,7 @@ func (receiver *Request) Parse(src any) error {
 
 func (receiver *Request) parse(reader io.Reader) error {
 	if nil == receiver {
-		return errNilReceiver
+		return ErrNilReceiver
 	}
 	if nil == reader {
 		return errNilSource
@@ -177,7 +177,7 @@ func (receiver Request) MarshalText() ([]byte, error) {
 // UnmarshalText  makes Request fit the encoding.TextUnmarshaler interface.
 func (receiver *Request) UnmarshalText(text []byte) error {
 	if nil == receiver {
-		return errNilReceiver
+		return ErrNilReceiver
 	}
 
 	var value string = string(text)

@@ -10,7 +10,7 @@ import (
 //
 // For example:
 //
-//	func ServerMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServerMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		w.WriteHeader(hg.StatusNotFound, "uh oh!")
 //	}
 const (
