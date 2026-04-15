@@ -149,6 +149,10 @@ func (receiver *Request) parse(reader io.Reader) error {
 	return nil
 }
 
+func (receiver Request) IsNothing() bool {
+	return !receiver.loaded
+}
+
 // String returns the full value of the Mercury request.
 // Note that this included the trailing carriage-return and line-feed.
 //

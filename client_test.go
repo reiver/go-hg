@@ -121,7 +121,7 @@ func TestCall_NilConnReturnsErrNilNetworkConnection(t *testing.T) {
 		t.Fatal("expected error with nil conn, got nil")
 	}
 
-	if !errors.Is(err, errNilNetworkConnection) {
+	if !errors.Is(err, ErrNilNetworkConnection) {
 		t.Fatalf("expected errNilNetworkConnection, got: %v", err)
 	}
 

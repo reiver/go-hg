@@ -102,9 +102,11 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 //
 //	• [DialAndCall]
 func Call(ctx context.Context, conn net.Conn, request Request) (ResponseReader, error) {
-
 	if nil == conn {
-		return nil, errNilNetworkConnection
+		return nil, ErrNilNetworkConnection
+	}
+	if request.IsNothing() {
+		return nil, ErrRequestIsNothing
 	}
 
 	if nil == ctx {

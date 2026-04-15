@@ -7,6 +7,8 @@ import (
 const (
 	ErrCannotParse              = erorr.Error("cannot parse")
 	ErrContextDone              = erorr.Error("context done")
+	ErrNilNetworkConnection     = erorr.Error("nil network connection")
+	ErrRequestIsNothing         = erorr.Error("request is nothing")
 	ErrResponseHeaderMetaTooBig = erorr.Error("response header meta too big")
 	ErrTargetTypeUnsupported    = erorr.Error("target type unsupported")
 )
@@ -17,7 +19,6 @@ const (
 	errExpectedLineFeed        = erorr.Error("hg: expected line-feed character")
 	errHeaderAlreadyRead       = erorr.Error("hg: header already read")
 	errHeaderAlreadyWritten    = erorr.Error("hg: header already written")
-	errNilNetworkConnection    = erorr.Error("hg: nil network connection")
 	errNilReader               = erorr.Error("hg: nil reader")
 	errNilReceiver             = erorr.Error("hg: nil receiver")
 	errNilWriter               = erorr.Error("hg: nil io.Writer")
