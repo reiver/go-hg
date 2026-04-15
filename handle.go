@@ -12,6 +12,12 @@ import (
 
 // The handle() function handles an incoming Mercury request using the handler passed to it.
 func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) {
+	if nil == ctx {
+		ctx = context.Background()
+	}
+	if nil == logger {
+		logger = internalDiscardLogger{}
+	}
 
 	log := logger.Begin()
 	defer log.End()
@@ -44,6 +50,8 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) 
 	}(log)
 
 	var request Request // This is set later; but need it here for the panic()-recover().
+	var rw internalResponseWriter // This is set later; but need it here for the panic()-recover().
+	var w ResponseWriter // This is set later; but need it here for the panic()-recover().
 
 	defer func(log Logger){
 		if r := recover(); nil != r {
@@ -54,6 +62,13 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) 
 					field.FormattedString("recovered-type", "%T", r),
 					field.FormattedString("recovered", "%v", r),
 				)
+			}
+
+			// Only send an error response if the header hasn't been written yet.
+			// If it has, the response is already partially sent — closing the
+			// connection is the least-bad option.
+			if nil != w && !rw.headerwritten {
+				ServeTemporaryFailure(ctx, w, request)
 			}
 		}
 	}(log)
@@ -72,7 +87,6 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) 
 	}
 	log.Debug(field.Stringer("request", request))
 
-	var rw internalResponseWriter
 	{
 		writer := io2.CreateWriter(conn)
 		if nil == writer {
@@ -86,7 +100,7 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) 
 		rw.logger = logger
 	}
 
-	var w ResponseWriter = &rw
+	w = &rw
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
