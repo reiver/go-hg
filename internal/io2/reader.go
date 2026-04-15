@@ -57,6 +57,12 @@ func (receiver internalReader) Read(ctx context.Context, p []byte) (n int, err e
 		// Intentionally mostly ignoring the error from SetReadDeadline —
 		// not all net.Conn implementations support deadlines, and
 		// the read itself will surface any real failures.
+		//
+		// Note: the defer clears the deadline to zero after the read completes.
+		// This means any deadline previously set on the underlying conn by an
+		// outer layer will be erased. This is acceptable because io2.Reader
+		// owns the deadline for the duration of each Read call, and net.Conn
+		// provides no way to read back the current deadline to restore it.
 		if nil == receiver.deadLinedReader.SetReadDeadline(deadline) {
 			defer receiver.deadLinedReader.SetReadDeadline(time.Time{})
 		}

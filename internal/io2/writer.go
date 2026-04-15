@@ -57,6 +57,12 @@ func (receiver internalWriter) Write(ctx context.Context, p []byte) (n int, err 
 		// Intentionally mostly ignoring the error from SetWriteDeadline —
 		// not all net.Conn implementations support deadlines, and
 		// the write itself will surface any real failures.
+		//
+		// Note: the defer clears the deadline to zero after the write completes.
+		// This means any deadline previously set on the underlying conn by an
+		// outer layer will be erased. This is acceptable because io2.Writer
+		// owns the deadline for the duration of each Write call, and net.Conn
+		// provides no way to read back the current deadline to restore it.
 		if nil == receiver.deadLinedWriter.SetWriteDeadline(deadline) {
 			defer receiver.deadLinedWriter.SetWriteDeadline(time.Time{})
 		}
