@@ -389,7 +389,7 @@ The **Project Mercury** space-mission also used a modified version **astrologica
 
 The chemical-element _mercury_ was also named after **Roman god** named **Mercury**.
 
-An older name for the chemicalelement _mercury_ is **hydrargyrum**.
+An older name for the chemical element _mercury_ is **hydrargyrum**.
 
 “Hydrargyrum” is a romanized version of the ancient Greek word “ὑδράργυρος” (hydrargyros).
 The ancient Greek word “ὑδράργυρος” (hydrargyros) is a compound word: “ὑδρ” + “άργυρος”.
