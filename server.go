@@ -106,6 +106,11 @@ type Server struct {
 	// connection open indefinitely (slowloris DoS vector).
 	ReadTimeout time.Duration
 
+	// HandlerTimeout is the default maximum duration for a handler to complete.
+	// If a handler implements TimeoutHandler, its Timeout value takes precedence.
+	// If zero, no timeout is applied and handlers may run indefinitely.
+	HandlerTimeout time.Duration
+
 	// MaxConnections limits the number of concurrent connections the server will handle.
 	// If zero or negative, no limit is applied.
 	MaxConnections int
@@ -293,7 +298,7 @@ func (receiver *Server) Serve(listener net.Listener) error {
 			if nil != sem {
 				defer func(){ <-sem }()
 			}
-			handle(ctx, log, conn, handler, receiver.ReadTimeout)
+			handle(ctx, log, conn, handler, receiver.ReadTimeout, receiver.HandlerTimeout)
 		}()
 		log.Debug(
 			field.S("spawned handler to handle connection"),

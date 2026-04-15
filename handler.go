@@ -2,6 +2,7 @@ package hg
 
 import (
 	"context"
+	"time"
 )
 
 // Handler represents something that responds to an Mercury Protocol request.
@@ -10,4 +11,19 @@ import (
 // and then (directly or indirectly) pass it to the Serve to ListenAndServe functions.
 type Handler interface {
 	ServeMercury(ctx context.Context, w ResponseWriter, r Request)
+}
+
+// TimeoutHandler is an optional interface that a Handler may implement to declare
+// how long it should be allowed to run.
+//
+// If Timeout returns a positive duration, the server will apply that as a deadline
+// on the context passed to ServeMercury.
+//
+// If Timeout returns zero or a negative duration, no timeout is applied (the handler
+// is considered long-lived).
+//
+// Handlers that do not implement this interface fall back to Server.HandlerTimeout.
+type TimeoutHandler interface {
+	Handler
+	Timeout() time.Duration
 }

@@ -11,7 +11,7 @@ import (
 )
 
 // The handle() function handles an incoming Mercury request using the handler passed to it.
-func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, readTimeout time.Duration) {
+func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, readTimeout time.Duration, handlerTimeout time.Duration) {
 	if nil == ctx {
 		ctx = context.Background()
 	}
@@ -120,6 +120,22 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, 
 
 		ServeTemporaryFailure(ctxWithTimeout, w, request)
 		return
+	}
+
+	// Determine the handler timeout.
+	// If the handler implements TimeoutHandler, its Timeout takes precedence.
+	// Otherwise, fall back to the server-wide handlerTimeout.
+	{
+		timeout := handlerTimeout
+		if th, casted := handler.(TimeoutHandler); casted {
+			timeout = th.Timeout()
+		}
+
+		if 0 < timeout {
+			var handlerCancel context.CancelFunc
+			ctx, handlerCancel = context.WithTimeout(ctx, timeout)
+			defer handlerCancel()
+		}
 	}
 
 	handler.ServeMercury(ctx, w, request)
