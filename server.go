@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sync"
 
 	"codeberg.org/reiver/go-field"
 )
@@ -98,6 +99,13 @@ type Server struct {
 	Addr string // TCP address to listen on; if empty defaults to ":1961"
 	Handler Handler // handler to invoke; if nil defaults to hg.DebugServer
 	Logger Logger
+
+	shutdownOnce sync.Once
+	shutdownCh   chan struct{}
+	activeConns  sync.WaitGroup
+
+	connsMu sync.Mutex
+	conns   map[net.Conn]struct{}
 }
 
 // ListenAndServe listens on the TCP network address 'server.Addr' and then spawns a call to the ServeMercury
@@ -173,7 +181,7 @@ func (server *Server) ListenAndServe() error {
 //	}
 func (server *Server) Serve(listener net.Listener) error {
 
-	defer listener.Close()
+	defer listener.Close() // Safety net for non-shutdown exits. During shutdown, listener is also closed by the shutdown goroutine to unblock Accept(); the double-close is harmless.
 
 	log := server.logger().Begin()
 	defer log.End()
@@ -184,6 +192,19 @@ func (server *Server) Serve(listener net.Listener) error {
 		log.Debug(field.S("defaulted handler to DebugHandler."))
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// When Shutdown is called, cancel the server context and close the listener to unblock Accept.
+	go func() {
+		select {
+		case <-server.shutdownChannel():
+			cancel()
+			listener.Close()
+		case <-ctx.Done():
+		}
+	}()
+
 	for {
 		// Wait for a new client connection.
 		log.Debug(
@@ -191,7 +212,15 @@ func (server *Server) Serve(listener net.Listener) error {
 			field.Stringer("addr", listener.Addr()),
 		)
 		conn, err := listener.Accept()
-		if err != nil {
+		if nil != err {
+			// If shutdown was requested, this is a clean exit.
+			select {
+			case <-server.shutdownChannel():
+				log.Debug(field.S("shutting down"))
+				return nil
+			default:
+			}
+
 //@TODO: Could try to recover from certain kinds of errors. Maybe waiting a while before trying again.
 			log.Error(
 				field.S("error while listing"),
@@ -207,11 +236,77 @@ func (server *Server) Serve(listener net.Listener) error {
 
 		// Handle the new client connection by spawning
 		// a new goroutine.
-		go handle(context.Background(), log, conn, handler)
+		server.trackConn(conn)
+		server.activeConns.Add(1)
+		go func() {
+			defer server.activeConns.Done()
+			defer server.untrackConn(conn)
+			handle(ctx, log, conn, handler)
+		}()
 		log.Debug(
 			field.S("spawned handler to handle connection"),
 			field.Stringer("remote-addr", conn.RemoteAddr()),
 		)
+	}
+}
+
+func (server *Server) shutdownChannel() chan struct{} {
+	if nil == server.shutdownCh {
+		server.shutdownCh = make(chan struct{})
+	}
+	return server.shutdownCh
+}
+
+// Shutdown gracefully shuts down the server.
+//
+// It stops accepting new connections, then waits for active connections to finish.
+// The provided context controls how long Shutdown is willing to wait — if the context
+// expires before all connections are done, Shutdown returns the context's error.
+//
+// Shutdown is safe to call multiple times — only the first call triggers the shutdown.
+func (server *Server) Shutdown(ctx context.Context) error {
+	server.shutdownOnce.Do(func() {
+		close(server.shutdownChannel())
+	})
+
+	done := make(chan struct{})
+	go func() {
+		server.activeConns.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return nil
+	case <-ctx.Done():
+		server.closeAllConns()
+		return ctx.Err()
+	}
+}
+
+func (server *Server) trackConn(conn net.Conn) {
+	server.connsMu.Lock()
+	defer server.connsMu.Unlock()
+
+	if nil == server.conns {
+		server.conns = make(map[net.Conn]struct{})
+	}
+	server.conns[conn] = struct{}{}
+}
+
+func (server *Server) untrackConn(conn net.Conn) {
+	server.connsMu.Lock()
+	defer server.connsMu.Unlock()
+
+	delete(server.conns, conn)
+}
+
+func (server *Server) closeAllConns() {
+	server.connsMu.Lock()
+	defer server.connsMu.Unlock()
+
+	for conn := range server.conns {
+		conn.Close()
 	}
 }
 

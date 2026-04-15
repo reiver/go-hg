@@ -59,7 +59,9 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) 
 	}(log)
 
 	{
-		err := request.Parse(conn)
+		reader := io2.ClassicReader(ctx, io2.CreateReader(conn))
+
+		err := request.Parse(reader)
 		if nil != err {
 			log.Error(
 				field.S("problem parsing request"),
@@ -92,7 +94,8 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler) 
 	if nil == handler {
 		var timeout time.Duration = 1*time.Minute
 
-		ctxWithTimeout, _ := context.WithTimeout(ctx, timeout)
+		ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, timeout)
+		defer cancelTimeout()
 
 		ServeTemporaryFailure(ctxWithTimeout, w, request)
 		return
