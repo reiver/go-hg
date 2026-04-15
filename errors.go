@@ -11,6 +11,7 @@ const (
 	ErrDialError                = erorr.Error("dial error")
 	ErrNilNetworkConnection     = erorr.Error("nil network connection")
 	ErrNilReceiver              = erorr.Error("nil receiver")
+	ErrServerShutdown           = erorr.Error("server shutdown")
 	ErrRequestIsNothing         = erorr.Error("request is nothing")
 	ErrResponseHeaderMetaTooBig = erorr.Error("response header meta too big")
 	ErrTargetTypeUnsupported    = erorr.Error("target type unsupported")

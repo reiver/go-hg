@@ -196,6 +196,13 @@ func (receiver *Server) Serve(listener net.Listener) error {
 
 	receiver.initShutdownChannel()
 
+	// A Server cannot be reused after Shutdown has been called.
+	select {
+	case <-receiver.shutdownCh:
+		return ErrServerShutdown
+	default:
+	}
+
 	defer listener.Close() // Safety net for non-shutdown exits. During shutdown, listener is also closed by the shutdown goroutine to unblock Accept(); the double-close is harmless.
 
 	log := receiver.logger().Begin()
