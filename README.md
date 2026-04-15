@@ -168,7 +168,7 @@ func main() {
 
 		case hg.ResponsePermanentFailure:
 			//@TODO
-		case hg.ResponseNotFound :
+		case hg.ResponseNotFound:
 			//@TODO
 		case hg.ResponseGone:
 			//@TODO
