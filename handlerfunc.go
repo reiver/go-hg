@@ -18,5 +18,9 @@ import (
 type HandlerFunc func(context.Context, ResponseWriter, Request)
 
 func (fn HandlerFunc) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
+	if nil == fn {
+		return
+	}
+
 	fn(ctx, w, r)
 }
