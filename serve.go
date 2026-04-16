@@ -11,7 +11,7 @@ import (
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -50,7 +50,7 @@ func ServeInput(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -89,7 +89,7 @@ func ServeSensitiveInput(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -120,7 +120,7 @@ func ServeRedirectTemporary(ctx context.Context, w ResponseWriter, target string
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -151,7 +151,7 @@ func ServeRedirectPermanent(ctx context.Context, w ResponseWriter, target string
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -190,7 +190,7 @@ func ServeTemporaryFailure(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -229,7 +229,7 @@ func ServeServerUnavailable(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -268,7 +268,7 @@ func ServeCGIError(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -307,7 +307,7 @@ func ServeProxyError(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -338,7 +338,7 @@ func ServeSlowDown(ctx context.Context, w ResponseWriter, numberOfSecondsToWait 
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -377,7 +377,7 @@ func ServePermanentFailure(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -416,7 +416,7 @@ func ServeNotFound(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -455,7 +455,7 @@ func ServeGone(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
@@ -494,7 +494,7 @@ func ServeProxyRequestRefused(ctx context.Context, w ResponseWriter, a ...any) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
 //	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
