@@ -68,8 +68,14 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, 
 			// Only send an error response if the header hasn't been written yet.
 			// If it has, the response is already partially sent — closing the
 			// connection is the least-bad option.
+			//
+			// Use a fresh context because the handler's context may already be
+			// cancelled (e.g., handler timeout expired). The short timeout is
+			// a safety net so we don't block on a stuck write.
 			if nil != w && !rw.headerwritten {
-				ServeTemporaryFailure(ctx, w, request)
+				panicCtx, panicCancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer panicCancel()
+				ServeTemporaryFailure(panicCtx, w, request)
 			}
 		}
 	}(log)
