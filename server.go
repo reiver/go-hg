@@ -10,7 +10,7 @@ import (
 	"codeberg.org/reiver/go-field"
 )
 
-// ListenAndServe listens on the TCP network address `addr` and then spawns a call to the ServeMercuary method on the `handler` to serve each incoming connection.
+// ListenAndServe listens on the TCP network address `addr` and then spawns a call to the ServeMercury method on the `handler` to serve each incoming connection.
 //
 // For a very simple example:
 //
@@ -36,7 +36,7 @@ func ListenAndServe(addr string, handler Handler) error {
 	return server.ListenAndServe()
 }
 
-// Serve accepts an incoming Mercuary Protocol client connection on the net.Listener `listener`.
+// Serve accepts an incoming Mercury Protocol client connection on the net.Listener `listener`.
 //
 // For a very simple example:
 //
