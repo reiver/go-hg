@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"strings"
 
 	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
@@ -153,17 +152,18 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 		return 0, erorr.Wrap(err, msg)
 	}
 
-	var header strings.Builder
+	var headerBuffer [1024]byte
+	var header []byte = headerBuffer[0:0]
 	{
-		fmt.Fprintf(&header, "%02d %s\r\n", statusCode, meta)
-		log.Trace(field.S("wrote header"))
+		header = appendHeader(header, statusCode, meta)
+		log.Trace(field.S("wrote header to buffer"))
 	}
 
 	var n int
 	{
 		var err error
 
-		n, err = io.WriteString(receiver.Writer(ctx), header.String())
+		n, err = receiver.writer.Write(ctx, header)
 		if nil != err {
 			const msg string = "failed to write Mercury Protocol response header"
 
@@ -177,4 +177,9 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 	}
 
 	return n, nil
+}
+
+func appendHeader(p []byte, statusCode int, meta any) []byte {
+	p = append(p, fmt.Sprintf("%02d %v\r\n", statusCode, meta)...)
+	return p
 }
