@@ -103,14 +103,14 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 
 		log.Error(
 			field.S(msg),
-			field.String("meta-preview", meta[:min(64, len(meta))]),
+			field.String("meta-preview", metaPreview(meta)),
 			field.Int("meta-len", len(meta)),
 			field.Uint("max", maxmeta),
 			field.E(err),
 		)
 
 		return 0, erorr.Wrap(err, msg,
-			field.String("meta-preview", meta[:min(64, len(meta))]),
+			field.String("meta-preview", metaPreview(meta)),
 			field.Int("meta-len", len(meta)),
 			field.Uint("max", maxmeta),
 		)
@@ -125,13 +125,13 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 
 			log.Error(
 				field.S(msg),
-				field.String("meta-preview", meta[:min(64, len(meta))]),
+				field.String("meta-preview", metaPreview(meta)),
 				field.Int("meta-len", len(meta)),
 				field.E(err),
 			)
 
 			return 0, erorr.Wrap(err, msg,
-				field.String("meta-preview", meta[:min(64, len(meta))]),
+				field.String("meta-preview", metaPreview(meta)),
 				field.Int("meta-len", len(meta)),
 			)
 		}
@@ -226,4 +226,11 @@ func appendHeader(p []byte, statusCode int, meta string) []byte {
 	p = append(p, meta...)
 	p = append(p, "\r\n"...)
 	return p
+}
+
+// metaPreview returns a log-safe preview of the meta string, capped at 64 bytes
+// and stripped of any invalid UTF-8 (which would otherwise happen if the byte
+// boundary fell mid-rune).
+func metaPreview(meta string) string {
+	return strings.ToValidUTF8(meta[:min(64, len(meta))], "")
 }
