@@ -23,7 +23,7 @@ func TestMustlogger_nil(t *testing.T) {
 
 		if nil == logger || Logger(nil) == logger {
 			t.Errorf("For test #%d, expected a valid logger but did not actually get one.", testNumber)
-			t.Logf("LOGGER: (%T) %$v", logger, logger)
+			t.Logf("LOGGER: (%T) %#v", logger, logger)
 			continue
 		}
 
@@ -60,7 +60,7 @@ func TestMustlogger_valid(t *testing.T) {
 
 		if nil == logger ||  Logger(nil) == logger {
 			t.Errorf("For test #%d, expected a valid logger but did not actually get one.", testNumber)
-			t.Logf("LOGGER: (%T) %$v", logger, logger)
+			t.Logf("LOGGER: (%T) %#v", logger, logger)
 			continue
 		}
 
