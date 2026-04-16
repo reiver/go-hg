@@ -194,7 +194,7 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 		return 0, erorr.Wrap(err, msg)
 	}
 
-	var headerBuffer [1024]byte
+	var headerBuffer [maxrequest]byte
 	var header []byte = headerBuffer[0:0]
 	{
 		header = appendHeader(header, statusCode, meta)
