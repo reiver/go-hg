@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 
 	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
@@ -25,15 +26,15 @@ import (
 type ResponseWriter interface {
 	Write(ctx context.Context, p []byte) (n int, err error)
 	Writer(ctx context.Context) io.Writer
-	WriteHeader(ctx context.Context, statusCode int, meta any) (int, error)
+	WriteHeader(ctx context.Context, statusCode int, meta string) (int, error)
 }
 
 var _ ResponseWriter = &internalResponseWriter{}
 
 // internalResponseWriter is used to create a ResponseWriter around a io.Writer (such as a net.Conn).
 type internalResponseWriter struct {
-	writer io2.Writer
-	logger Logger
+	writer        io2.Writer
+	logger        Logger
 	headerwritten bool
 }
 
@@ -87,13 +88,54 @@ func (receiver *internalResponseWriter) Write(ctx context.Context, data []byte) 
 	return n, nil
 }
 
-func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusCode int, meta any) (int, error) {
+func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusCode int, meta string) (int, error) {
 	if nil == receiver {
 		return 0, ErrNilReceiver
 	}
 
 	log := mustlogger(receiver.logger).Begin()
 	defer log.End()
+
+	if maxmeta < len(meta) {
+		var err error = ErrResponseHeaderMetaTooBig
+
+		const msg string = "response header meta too big"
+
+		log.Error(
+			field.S(msg),
+			field.String("meta-preview", meta[:min(64, len(meta))]),
+			field.Int("meta-len", len(meta)),
+			field.Uint("max", maxmeta),
+			field.E(err),
+		)
+
+		return 0, erorr.Wrap(err, msg,
+			field.String("meta-preview", meta[:min(64, len(meta))]),
+			field.Int("meta-len", len(meta)),
+			field.Uint("max", maxmeta),
+		)
+	}
+
+	// Deal with the case where there is a "\r\n" (or "\r" or "\n") in the `meta` string.
+	{
+		if 0 <= strings.IndexAny(meta, "\r\n") {
+			var err error = ErrBadResponseHeaderMeta
+
+			const msg string = "response header meta contains carriage-return or line-feed"
+
+			log.Error(
+				field.S(msg),
+				field.String("meta-preview", meta[:min(64, len(meta))]),
+				field.Int("meta-len", len(meta)),
+				field.E(err),
+			)
+
+			return 0, erorr.Wrap(err, msg,
+				field.String("meta-preview", meta[:min(64, len(meta))]),
+				field.Int("meta-len", len(meta)),
+			)
+		}
+	}
 
 	if nil == ctx {
 		ctx = context.Background()
@@ -179,7 +221,9 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 	return n, nil
 }
 
-func appendHeader(p []byte, statusCode int, meta any) []byte {
-	p = append(p, fmt.Sprintf("%02d %v\r\n", statusCode, meta)...)
+func appendHeader(p []byte, statusCode int, meta string) []byte {
+	p = append(p, fmt.Sprintf("%02d ", statusCode)...)
+	p = append(p, meta...)
+	p = append(p, "\r\n"...)
 	return p
 }

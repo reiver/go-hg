@@ -6,6 +6,7 @@ import (
 
 const (
 	ErrBadStatusCode            = erorr.Error("bad status code")
+	ErrBadResponseHeaderMeta    = erorr.Error("bad response header meta")
 	ErrCannotParse              = erorr.Error("cannot parse")
 	ErrContextDone              = erorr.Error("context done")
 	ErrDialError                = erorr.Error("dial error")

@@ -13,3 +13,5 @@ const (
 // We are allowing twice that.
 const maxrequest = 1024 * 2
 
+const maxmeta = maxrequest - 2
+//                           2 == len("\r\n")

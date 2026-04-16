@@ -126,10 +126,6 @@ func (receiver *internalResponseReader) Read(ctx context.Context, data []byte) (
 // Both the public ReadHeader and the auto-read path in Read call this method.
 func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n int, err error) {
 
-	// The Gemini Protocol spec (which the Mercury Protocol is based on) says the meta SHOULD be a maximum of 1024 bytes.
-	// We are allowing more than that.
-	const maxmeta = 1024 * 2
-
 	if nil == receiver {
 		return 0, ErrNilReceiver
 	}
