@@ -59,7 +59,7 @@ func ListenAndServe(addr string, handler Handler) error {
 //		//@TODO: In your code, you would probably want to use a different handler.
 //		var handler hg.Handler = hg.DebugHandler
 //		
-//		err := hg.Serve(listener, handler)
+//		err = hg.Serve(listener, handler)
 //		if nil != err {
 //			//@TODO: Handle this error better.
 //			panic(err)
@@ -192,7 +192,7 @@ func (receiver *Server) ListenAndServe() error {
 //			Handler:handler,
 //		}
 //	
-//		err := server.Serve(listener)
+//		err = server.Serve(listener)
 //		if nil != err {
 //			//@TODO: Handle this error better.
 //			panic(err)
