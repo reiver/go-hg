@@ -83,9 +83,6 @@ func (receiver *internalResponseReader) Read(ctx context.Context, data []byte) (
 			case <-done:
 			}
 		}()
-	} else if _, ok := ctx.Deadline(); ok {
-		// Deadline but no cancel — still need to clear after.
-		defer conn.SetReadDeadline(time.Time{})
 	}
 
 	// Auto-read header if not yet read.
@@ -333,8 +330,6 @@ func (receiver *internalResponseReader) ReadHeader(ctx context.Context, statusCo
 			case <-done:
 			}
 		}()
-	} else if _, ok := ctx.Deadline(); ok {
-		defer conn.SetReadDeadline(time.Time{})
 	}
 
 	n, err = receiver.readHeader(statusCode, meta)
