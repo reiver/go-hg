@@ -269,7 +269,7 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 				field.S("problem writing Mercury Protocol header"),
 				field.E(err),
 			)
-			// intentially not returning here.
+			return
 		}
 		log.Trace(field.S("Mercury Protocol header written"))
 	}

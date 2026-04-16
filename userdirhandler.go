@@ -257,7 +257,7 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 				field.Stringer("request", r),
 				field.E(headerErr),
 			)
-			// intentionally not returning here.
+			return
 		}
 
 		if _, copyErr := io.Copy(w.Writer(ctx), file); nil != copyErr {
