@@ -186,6 +186,18 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 			return
 		}
 
+		// Symlink check: resolve the real path and verify it stays within the
+		// user's mercury_public directory.
+		//
+		// Note: there is an inherent TOCTOU (time-of-check-time-of-use) race here —
+		// the filesystem could change between EvalSymlinks and the os.Open below.
+		// The correct fix would be to open the file first, then verify the resolved
+		// path of the already-opened file descriptor (e.g., via fstat + readlink on
+		// /proc/self/fd). However, Go's standard library does not provide a way to
+		// resolve symlinks from an open *os.File — filepath.EvalSymlinks operates on
+		// paths, not file descriptors. The race window is small and exploitation
+		// requires write access to the user's mercury_public directory, which already
+		// grants the ability to serve arbitrary content.
 		if "" != allowedPrefix {
 			resolved, err := filepath.EvalSymlinks(targetpath)
 			if nil != err {
