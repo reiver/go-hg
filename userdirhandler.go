@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode/utf8"
+
+	"codeberg.org/reiver/go-field"
 )
 
 // UserDirHandler is a Mercury Protocol handler for tilde (~) capsule sites.
@@ -35,11 +37,19 @@ type UserDirHandler struct {
 	// directory are followed. If false (the default), requests that resolve to a
 	// symlink or pass through a symlink are rejected with a not-found response.
 	AllowSymLinks bool
+
+	Logger Logger
 }
 
 var _ Handler = &UserDirHandler{}
 
 func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
+	if nil == receiver {
+		return
+	}
+
+	log := mustlogger(receiver.Logger).Begin()
+	defer log.End()
 
 	requestValue := r.RequestValue()
 
@@ -200,7 +210,12 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 			defer func() {
 				err := file.Close()
 				if nil != err {
-					
+					log.Error(
+						field.S("could not close file"),
+						field.String("path", targetpath),
+						field.Stringer("request", r),
+						field.E(err),
+					)
 				}
 			}()
 		}
@@ -236,8 +251,23 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 			}
 		}
 
-		w.WriteHeader(ctx, StatusSuccess, mediatype)
-		io.Copy(w.Writer(ctx), file)
+		if _, headerErr := w.WriteHeader(ctx, StatusSuccess, mediatype); nil != headerErr {
+			log.Error(
+				field.S("problem writing Mercury Protocol header"),
+				field.Stringer("request", r),
+				field.E(headerErr),
+			)
+			// intentionally not returning here.
+		}
+
+		if _, copyErr := io.Copy(w.Writer(ctx), file); nil != copyErr {
+			log.Error(
+				field.S("problem writing Mercury Protocol body by copying file inferred from request"),
+				field.String("path", targetpath),
+				field.Stringer("request", r),
+				field.E(copyErr),
+			)
+		}
 		return
 	}
 }
