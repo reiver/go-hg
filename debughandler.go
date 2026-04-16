@@ -65,6 +65,8 @@ func (internalDebugHandler) ServeMercury(ctx context.Context, w ResponseWriter, 
 	storage.WriteString("\x1B[0m")
 	storage.WriteString("\r\n")
 
-	w.WriteHeader(ctx, StatusSuccess, "text/gemini")
+	if _, err := w.WriteHeader(ctx, StatusSuccess, "text/gemini"); nil != err {
+		return
+	}
 	io.WriteString(w.Writer(ctx), storage.String())
 }
