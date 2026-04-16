@@ -14,6 +14,7 @@ const (
 	ErrServerShutdown           = erorr.Error("server shutdown")
 	ErrRequestIsNothing         = erorr.Error("request is nothing")
 	ErrResponseHeaderMetaTooBig = erorr.Error("response header meta too big")
+	ErrNilResponseReader        = erorr.Error("nil response reader")
 	ErrTargetTypeUnsupported    = erorr.Error("target type unsupported")
 	ErrWriteError               = erorr.Error("write error")
 )

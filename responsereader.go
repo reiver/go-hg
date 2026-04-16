@@ -351,7 +351,7 @@ func (receiver *internalResponseReader) ReadHeader(ctx context.Context, statusCo
 
 func (receiver *internalResponseReader) Reader(ctx context.Context) io.Reader {
 	if nil == receiver {
-		return &internalReaderAdapter{}
+		return nil
 	}
 
 	if nil == ctx {
@@ -370,5 +370,13 @@ type internalReaderAdapter struct {
 }
 
 func (receiver *internalReaderAdapter) Read(data []byte) (int, error) {
+	if nil == receiver {
+		return 0, ErrNilReceiver
+	}
+	if nil == receiver.rr {
+		return 0, ErrNilResponseReader
+	}
+
+
 	return receiver.rr.Read(receiver.ctx, data)
 }
