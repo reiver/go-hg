@@ -11,7 +11,7 @@ package hg
 //
 //	var domain string = "example.com"
 //	
-//	var address string = fmt.Sprint("%s:%d", domain, hg.DefaultTCPPort)
+//	var address string = fmt.Sprintf("%s:%d", domain, hg.DefaultTCPPort)
 //	
 //	err := hg.ListenAndServe(address, handler)
 const DefaultTCPPort = 1961
