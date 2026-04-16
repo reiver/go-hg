@@ -2,17 +2,18 @@ package hg
 
 import (
 	"context"
-	"net/url"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"os/user"
 	"path"
 	"path/filepath"
+	"strings"
 	"unicode/utf8"
 )
 
-// Mercury based tilde (~) capsule sites.
+// UserDirHandler is a Mercury Protocol handler for tilde (~) capsule sites.
 //
 // Makes things like this:
 //
@@ -29,13 +30,16 @@ import (
 // Get mapped to:
 //
 //	/home/username/mercury_public/once/twice/thrice/fource.txt
-const UserDirHandler internalUserDirHandler = internalUserDirHandler(0)
+type UserDirHandler struct {
+	// AllowSymLinks controls whether symbolic links inside a user's mercury_public
+	// directory are followed. If false (the default), requests that resolve to a
+	// symlink or pass through a symlink are rejected with a not-found response.
+	AllowSymLinks bool
+}
 
-type internalUserDirHandler int
+var _ Handler = &UserDirHandler{}
 
-var _ Handler = internalUserDirHandler(0)
-
-func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
+func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
 
 	requestValue := r.RequestValue()
 
@@ -125,10 +129,10 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 		}
 	}
 
+	const publicDir = "mercury_public"
+
 	var targetpath string
 	{
-		const publicDir = "mercury_public"
-
 		targetpath = filepath.Join(homedir, publicDir, subpath)
 
 		targetpath = filepath.Clean(targetpath)
@@ -137,6 +141,13 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 			ServeTemporaryFailure(ctx, w)
 			return
 		}
+	}
+
+	// If symlinks are not allowed, resolve the real path and verify it is still
+	// under the user's mercury_public directory.
+	var allowedPrefix string
+	if nil == receiver || !receiver.AllowSymLinks {
+		allowedPrefix = filepath.Join(homedir, publicDir) + string(filepath.Separator)
 	}
 
 	{
@@ -163,6 +174,18 @@ func (internalUserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter
 		default:
 			ServeNotFound(ctx, w)
 			return
+		}
+
+		if "" != allowedPrefix {
+			resolved, err := filepath.EvalSymlinks(targetpath)
+			if nil != err {
+				ServeNotFound(ctx, w)
+				return
+			}
+			if !strings.HasPrefix(resolved, allowedPrefix) {
+				ServeNotFound(ctx, w)
+				return
+			}
 		}
 
 		var file *os.File
