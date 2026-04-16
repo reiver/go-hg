@@ -75,7 +75,13 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, 
 			if nil != w && !rw.headerwritten {
 				panicCtx, panicCancel := context.WithTimeout(context.Background(), 5*time.Second)
 				defer panicCancel()
-				ServeTemporaryFailure(panicCtx, w, request)
+				if err := ServeTemporaryFailure(panicCtx, w, request); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response after panic"),
+					field.Stringer("request", request),
+					field.E(err),
+				)
+			}
 			}
 		}
 	}(log)
@@ -143,7 +149,13 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, 
 		ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, timeout)
 		defer cancelTimeout()
 
-		ServeTemporaryFailure(ctxWithTimeout, w, request)
+		if err := ServeTemporaryFailure(ctxWithTimeout, w, request); nil != err {
+			log.Error(
+				field.S("problem sending temporary-failure response for nil handler"),
+				field.Stringer("request", request),
+				field.E(err),
+			)
+		}
 		return
 	}
 

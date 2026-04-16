@@ -37,7 +37,13 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 
 		if nil == root {
 			log.Error(field.S("nil root fs.FS (file system)"))
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 
@@ -67,7 +73,13 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 				field.String("request-value", requestValue),
 				field.E(err),
 			)
-			ServeBadRequest(ctx, w, "could not parse URL")
+			if err := ServeBadRequest(ctx, w, "could not parse URL"); nil != err {
+				log.Error(
+					field.S("problem sending bad-request response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 
@@ -94,7 +106,13 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 				field.String("actual-scheme", actualScheme),
 				field.Stringer("uri", uri),
 			)
-			ServeBadRequest(ctx, w, "unsupported URL scheme")
+			if err := ServeBadRequest(ctx, w, "unsupported URL scheme"); nil != err {
+				log.Error(
+					field.S("problem sending bad-request response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 
@@ -115,7 +133,13 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 				field.String("path", reqpath),
 				field.Stringer("request", r),
 			)
-			ServeBadRequest(ctx, w, "empty request path")
+			if err := ServeBadRequest(ctx, w, "empty request path"); nil != err {
+				log.Error(
+					field.S("problem sending bad-request response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 
@@ -135,7 +159,13 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 				field.S("request-path is invalid."),
 				field.String("request-path", reqpath),
 			)
-			ServeBadRequest(ctx, w, "invalid URL path")
+			if err := ServeBadRequest(ctx, w, "invalid URL path"); nil != err {
+				log.Error(
+					field.S("problem sending bad-request response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 		log.Trace(
@@ -158,10 +188,22 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 
 				switch {
 				case notfound:
-					ServeNotFound(ctx, w)
+					if err := ServeNotFound(ctx, w); nil != err {
+						log.Error(
+							field.S("problem sending not-found response"),
+							field.Stringer("request", r),
+							field.E(err),
+						)
+					}
 					return
 				default:
-					ServeTemporaryFailure(ctx, w)
+					if err := ServeTemporaryFailure(ctx, w); nil != err {
+						log.Error(
+							field.S("problem sending temporary-failure response"),
+							field.Stringer("request", r),
+							field.E(err),
+						)
+					}
 					return
 				}
 			}
@@ -170,7 +212,13 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 					field.S("file is nil"),
 					field.FormattedString("file", "%#v", file),
 				)
-				ServeTemporaryFailure(ctx, w)
+				if err := ServeTemporaryFailure(ctx, w); nil != err {
+					log.Error(
+						field.S("problem sending temporary-failure response"),
+						field.Stringer("request", r),
+						field.E(err),
+					)
+				}
 				return
 			}
 		}
@@ -198,7 +246,13 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 				field.Stringer("request", r),
 				field.E(err),
 			)
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 		log.Trace(field.FormattedString("fileinfo", "%#v", fileinfo))
@@ -226,10 +280,22 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 
 				switch {
 				case notfound:
-					ServeNotFound(ctx, w)
+					if err := ServeNotFound(ctx, w); nil != err {
+						log.Error(
+							field.S("problem sending not-found response"),
+							field.Stringer("request", r),
+							field.E(err),
+						)
+					}
 					return
 				default:
-					ServeTemporaryFailure(ctx, w)
+					if err := ServeTemporaryFailure(ctx, w); nil != err {
+						log.Error(
+							field.S("problem sending temporary-failure response"),
+							field.Stringer("request", r),
+							field.E(err),
+						)
+					}
 					return
 				}
 			}

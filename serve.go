@@ -24,11 +24,11 @@ import (
 //		// ...
 //		
 //	}
-func ServeInput(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeInput(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusInput
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -41,7 +41,8 @@ func ServeInput(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 11 SENSITIVE INPUT
@@ -63,11 +64,11 @@ func ServeInput(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeSensitiveInput(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeSensitiveInput(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusSensitiveInput
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -80,7 +81,8 @@ func ServeSensitiveInput(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 30 REDIRECT - TEMPORARY
@@ -104,14 +106,15 @@ func ServeSensitiveInput(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeRedirectTemporary(ctx context.Context, w ResponseWriter, target string) {
+func ServeRedirectTemporary(ctx context.Context, w ResponseWriter, target string) error {
 	const statuscode = StatusRedirectTemporary
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
-	w.WriteHeader(ctx, statuscode, target)
+	_, err := w.WriteHeader(ctx, statuscode, target)
+	return err
 }
 
 // 31 REDIRECT - PERMANENT
@@ -135,14 +138,15 @@ func ServeRedirectTemporary(ctx context.Context, w ResponseWriter, target string
 //		// ...
 //		
 //	}
-func ServeRedirectPermanent(ctx context.Context, w ResponseWriter, target string) {
+func ServeRedirectPermanent(ctx context.Context, w ResponseWriter, target string) error {
 	const statuscode = StatusRedirectPermanent
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
-	w.WriteHeader(ctx, statuscode, target)
+	_, err := w.WriteHeader(ctx, statuscode, target)
+	return err
 }
 
 // 40 TEMPORARY FAILURE
@@ -164,11 +168,11 @@ func ServeRedirectPermanent(ctx context.Context, w ResponseWriter, target string
 //		// ...
 //		
 //	}
-func ServeTemporaryFailure(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeTemporaryFailure(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusTemporaryFailure
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -181,7 +185,8 @@ func ServeTemporaryFailure(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 41 SERVER UNAVAILABLE
@@ -203,11 +208,11 @@ func ServeTemporaryFailure(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeServerUnavailable(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeServerUnavailable(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusServerUnavailable
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -220,7 +225,8 @@ func ServeServerUnavailable(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 42 CGI ERROR
@@ -242,11 +248,11 @@ func ServeServerUnavailable(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeCGIError(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeCGIError(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusCGIError
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -259,7 +265,8 @@ func ServeCGIError(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 43 PROXY ERROR
@@ -281,11 +288,11 @@ func ServeCGIError(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeProxyError(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeProxyError(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusProxyError
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -298,7 +305,8 @@ func ServeProxyError(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 44 SLOW DOWN
@@ -320,16 +328,17 @@ func ServeProxyError(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeSlowDown(ctx context.Context, w ResponseWriter, numberOfSecondsToWait uint) {
+func ServeSlowDown(ctx context.Context, w ResponseWriter, numberOfSecondsToWait uint) error {
 	const statuscode = StatusSlowDown
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string = fmt.Sprintf("%d", numberOfSecondsToWait)
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 50 PERMANENT FAILURE
@@ -351,11 +360,11 @@ func ServeSlowDown(ctx context.Context, w ResponseWriter, numberOfSecondsToWait 
 //		// ...
 //		
 //	}
-func ServePermanentFailure(ctx context.Context, w ResponseWriter, a ...any) {
+func ServePermanentFailure(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusPermanentFailure
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -368,7 +377,8 @@ func ServePermanentFailure(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 51 NOT FOUND
@@ -390,11 +400,11 @@ func ServePermanentFailure(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeNotFound(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeNotFound(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusNotFound
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -407,7 +417,8 @@ func ServeNotFound(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 52 GONE
@@ -429,11 +440,11 @@ func ServeNotFound(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeGone(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeGone(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusGone
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -446,7 +457,8 @@ func ServeGone(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 53 PROXY REQUEST REFUSED
@@ -468,11 +480,11 @@ func ServeGone(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeProxyRequestRefused(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeProxyRequestRefused(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusProxyRequestRefused
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -485,7 +497,8 @@ func ServeProxyRequestRefused(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 59 BAD REQUEST
@@ -507,11 +520,11 @@ func ServeProxyRequestRefused(ctx context.Context, w ResponseWriter, a ...any) {
 //		// ...
 //		
 //	}
-func ServeBadRequest(ctx context.Context, w ResponseWriter, a ...any) {
+func ServeBadRequest(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusBadRequest
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -524,5 +537,6 @@ func ServeBadRequest(ctx context.Context, w ResponseWriter, a ...any) {
 		}
 	}
 
-	w.WriteHeader(ctx, statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }

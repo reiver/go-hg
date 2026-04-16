@@ -59,12 +59,24 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 
 		uri, err = url.Parse(requestValue)
 		if nil != err {
-			ServeBadRequest(ctx, w)
+			if serveErr := ServeBadRequest(ctx, w); nil != serveErr {
+				log.Error(
+					field.S("problem sending bad-request response"),
+					field.Stringer("request", r),
+					field.E(serveErr),
+				)
+			}
 			return
 		}
 
 		if nil == uri {
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -77,7 +89,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		{
 			r, _ := utf8.DecodeLastRuneInString(uri.Path)
 			if utf8.RuneError == r {
-				ServeBadRequest(ctx, w)
+				if err := ServeBadRequest(ctx, w); nil != err {
+					log.Error(
+						field.S("problem sending bad-request response"),
+						field.String("request-value", requestValue),
+						field.E(err),
+					)
+				}
 				return
 			}
 
@@ -89,7 +107,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		requestpath = path.Clean(uri.Path)
 
 		if "" == requestpath {
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -103,16 +127,34 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 
 		username, subpath, valid = parsetildedir(requestpath)
 		if !valid {
-			ServeNotFound(ctx, w)
+			if err := ServeNotFound(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending not-found response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 
 		if "" == username {
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 		if "" == subpath {
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -123,10 +165,22 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		if nil != err {
 			switch err.(type) {
 			case user.UnknownUserError:
-				ServeNotFound(ctx, w)
+				if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending not-found response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			default:
-				ServeTemporaryFailure(ctx, w)
+				if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending temporary-failure response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			}
 		}
@@ -134,7 +188,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		homedir = u.HomeDir
 
 		if "" == homedir {
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -148,7 +208,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		targetpath = filepath.Clean(targetpath)
 
 		if "" == targetpath {
-			ServeTemporaryFailure(ctx, w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -163,7 +229,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 	{
 		fi, err := os.Stat(targetpath)
 		if nil != err {
-			ServeNotFound(ctx, w)
+			if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+				log.Error(
+					field.S("problem sending not-found response"),
+					field.Stringer("request", r),
+					field.E(serveErr),
+				)
+			}
 			return
 		}
 
@@ -173,7 +245,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		case mode.IsDir():
 			if !explicitDir {
 				uri.Path += "/"
-				ServeRedirectTemporary(ctx, w, uri.String())
+				if err := ServeRedirectTemporary(ctx, w, uri.String()); nil != err {
+					log.Error(
+						field.S("problem sending redirect-temporary response"),
+						field.Stringer("request", r),
+						field.E(err),
+					)
+				}
 				return
 			}
 
@@ -182,7 +260,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		case mode.IsRegular():
 			// Nothing here.
 		default:
-			ServeNotFound(ctx, w)
+			if err := ServeNotFound(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending not-found response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 
@@ -201,11 +285,23 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		if "" != allowedPrefix {
 			resolved, err := filepath.EvalSymlinks(targetpath)
 			if nil != err {
-				ServeNotFound(ctx, w)
+				if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending not-found response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			}
 			if !strings.HasPrefix(resolved, allowedPrefix) {
-				ServeNotFound(ctx, w)
+				if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending not-found response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			}
 		}
@@ -216,7 +312,13 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 
 			file, err = os.Open(targetpath)
 			if nil != err {
-				ServeTemporaryFailure(ctx, w)
+				if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending temporary-failure response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			}
 			defer func() {
@@ -238,13 +340,25 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 
 			n, err := file.Read(magic[:])
 			if nil != err && err != io.EOF {
-				ServeTemporaryFailure(ctx, w)
+				if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending temporary-failure response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			}
 			{
 				_, err := file.Seek(0,0)
 				if nil != err {
-					ServeTemporaryFailure(ctx, w)
+					if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
+						log.Error(
+							field.S("problem sending temporary-failure response"),
+							field.Stringer("request", r),
+							field.E(serveErr),
+						)
+					}
 					return
 				}
 			}
