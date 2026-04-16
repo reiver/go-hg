@@ -42,24 +42,24 @@ const (
 
 const (
 	StatusTextInput               = "input"                 // 10
-	StatusTextSensitiveInput      = "sensitive‐input"       // 11
+	StatusTextSensitiveInput      = "sensitive-input"       // 11
 
 	StatusTextSuccess             = "success"               // 20
 
 	StatusTextRedirectTemporary   = "temporary-redirection" // 30
 	StatusTextRedirectPermanent   = "permanent-redirection" // 31
 
-	StatusTextTemporaryFailure    = "temporary‐failure"     // 40
-	StatusTextServerUnavailable   = "server‐unavailable"    // 41
-	StatusTextCGIError            = "cgi‐error"             // 42
-	StatusTextProxyError          = "proxy‐error"           // 43
+	StatusTextTemporaryFailure    = "temporary-failure"     // 40
+	StatusTextServerUnavailable   = "server-unavailable"    // 41
+	StatusTextCGIError            = "cgi-error"             // 42
+	StatusTextProxyError          = "proxy-error"           // 43
 	StatusTextSlowDown            = "slow-down"             // 44
 
-	StatusTextPermanentFailure    = "permanent‐failure"     // 50
-	StatusTextNotFound            = "not‐found"             // 51
+	StatusTextPermanentFailure    = "permanent-failure"     // 50
+	StatusTextNotFound            = "not-found"             // 51
 	StatusTextGone                = "gone"                  // 52
-	StatusTextProxyRequestRefused = "proxy‐request‐refused" // 53
-	StatusTextBadRequest          = "bad‐request"           // 59
+	StatusTextProxyRequestRefused = "proxy-request-refused" // 53
+	StatusTextBadRequest          = "bad-request"           // 59
 
 	// Not exported since, unlike Gemini Protocol, Mercury Protocol doesn't support certficates.
 	statusTextCertificateRequired      = "certificate-required" // 60

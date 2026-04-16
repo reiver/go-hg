@@ -27,22 +27,22 @@ package hg
 // The following constants provide useful default values for these cosmetic meta value's, that can make a programmer's life easier when developing a Mercury Protcol client or server:
 //
 //	• DefaultMetaSuccess             = "success"               // 20
-//	• DefaultMetaTemporaryFailure    = "temporary‐failure"     // 40
-//	• DefaultMetaServerUnavailable   = "server‐unavailable"    // 41
-//	• DefaultMetaCGIError            = "cgi‐error"             // 42
-//	• DefaultMetaProxyError          = "proxy‐error"           // 43
-//	• DefaultMetaPermanentFailure    = "permanent‐failure"     // 50
-//	• DefaultMetaNotFound            = "not‐found"             // 51
+//	• DefaultMetaTemporaryFailure    = "temporary-failure"     // 40
+//	• DefaultMetaServerUnavailable   = "server-unavailable"    // 41
+//	• DefaultMetaCGIError            = "cgi-error"             // 42
+//	• DefaultMetaProxyError          = "proxy-error"           // 43
+//	• DefaultMetaPermanentFailure    = "permanent-failure"     // 50
+//	• DefaultMetaNotFound            = "not-found"             // 51
 //	• DefaultMetaGone                = "gone"                  // 52
-// 	• DefaultMetaProxyRequestRefused = "proxy‐request‐refused" // 53
-//	• DefaultMetaBadRequest          = "bad‐request"           // 59
+// 	• DefaultMetaProxyRequestRefused = "proxy-request-refused" // 53
+//	• DefaultMetaBadRequest          = "bad-request"           // 59
 //
 // Two of the of these default response‐header's ‘meta’ are (not cosmetic but are) shown to the user.
 // The programmer SHOULD create their own message; but just in case the don't, these default values exist:
 //
 // • DefaultMetaInput               = "input"                 // 10
 //
-// • DefaultMetaSensitiveInput      = "sensitive‐input"       // 11
+// • DefaultMetaSensitiveInput      = "sensitive-input"       // 11
 //
 // In addition to these, one of these default response‐header is functional.
 //
