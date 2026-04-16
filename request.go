@@ -106,10 +106,6 @@ func (receiver *Request) parse(reader io.Reader) error {
 		return errNilSource
 	}
 
-	// The Gemini Protocol spec (which the Mercury Protocol is based on) says the request URI SHOULD be a maximum of 1024 bytes.
-	// We are allowing twice that.
-	const maxrequest = 1024 * 2
-
 	var storage strings.Builder
 	{
 		for {

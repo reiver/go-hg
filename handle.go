@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"bufio"
 	"context"
 	"net"
 	"time"
@@ -74,16 +75,34 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, 
 	}(log)
 
 	{
-		readCtx := ctx
+		// Set a single, absolute read deadline on the connection for the
+		// entire request-line read. This protects against slowloris attacks
+		// where a client sends data very slowly to hold the connection open.
 		if readTimeout > 0 {
-			var readCancel context.CancelFunc
-			readCtx, readCancel = context.WithTimeout(ctx, readTimeout)
-			defer readCancel()
+			conn.SetReadDeadline(time.Now().Add(readTimeout))
 		}
 
-		reader := io2.ClassicReader(readCtx, io2.CreateReader(conn))
+		// Buffer the request line from the network in one shot.
+		// The buffer is sized to maxrequest so ReadSlice
+		// returns bufio.ErrBufferFull if the line exceeds the limit.
+		br := bufio.NewReaderSize(conn, maxrequest)
+		line, err := br.ReadSlice('\n')
 
-		err := request.Parse(reader)
+		// Clear the read deadline now that we have the request bytes.
+		if readTimeout > 0 {
+			conn.SetReadDeadline(time.Time{})
+		}
+
+		if nil != err {
+			log.Error(
+				field.S("problem reading request"),
+				field.E(err),
+			)
+			return
+		}
+
+		// Parse the in-memory bytes (UTF-8 validation, \r\n check, etc.).
+		err = request.Parse(line)
 		if nil != err {
 			log.Error(
 				field.S("problem parsing request"),
