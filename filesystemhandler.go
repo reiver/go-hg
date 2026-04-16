@@ -233,17 +233,17 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 					return
 				}
 			}
-			defer func() {
-				err := file.Close()
+			defer func(f fs.File, path string) {
+				err := f.Close()
 				if nil != err {
 					log.Error(
 						field.S("could not close default file from request"),
-						field.String("default-path", defaultpath),
+						field.String("default-path", path),
 						field.Stringer("request", r),
 						field.E(err),
 					)
 				}
-			}()
+			}(defaultfile, defaultpath)
 
 			file = defaultfile
 			fspath = defaultpath
