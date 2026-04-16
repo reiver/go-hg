@@ -277,7 +277,7 @@ func (receiver *Server) Serve(listener net.Listener) error {
 
 //@TODO: Could try to recover from certain kinds of errors. Maybe waiting a while before trying again.
 			log.Error(
-				field.S("error while listing"),
+				field.S("error while listening"),
 				field.Stringer("addr", listener.Addr()),
 				field.E(err),
 			)
