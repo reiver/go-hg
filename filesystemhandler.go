@@ -6,7 +6,7 @@ import (
 	"io/fs"
 	"net/url"
 	"os"
-	"path/filepath"
+	"path"
 
 	"codeberg.org/reiver/go-field"
 )
@@ -209,7 +209,7 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 				field.String("filesystem-path", fspath),
 			)
 
-			defaultpath := filepath.Join(fspath, defaultfilename)
+			defaultpath := path.Join(fspath, defaultfilename)
 
 			defaultfile, err := root.Open(defaultpath)
 			if nil != err {
