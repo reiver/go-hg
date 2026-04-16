@@ -245,7 +245,7 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 				extension := filepath.Ext(targetpath)
 
 				switch extension {
-				case ".gmi", ".gmni":
+				case ".gmi", ".gmni", ".gemini":
 					mediatype = "text/gemini"
 				}
 			}
