@@ -137,9 +137,9 @@ type Server struct {
 //	
 //	func main() {
 //	
-//		var handler hg.Handler = hg.EchoHandler
+//		var handler hg.Handler = hg.DebugHandler
 //	
-//		server := &telnet.Server{
+//		server := &hg.Server{
 //			Addr:":1961",
 //			Handler:handler,
 //		}
@@ -186,9 +186,9 @@ func (receiver *Server) ListenAndServe() error {
 //			panic(err)
 //		}
 //	
-//		var handler hg.Handler = hg.EchoHandler
+//		var handler hg.Handler = hg.DebugHandler
 //	
-//		server := &telnet.Server{
+//		server := &hg.Server{
 //			Handler:handler,
 //		}
 //	
