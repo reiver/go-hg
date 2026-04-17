@@ -2,6 +2,7 @@ package hg
 
 import (
 	"context"
+	"crypto/tls"
 	"io"
 	"net"
 	"time"
@@ -79,6 +80,91 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 		// from Close().
 		conn.Close()
 		return nil, erorr.Wrap(err, "could not dial and call for mercury protocol",
+			field.String("addr", addr),
+			field.Stringer("request", request),
+		)
+	}
+	return rr, nil
+}
+
+// DialAndCallTLS makes a TLS connection to the TCP address given by 'addr',
+// and sends the request given by 'request'.
+//
+// This can be used to speak protocols that layer on TLS (such as the Gemini Protocol).
+//
+// The context 'ctx' controls the lifetime of the dial and the request write.
+// If 'ctx' is nil, context.Background() is used.
+// To apply a timeout, use context.WithTimeout or context.WithDeadline.
+//
+// If 'tlsConf' is nil, a default tls.Config is used.
+//
+// What is given by 'addr' might be something like: "11.22.33.44:1965", or "example.com:1965"
+//
+// What is given by 'request' might be a Request containing something like: "gemini://example.com/path/to/file.txt\r\n"
+//
+// A example of using this might be:
+//
+//	var uri string = "gemini://example.com/once/twice/thrice/fource.gmni"
+//
+//	var request hg.Request
+//	err := request.Parse(uri)
+//	if nil != err {
+//		return err
+//	}
+//
+//	var addr string = "example.com:1965"
+//
+//	ctx := context.Background()
+//
+//	rr, err := hg.DialAndCallTLS(ctx, addr, request, nil)
+//
+// See also:
+//
+//	• [Call]
+//	• [DialAndCall]
+func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *tls.Config) (ResponseReader, error) {
+
+	if nil == ctx {
+		ctx = context.Background()
+	}
+
+	if ctxErr := ctx.Err(); nil != ctxErr {
+		var errs error = erorr.Errors{ErrContextDone, ctxErr}
+		return nil, erorr.Wrap(errs, "could not dial and call over tls",
+			field.String("addr", addr),
+			field.Stringer("request", request),
+		)
+	}
+
+	var dialer net.Dialer
+
+	if deadline, ok := ctx.Deadline(); ok {
+		dialer.Deadline = deadline
+	}
+
+	conn, err := tls.DialWithDialer(&dialer, "tcp", addr, tlsConf)
+	if nil != err {
+		if ctxErr := ctx.Err(); nil != ctxErr {
+			var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
+			return nil, erorr.Wrap(errs, "could not dial tls",
+				field.String("addr", addr),
+				field.Stringer("request", request),
+			)
+		}
+		var errs error = erorr.Errors{ErrDialError, err}
+		return nil, erorr.Wrap(errs, "could not dial tls",
+			field.String("addr", addr),
+			field.Stringer("request", request),
+		)
+	}
+
+	rr, err := Call(ctx, conn, request)
+	if nil != err {
+		// The connection is not owned by a ResponseReader on the error path,
+		// so nothing else will close it. Intentionally discarding the error
+		// from Close().
+		conn.Close()
+		return nil, erorr.Wrap(err, "could not dial and call over tls",
 			field.String("addr", addr),
 			field.Stringer("request", request),
 		)
