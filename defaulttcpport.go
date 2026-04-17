@@ -17,7 +17,7 @@ const (
 	//	err := hg.ListenAndServe(address, handler)
 	DefaultTCPPort    = 1961
 
-	// A Gemni Protocol server runs over TLS over TCP.
+	// A Gemini Protocol server runs over TLS over TCP.
 	// TCP has communications happening over TCP-ports.
 	// A client-server protocol (including the Gemini Protocol) typically defines a default-TCP-port for servers.
 	// For the Gemini Protocol, this default-TCP-port is: 1965.
