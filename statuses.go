@@ -34,10 +34,11 @@ const (
 	StatusProxyRequestRefused = 53
 	StatusBadRequest          = 59
 
-	// Not exported since, unlike Gemini Protocol, Mercury Protocol doesn't support certficates.
-	statusCertificateRequired      = 60
-	statusCertificateNotAuthorized = 61
-	statusCertificateNotValid      = 62
+	// Gemini Protocol only.
+	// Not used in the Mercury Protocol.
+	StatusCertificateRequired      = 60
+	StatusCertificateNotAuthorized = 61
+	StatusCertificateNotValid      = 62
 )
 
 const (
@@ -62,9 +63,9 @@ const (
 	StatusTextBadRequest          = "bad-request"           // 59
 
 	// Not exported since, unlike Gemini Protocol, Mercury Protocol doesn't support certficates.
-	statusTextCertificateRequired      = "certificate-required" // 60
-	statusTextCertificateNotAuthorized = "certificate-not-authorized" // 61
-	statusTextCertificateNotValid      = "certificate-not-valid" // 62
+	StatusTextCertificateRequired      = "certificate-required" // 60
+	StatusTextCertificateNotAuthorized = "certificate-not-authorized" // 61
+	StatusTextCertificateNotValid      = "certificate-not-valid" // 62
 )
 
 func StatusText(code int) string {
@@ -104,12 +105,12 @@ func StatusText(code int) string {
 	case StatusBadRequest:          // 59
 		return StatusTextBadRequest
 
-	case statusCertificateRequired:      // 60
-		return statusTextCertificateRequired
-	case statusCertificateNotAuthorized: // 61
-		return statusTextCertificateNotAuthorized
-	case statusCertificateNotValid:      // 62
-		return statusTextCertificateNotValid
+	case StatusCertificateRequired:      // 60
+		return StatusTextCertificateRequired
+	case StatusCertificateNotAuthorized: // 61
+		return StatusTextCertificateNotAuthorized
+	case StatusCertificateNotValid:      // 62
+		return StatusTextCertificateNotValid
 
 	default:
 		return fmt.Sprintf("meta-%d", code)
