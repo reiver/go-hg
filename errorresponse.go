@@ -79,6 +79,13 @@ package hg
 //			case hg.ResponseBadRequest:
 //				//@TODO
 //
+//			case hg.ResponseCertificateRequired:
+//				//@TODO
+//			case hg.ResponseCertificateNotAuthorized:
+//				//@TODO
+//			case hg.ResponseCertificateNotValid:
+//				//@TODO
+//
 //			case hg.UnknownResponse:
 //				//@TODO
 //
@@ -125,6 +132,13 @@ func ErrorResponse(statuscode int, meta string) error {
 		return ResponseProxyRequestRefused{meta}
 	case StatusBadRequest:
 		return ResponseBadRequest{meta}
+
+	case StatusCertificateRequired:
+		return ResponseCertificateRequired{meta}
+	case StatusCertificateNotAuthorized:
+		return ResponseCertificateNotAuthorized{meta}
+	case StatusCertificateNotValid:
+		return ResponseCertificateNotValid{meta}
 
 	default:
 		return UnknownResponse{meta:meta, statusCode:statuscode}

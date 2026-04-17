@@ -36,7 +36,14 @@ type ResponseProxyRequestRefused struct {meta string} // 53
 // ResponseBadRequest represents a Mercury Protocol “59 BAD REQUEST” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseBadRequest          struct {meta string} // 59
 
-// UnknownResponse represents a Mercury Protocol unknown response that this package doesn't have a type for. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
+// ResponseCertificateRequired represents a "60 CLIENT CERTIFICATE REQUIRED" response (Gemini Protocol only). You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
+type ResponseCertificateRequired      struct {meta string} // 60
+// ResponseCertificateNotAuthorized represents a "61 CERTIFICATE NOT AUTHORIZED" response (Gemini Protocol only). You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
+type ResponseCertificateNotAuthorized struct {meta string} // 61
+// ResponseCertificateNotValid represents a "62 CERTIFICATE NOT VALID" response (Gemini Protocol only). You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
+type ResponseCertificateNotValid      struct {meta string} // 62
+
+// UnknownResponse represents an unknown response that this package doesn't have a type for. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type UnknownResponse             struct {meta string ; statusCode int}
 
 
@@ -58,6 +65,10 @@ func (receiver ResponseNotFound)            Error() string {return fmt.Sprintf("
 func (receiver ResponseGone)                Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 52
 func (receiver ResponseProxyRequestRefused) Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 53
 func (receiver ResponseBadRequest)          Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 59
+
+func (receiver ResponseCertificateRequired)      Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 60
+func (receiver ResponseCertificateNotAuthorized) Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 61
+func (receiver ResponseCertificateNotValid)      Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 62
 
 func (receiver UnknownResponse)             Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.statusCode,   receiver.meta)}
 
@@ -81,6 +92,10 @@ func (receiver ResponseGone)                StatusCode() int {return StatusGone 
 func (receiver ResponseProxyRequestRefused) StatusCode() int {return StatusProxyRequestRefused } // 53
 func (receiver ResponseBadRequest)          StatusCode() int {return StatusBadRequest          } // 59
 
+func (receiver ResponseCertificateRequired)      StatusCode() int {return StatusCertificateRequired      } // 60
+func (receiver ResponseCertificateNotAuthorized) StatusCode() int {return StatusCertificateNotAuthorized } // 61
+func (receiver ResponseCertificateNotValid)      StatusCode() int {return StatusCertificateNotValid      } // 62
+
 func (receiver UnknownResponse)             StatusCode() int {return receiver.statusCode       }
 
 
@@ -103,6 +118,10 @@ func (receiver ResponseGone)                Meta() string {return receiver.meta}
 func (receiver ResponseProxyRequestRefused) Meta() string {return receiver.meta}
 func (receiver ResponseBadRequest)          Meta() string {return receiver.meta}
 
+func (receiver ResponseCertificateRequired)      Meta() string {return receiver.meta}
+func (receiver ResponseCertificateNotAuthorized) Meta() string {return receiver.meta}
+func (receiver ResponseCertificateNotValid)      Meta() string {return receiver.meta}
+
 func (receiver UnknownResponse)             Meta() string {return receiver.meta}
 
 
@@ -124,5 +143,9 @@ func (receiver ResponseNotFound)            StatusText() string {return "not fou
 func (receiver ResponseGone)                StatusText() string {return "gone"}
 func (receiver ResponseProxyRequestRefused) StatusText() string {return "proxy request refused"}
 func (receiver ResponseBadRequest)          StatusText() string {return "bad request"}
+
+func (receiver ResponseCertificateRequired)      StatusText() string {return "certificate required"}
+func (receiver ResponseCertificateNotAuthorized) StatusText() string {return "certificate not authorized"}
+func (receiver ResponseCertificateNotValid)      StatusText() string {return "certificate not valid"}
 
 func (receiver UnknownResponse)             StatusText() string {return ""}
