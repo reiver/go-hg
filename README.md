@@ -1,6 +1,6 @@
 # go-hg ☿
 
-Package **hg** provides ☿ **Mercury Protocol** client and server implementations, for the Go programming-language (golang).
+Package **hg** provides ☿ **Mercury Protocol** and **Gemini Protocol** client and server implementations, for the Go programming-language (golang).
 
 The **hg** package provides an API in a style similar to the `"net/http"` package that is part of the Go standard library, including support for "middleware".
 
