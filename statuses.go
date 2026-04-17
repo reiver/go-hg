@@ -62,10 +62,11 @@ const (
 	StatusTextProxyRequestRefused = "proxy-request-refused" // 53
 	StatusTextBadRequest          = "bad-request"           // 59
 
-	// Not exported since, unlike Gemini Protocol, Mercury Protocol doesn't support certficates.
-	StatusTextCertificateRequired      = "certificate-required" // 60
+	// Gemini Protocol only.
+	// Not used in the Mercury Protocol.
+	StatusTextCertificateRequired      = "certificate-required"       // 60
 	StatusTextCertificateNotAuthorized = "certificate-not-authorized" // 61
-	StatusTextCertificateNotValid      = "certificate-not-valid" // 62
+	StatusTextCertificateNotValid      = "certificate-not-valid"      // 62
 )
 
 func StatusText(code int) string {
