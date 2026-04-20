@@ -114,7 +114,7 @@ func StatusText(code int) string {
 		return StatusTextCertificateNotValid
 
 	default:
-		return fmt.Sprintf("meta-%d", code)
+		return fmt.Sprintf("unknown-meta-%d", code)
 
 	}
 }
