@@ -16,23 +16,25 @@ func init() {
 // infermediatype infers the media-type from the filename or filesystem-path.
 //
 // If it cannot infer it, then it returns an empty string ("").
-func infermediatype(s string) string {
+func infermediatype(fileName string) string {
 
-	var fileextension string
+	var fileExtension string
 	{
-		fileextension  = filepath.Ext(s)
+		fileExtension  = filepath.Ext(fileName)
 	}
 
 	{
-		if "" == fileextension {
+		if "" == fileExtension {
 			return defaultmediatype
 		}
 	}
 
 	var mediatype string
 	{
-		mediatype = mime.TypeByExtension(fileextension)
+		mediatype = mime.TypeByExtension(fileExtension)
 	}
+
+	//@TODO: should we had a http.DetectContentType() check if the fileExtension check fails?
 
 	if "" == mediatype {
 		return defaultmediatype
