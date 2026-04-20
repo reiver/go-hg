@@ -107,7 +107,7 @@ func (receiver *internalResponseReader) Read(ctx context.Context, data []byte) (
 		if nil != err {
 			if ctxErr := ctx.Err(); nil != ctxErr {
 				var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
-				return 0, erorr.Wrap(errs, "could not read Mercury Protocol response header")
+				return 0, erorr.Wrap(errs, "was told not read Mercury Protocol response header")
 			}
 			return 0, err
 		}
@@ -308,7 +308,7 @@ func (receiver *internalResponseReader) ReadHeader(ctx context.Context, statusCo
 
 	if ctxErr := ctx.Err(); nil != ctxErr {
 		var errs error = erorr.Errors{ErrContextDone, ctxErr}
-		return 0, erorr.Wrap(errs, "could not read Mercury Protocol response header")
+		return 0, erorr.Wrap(errs, "was told not read Mercury Protocol response header")
 	}
 
 	var conn net.Conn = receiver.conn
@@ -342,7 +342,7 @@ func (receiver *internalResponseReader) ReadHeader(ctx context.Context, statusCo
 	if nil != err {
 		if ctxErr := ctx.Err(); nil != ctxErr {
 			var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
-			return n, erorr.Wrap(errs, "could not read Mercury Protocol response header")
+			return n, erorr.Wrap(errs, "was told not read Mercury Protocol response")
 		}
 		return n, err
 	}
