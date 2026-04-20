@@ -98,7 +98,7 @@ func Serve(listener net.Listener, handler Handler) error {
 //	}
 type Server struct {
 	Addr string // TCP address to listen on; if empty defaults to ":1961"
-	Handler Handler // handler to invoke; if nil defaults to hg.DebugServer
+	Handler Handler // handler to invoke; if nil defaults to hg.DebugHandler
 	Logger Logger
 
 	// ReadTimeout is the maximum duration for reading the request line.

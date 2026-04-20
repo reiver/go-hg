@@ -38,7 +38,7 @@ import (
 	"github.com/reiver/go-hg"
 
 	"context"
-	"io"
+	"fmt"
 	"os"
 )
 
@@ -58,7 +58,7 @@ func main() {
 }
 
 func serveMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
-	fmt.Fprintln(w, "Hello world!")
+	fmt.Fprintln(w.Writer(ctx), "Hello world!")
 }
 ```
 
@@ -304,8 +304,8 @@ The helper functions are:
 
 | Mercury Protocol Response  | Basic Usage                              | Intermediate Usage                          |
 | -------------------------- | ---------------------------------------- | ------------------------------------------- |
-| `10 INPUT`                 | `hg.ServeInput(ctx, w, prompt)`          |                                             |
-| `11 SENSITIVE INPUT`       | `hg.ServeSensitiveInput(ctx, w, prompt)` |                                             |
+| `10 INPUT`                 | `hg.ServeInput(ctx, w, prompt...)`          |                                             |
+| `11 SENSITIVE INPUT`       | `hg.ServeSensitiveInput(ctx, w, prompt...)` |                                             |
 | `20 SUCCESS`               |                                          |                                             |
 | `30 REDIRECT - TEMPORARY`  | `hg.ServeRedirectTemporary(ctx, w, url)` |                                             |
 | `31 REDIRECT - PERMANENT`  | `hg.ServeRedirectPermanent(ctx, w, url)` |                                             |
