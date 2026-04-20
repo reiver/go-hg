@@ -17,7 +17,7 @@ The ☿ **Mercury Protocol** is a simple client-server protocol.
 The ☿ **Mercury Protocol** is derived from the _Gemini Protocol_ — basically the _Mercury Protocol_ is the _Gemini Protocol_ without the TLS encryption.
 In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Protocol_.
 
-The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inpired by the _Gopher Protocol_.
+The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inspired by the _Gopher Protocol_.
 
 ## Gemini Protocol Server from a ☿ Mercury Protocol Server
 
@@ -66,7 +66,7 @@ In this example, the ☿ **Mercury Protocol** just outputs a _Gemtext_ file with
 
 If you wanted to write your own ☿ **Mercury Protocol** server based on this code, then you would change what is inside the `serveMercury()` function.
 
-## Example ☿ *Mercury Protocol Client
+## Example ☿ Mercury Protocol Client
 
 A very simple ☿ **Mercury Protocol** client might look like this:
 
@@ -113,7 +113,7 @@ In this code, the download file is just outputted to STDOUT. You could modify th
 Note that we can do more sophisticated things by inspecting the error that was returned.
 To deal with redirects, etc.
 
-So, we could do tha with code like the following:
+So, we could do that with code like the following:
 
 ```go
 package main
@@ -301,7 +301,7 @@ func (receiver myCustomHandler) ServeMercury(ctx context.Context, w hg.ResponseW
 }
 ```
 
-Alternatively, this could be made a bit simple it `hg.HandlerFunc()` is used:
+Alternatively, this could be made a bit simpler if `hg.HandlerFunc()` is used:
 
 ```go
 package main
