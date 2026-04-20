@@ -130,65 +130,32 @@ import (
 func main() {
 
 	const address =       "example.com:1961"
-	const uri = "mercury://example.com/apple/banana/cherry.txt"
+	const uri = "mercury://example.com/apple/banana/cherry.gmni"
 
 	var request hg.Request
 	err := request.Parse(uri)
 
 	if nil != err {
-		fmt.Fprintln(os.Stderr, "problem parsing URI:", err)
+		fmt.Fprintf(os.Stderr, "problem parsing URI %q: %s\n", uri, err)
 		os.Exit(1)
 		return
 	}
 
-	responsereader, err := hg.DialAndCall(context.Background(), address, request)
+	ctx := context.Background()
+	responsereader, err := hg.DialAndCall(ctx, address, request)
 	if nil != err {
-
-		switch casted := err.(type) {
-		case hg.ResponseInput:
-			//@TODO
-		case hg.ResponseSensitiveInput:
-			//@TODO
-
-		case hg.ResponseRedirectTemporary:
-			//@TODO
-		case hg.ResponseRedirectPermanent:
-			//@TODO
-
-		case hg.ResponseTemporaryFailure:
-			//@TODO
-		case hg.ResponseServerUnavailable:
-			//@TODO
-		case hg.ResponseCGIError:
-			//@TODO
-		case hg.ResponseProxyError:
-			//@TODO
-		case hg.ResponseSlowDown:
-			//@TODO
-
-		case hg.ResponsePermanentFailure:
-			//@TODO
-		case hg.ResponseNotFound:
-			//@TODO
-		case hg.ResponseGone:
-			//@TODO
-		case hg.ResponseProxyRequestRefused:
-			//@TODO
-		case hg.ResponseBadRequest:
-			//@TODO
-
-		case hg.UnknownResponse:
-			//@TODO
-
-		default:
-			fmt.Fprintln(os.Stderr, "problem with request:", err)
-			os.Exit(1)
-			return
-		}
+		fmt.Fprintf(os.Stderr, "problem dialing and connecting to %q: %s", uri, err)
+		os.Exit(1)
+		return
 	}
 	defer responsereader.Close()
 
-	io.Copy(os.Stdout, responsereader)
+	_, err = io.Copy(os.Stdout, responsereader)
+	if nil != err {
+		fmt.Fprintf(os.Stderr, "problem outputing response body for %q to STDOUT: %s", uri, err)
+		os.Exit(1)
+		return
+	}
 }
 ```
 
@@ -281,6 +248,7 @@ import (
 	"github.com/reiver/go-hg"
 
 	"context"
+	"fmt"
 )
 
 func main() {
@@ -294,10 +262,10 @@ func main() {
 	}
 }
 
-type myCustomHandler {}
+type myCustomHandler struct{}
 
 func (receiver myCustomHandler) ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
-	io.WriteString(w, "Hello world!")
+	io.WriteString(w.Writer(ctx), "Hello world!")
 }
 ```
 
@@ -310,6 +278,7 @@ import (
 	"github.com/reiver/go-hg"
 
 	"context"
+	"fmt"
 )
 
 func main() {
@@ -324,7 +293,7 @@ func main() {
 }
 
 func helloworld(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
-	io.WriteString(w, "Hello world!")
+	io.WriteString(w.Writer(ctx), "Hello world!")
 }
 ```
 
