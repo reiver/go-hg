@@ -22,16 +22,56 @@ import (
 //
 //	var rr hg.ResponseReader
 //	var err error
-//	
+//
 //	rr, err = hg.DialAndCall(ctx, "example.com:1961", request)
-//	
+//
 //	// ...
-//	
+//
 //	var reader io.Reader = rr.Reader(ctx)
 //
 // Alternatively, to use a read-method with a context, just do something similar to:
 //
 //	n, err := rr.Read(ctx, p)
+//
+// # Auto-Reading Header
+//
+// If Read is called before ReadHeader, it will automatically read and consume the response header.
+// If the status code is not "20 SUCCESS", Read returns an error that can be type-switched or used with [errors.As] to extract the status code and meta.
+// For example:
+//
+//	n, err := rr.Read(ctx, buf)
+//	if nil != err {
+//		var notFound hg.ResponseNotFound
+//		if errors.As(err, &notFound) {
+//			fmt.Println("not found:", notFound.Meta())
+//		}
+//	}
+//
+// The possible error types are:
+//
+//	• [ResponseBadRequest]
+//	• [ResponseCertificateNotAuthorized]
+//	• [ResponseCertificateNotValid]
+//	• [ResponseCertificateRequired]
+//	• [ResponseCGIError]
+//	• [ResponseGone]
+//	• [ResponseInput]
+//	• [ResponseNotFound]
+//	• [ResponsePermanentFailure]
+//	• [ResponseProxyError]
+//	• [ResponseProxyRequestRefused]
+//	• [ResponseRedirectPermanent]
+//	• [ResponseRedirectTemporary]
+//	• [ResponseSensitiveInput]
+//	• [ResponseServerUnavailable]
+//	• [ResponseSlowDown]
+//	• [ResponseTemporaryFailure]
+//	• [UnknownResponse]
+//
+// Each has StatusCode() and Meta() methods.
+//
+// Note that once Read has consumed the header, calling ReadHeader will return an error.
+// If you need to inspect the header before reading the body, call ReadHeader first.
 type ResponseReader interface {
 	io.Closer
 	Read(ctx context.Context, data []byte) (int, error)
