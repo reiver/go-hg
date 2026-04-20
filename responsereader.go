@@ -14,6 +14,19 @@ import (
 )
 
 // ResponseReader is used by a Handler to read a Mercury Protocol response.
+//
+// To get [io.Reader] version of ResponseReader call its `Reader` method.
+// For example:
+//
+//	var rr hg.ResponseReader
+//	
+//	// ...
+//	
+//	var reader io.Reader. rr.Reader(ctx)
+//
+// Alternatively, to use a read-method with a context, just do something similar to:
+//
+//	n, err := rr.Read(ctx, p)
 type ResponseReader interface {
 	io.Closer
 	Read(ctx context.Context, data []byte) (int, error)
@@ -35,10 +48,8 @@ func (receiver *internalResponseReader) Close() error {
 	}
 
 	var conn net.Conn = receiver.conn
-	{
-		if nil == conn {
-			return nil
-		}
+	if nil == conn {
+		return nil
 	}
 
 	return conn.Close()
@@ -125,7 +136,6 @@ func (receiver *internalResponseReader) Read(ctx context.Context, data []byte) (
 // readHeader does pure header parsing with no context/deadline management.
 // Both the public ReadHeader and the auto-read path in Read call this method.
 func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n int, err error) {
-
 	if nil == receiver {
 		return 0, ErrNilReceiver
 	}
