@@ -11,12 +11,95 @@ import (
 	"codeberg.org/reiver/go-field"
 )
 
+// DialAndCallURL makes a TCP connection to the TCP address implied by the URL.
+// and (speaking the Mercury Protocol or the Gemini Protocol) sends the request implied by the URL.
+//
+// The context 'ctx' controls the lifetime of the dial and the request write.
+// If 'ctx' is nil, context.Background() is used.
+// To apply a timeout, use [context.WithTimeout] or [context.WithDeadline].
+//
+// A example of using this might be:
+//
+//	var url string = "mercury://example.com/once/twice/thrice/fource.gmni"
+//	
+//	ctx := context.Background()
+//	
+//	rr, err := hg.DialAndCallURL(ctx, url)
+//
+// See also:
+//
+//	• [Call]
+//	• [DialAndCall]
+//	• [DialAndCallTLS]
+func DialAndCallURL(ctx context.Context, url string) (ResponseReader, error) {
+	if nil == ctx {
+		ctx = context.Background()
+	}
+
+	if ctxErr := ctx.Err(); nil != ctxErr {
+		var errs error = erorr.Errors{ErrContextDone, ctxErr}
+		return nil, erorr.Wrap(errs, "was told not to dial-and-call URL",
+			field.String("url", url),
+		)
+	}
+
+	var request Request
+	{
+		err := request.Parse(url)
+		if nil != err {
+			return nil, erorr.Wrap(err, "failed to parse URL, that would have been used to create request, that would have been used to dial-and-call URL",
+				field.String("url", url),
+			)
+		}
+	}
+
+	var addr string
+	{
+		var found bool
+		addr, found = request.TCPAddr()
+		if !found {
+			var err error = ErrBadTCPAddr
+
+			return nil, erorr.Wrap(err, "failed to infer TCP address request created from URL, that would have been used to dial-and-call URL",
+				field.String("url", url),
+			)
+		}
+	}
+
+	{
+		var scheme string = request.Scheme()
+
+		switch scheme {
+		case Scheme:
+			return DialAndCall(ctx, addr, request)
+		case SchemeTLS:
+			//@TODO: when later have way of persisting TLS keys, should consider checking whether already have one for this TCP-address, and using that instead.
+			tlsConfig, err := GenerateClientTLSConfig()
+			if nil != err {
+				return nil, erorr.Wrap(err, "failed to generate client TLS-config, that would have been used to dial-and-call (TLS) URL",
+					field.String("url", url),
+					field.String("scheme", scheme),
+				)
+			}
+
+			return DialAndCallTLS(ctx, addr, request, tlsConfig)
+		default:
+			var err error = ErrSchemeUnsupported
+
+			return nil, erorr.Wrap(err, "failed to dial-and-call URL because of unsupported URL scheme",
+				field.String("url", url),
+				field.String("scheme", scheme),
+			)
+		}
+	}
+}
+
 // DialAndCall makes a TCP connection to the TCP address given by 'addr',
 // and (speaking the Mercury Protocol) sends the request given by 'request'.
 //
 // The context 'ctx' controls the lifetime of the dial and the request write.
 // If 'ctx' is nil, context.Background() is used.
-// To apply a timeout, use context.WithTimeout or context.WithDeadline.
+// To apply a timeout, use [context.WithTimeout] or [context.WithDeadline].
 //
 // What is given by 'addr' might be something like: "11.22.33.44:1961", or "example.com:1961"
 //
@@ -44,6 +127,8 @@ import (
 // See also:
 //
 //	• [Call]
+//	• [DialAndCallURL]
+//	• [DialAndCallTLS]
 func DialAndCall(ctx context.Context, addr string, request Request) (ResponseReader, error) {
 	if nil == ctx {
 		ctx = context.Background()
@@ -96,7 +181,7 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 //
 // The context 'ctx' controls the lifetime of the dial and the request write.
 // If 'ctx' is nil, context.Background() is used.
-// To apply a timeout, use context.WithTimeout or context.WithDeadline.
+// To apply a timeout, use [context.WithTimeout] or [context.WithDeadline].
 //
 // If 'tlsConf' is nil, a default tls.Config is used.
 //
@@ -127,6 +212,7 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 //
 //	• [Call]
 //	• [DialAndCall]
+//	• [DialAndCallURL]
 func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *tls.Config) (ResponseReader, error) {
 
 	if nil == ctx {
@@ -199,6 +285,8 @@ func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *
 // See also:
 //
 //	• [DialAndCall]
+//	• [DialAndCallURL]
+//	• [DialAndCallTLS]
 func Call(ctx context.Context, conn net.Conn, request Request) (ResponseReader, error) {
 	if nil == conn {
 		return nil, ErrNilNetworkConnection

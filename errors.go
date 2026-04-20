@@ -7,6 +7,7 @@ import (
 const (
 	ErrBadStatusCode            = erorr.Error("bad status code")
 	ErrBadResponseHeaderMeta    = erorr.Error("bad response header meta")
+	ErrBadTCPAddr               = erorr.Error("bad TCP address")
 	ErrCannotParse              = erorr.Error("cannot parse")
 	ErrContextDone              = erorr.Error("context done")
 	ErrDialError                = erorr.Error("dial error")
@@ -16,6 +17,7 @@ const (
 	ErrNilResponseWriter        = erorr.Error("nil response writer")
 	ErrRequestIsNothing         = erorr.Error("request is nothing")
 	ErrResponseHeaderMetaTooBig = erorr.Error("response header meta too big")
+	ErrSchemeUnsupported        = erorr.Error("scheme unsupported")
 	ErrServerShutdown           = erorr.Error("server shutdown")
 	ErrTargetTypeUnsupported    = erorr.Error("target type unsupported")
 	ErrWriteError               = erorr.Error("write error")
