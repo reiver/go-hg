@@ -3,11 +3,18 @@ package hg
 import (
 	"bytes"
 	"io"
+	"net"
+	gourl "net/url"
 	"strings"
 
 	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
 	"github.com/reiver/go-utf8s"
+	"golang.org/x/net/idna"
+)
+
+const (
+	requestEOL = "\r\n"
 )
 
 // Request represents a Mercury Protocol request — either received by a server, or being sent by a client.
@@ -41,7 +48,7 @@ func nothing() Request {
 func something(value string) Request {
 	return Request{
 		loaded:true,
-		value:value + "\r\n",
+		value:value + requestEOL,
 	}
 }
 
@@ -58,7 +65,7 @@ func (receiver Request) RequestValue() string {
 	if receiver.IsNothing() {
 		return ""
 	}
-	return receiver.value[:len(receiver.value)-2]
+	return receiver.value[:len(receiver.value)-len(requestEOL)]
 }
 
 // Parse parses the input ‘value’ and if valid sets the value of the request.
@@ -170,6 +177,89 @@ func (receiver Request) String() string {
 	}
 
 	return receiver.value
+}
+
+// TCPAddr returns the TCP-address that is embedded in the request.
+//
+// Example usage for the Mercury Protocol:
+//
+//	var req hg.Request
+//	
+//	// ...
+//	
+//	addr, found := request.TCPAddr()
+//	if !found {
+//		return errBadRequest
+//	}
+//	
+//	rr, err := hg.DialAndCall(ctx, addr, req)
+//
+//
+// Example usage for the Gemini Protocol:
+//
+//	var req hg.Request
+//	
+//	// ...
+//	
+//	addr, found := request.TCPAddr()
+//	if !found {
+//		return errBadRequest
+//	}
+//	
+//	rr, err := hg.DialAndCallTLS(ctx, addr, req)
+//
+// See also:
+//
+//	• [DialAndCall]
+//	• [DialAndCallTLS]
+func (receiver Request) TCPAddr() (string, bool) {
+	if nothing() == receiver {
+		return "", false
+	}
+
+	var str string = receiver.value
+
+	// Remove the "\r\n" at the end.
+	// We assume it is there without verifying.
+	if len(str) < len(requestEOL) {
+		return "", false
+	}
+	str = str[:len(str)-len(requestEOL)]
+
+	url, err := gourl.Parse(str)
+	if nil != err {
+		return "", false
+	}
+
+	var hostName string = url.Hostname()
+	if "" == hostName {
+		return "", false
+	}
+	{
+		var err error
+		hostName, err = idna.ToASCII(hostName)
+		if nil != err {
+			return "", false
+		}
+	}
+	if "" == hostName {
+		return "", false
+	}
+	hostName = strings.ToLower(hostName)
+
+	var tcpPort string = url.Port()
+	if "" == tcpPort {
+		switch url.Scheme {
+		case Scheme:
+			tcpPort = DefaultTCPPortString
+		case SchemeTLS:
+			tcpPort = DefaultTCPPortTLSString
+		default:
+			return "", false
+		}
+	}
+
+	return net.JoinHostPort(hostName, tcpPort), true
 }
 
 // MarshalText makes Request fit the encoding.TextMarshaler interface.

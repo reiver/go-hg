@@ -25,17 +25,20 @@ import (
 // A example of using this might be:
 //
 //	var uri string = "mercury://example.com/once/twice/thrice/fource.gmni"
-//
+//	
 //	var request hg.Request
 //	err := request.Parse(uri)
 //	if nil != err {
 //		return err
 //	}
-//
-//	var addr string = "example.com:1961"
-//
+//	
+//	addr, found := request.TCPAddr()
+//	if !found {
+//		return errBadRequest
+//	}
+//	
 //	ctx := context.Background()
-//
+//	
 //	rr, err := hg.DialAndCall(ctx, addr, request)
 //
 // See also:
@@ -105,17 +108,20 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 // A example of using this might be:
 //
 //	var uri string = "gemini://example.com/once/twice/thrice/fource.gmni"
-//
+//	
 //	var request hg.Request
 //	err := request.Parse(uri)
 //	if nil != err {
 //		return err
 //	}
-//
-//	var addr string = "example.com:1965"
-//
+//	
+//	addr, found := request.TCPAddr()
+//	if !found {
+//		return errBadRequest
+//	}
+//	
 //	ctx := context.Background()
-//
+//	
 //	rr, err := hg.DialAndCallTLS(ctx, addr, request, nil)
 //
 // See also:
