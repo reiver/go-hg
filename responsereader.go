@@ -368,6 +368,5 @@ func (receiver *internalReaderAdapter) Read(data []byte) (int, error) {
 		return 0, ErrNilResponseReader
 	}
 
-
 	return receiver.rr.Read(receiver.ctx, data)
 }
