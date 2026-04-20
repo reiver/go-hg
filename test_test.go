@@ -1,9 +1,5 @@
 package hg
 
-import (
-//	"codeberg.org/reiver/go-field"
-)
-
 type testLogger struct {}
 func (testLogger) Begin(fields ...Field) Logger {return testLogger{}}
 func (testLogger) End(fields ...Field) {}
