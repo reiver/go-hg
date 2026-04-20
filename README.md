@@ -104,7 +104,8 @@ func main() {
 	}
 	defer responsereader.Close()
 
-	io.Copy(os.Stdout, responsereader)
+	var ctx context.Context = context.Background()
+	io.Copy(os.Stdout, responsereader.Reader(ctx))
 }
 ```
 
@@ -225,7 +226,7 @@ import (
 
 func main() {
 
-	var handler hg.Handler = hg.UserDirHandler
+	var handler hg.Handler = &hg.UserDirHandler{}
 
 	err := hg.ListenAndServe(":1961", handler)
 	if nil != err {
