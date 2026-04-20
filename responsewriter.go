@@ -39,6 +39,10 @@ type internalResponseWriter struct {
 }
 
 func (receiver *internalResponseWriter) Writer(ctx context.Context) io.Writer {
+	if nil == receiver {
+		return nil
+	}
+
 	return io2.ClassicWriter(ctx, receiver.writer)
 }
 
