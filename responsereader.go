@@ -19,10 +19,13 @@ import (
 // For example:
 //
 //	var rr hg.ResponseReader
+//	var err error
+//	
+//	rr, err = hg.DialAndCall(ctx, "example.com:1961", request)
 //	
 //	// ...
 //	
-//	var reader io.Reader. rr.Reader(ctx)
+//	var reader io.Reader = rr.Reader(ctx)
 //
 // Alternatively, to use a read-method with a context, just do something similar to:
 //
