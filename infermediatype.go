@@ -15,7 +15,9 @@ func init() {
 
 // infermediatype infers the media-type from the filename or filesystem-path.
 //
-// If it cannot infer it, then it returns an empty string ("").
+// If it cannot infer it, then it returns:
+//
+//	"application/octet-stream"
 func infermediatype(fileName string) string {
 
 	var fileExtension string
