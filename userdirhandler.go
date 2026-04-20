@@ -3,7 +3,6 @@ package hg
 import (
 	"context"
 	"io"
-	"net/http"
 	"net/url"
 	"os"
 	"os/user"
@@ -352,48 +351,7 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 			}()
 		}
 
-		var mediatype string
-		{
-			var magic [512]byte
-
-			n, err := file.Read(magic[:])
-			if nil != err && err != io.EOF {
-				if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
-					log.Error(
-						field.S("problem sending temporary-failure response"),
-						field.Stringer("request", r),
-						field.E(serveErr),
-					)
-				}
-				return
-			}
-			{
-				_, err := file.Seek(0,0)
-				if nil != err {
-					if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
-						log.Error(
-							field.S("problem sending temporary-failure response"),
-							field.Stringer("request", r),
-							field.E(serveErr),
-						)
-					}
-					return
-				}
-			}
-
-			mediatype = http.DetectContentType(magic[:n])
-
-			switch mediatype {
-			case "application/octet-stream":
-
-				extension := filepath.Ext(targetpath)
-
-				switch extension {
-				case ".gmi", ".gmni", ".gemini":
-					mediatype = "text/gemini"
-				}
-			}
-		}
+		var mediatype string = infermediatype(targetpath)
 
 		if _, headerErr := w.WriteHeader(ctx, StatusSuccess, mediatype); nil != headerErr {
 			log.Error(
