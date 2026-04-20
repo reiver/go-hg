@@ -9,6 +9,7 @@ import (
 
 	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
+	"github.com/reiver/go-opt"
 	"github.com/reiver/go-utf8s"
 	"golang.org/x/net/idna"
 )
@@ -35,20 +36,13 @@ const (
 //
 //	err := request.Parse("gemini://example.com/apple/banana/cherry.txt")
 type Request struct {
-	loaded bool
-	value string
-}
-
-// nothing returns the ‘nothing’ value for hg.Request; hg.Request is an option-type.
-func nothing() Request {
-	return Request{}
+	optional opt.Optional[string]
 }
 
 // something returns a ‘something’ value for hg.Request; hg.Request is an option-type.
 func something(value string) Request {
 	return Request{
-		loaded:true,
-		value:value + requestEOL,
+		optional: opt.Something(value + requestEOL),
 	}
 }
 
@@ -62,10 +56,11 @@ func something(value string) Request {
 //
 //	"mercury://example.com/path/to/file.txt"
 func (receiver Request) RequestValue() string {
-	if receiver.IsNothing() {
+	value, found := receiver.optional.Get()
+	if !found {
 		return ""
 	}
-	return receiver.value[:len(receiver.value)-len(requestEOL)]
+	return value[:len(value)-len(requestEOL)]
 }
 
 // Parse parses the input ‘value’ and if valid sets the value of the request.
@@ -164,7 +159,7 @@ func (receiver *Request) parse(reader io.Reader) error {
 }
 
 func (receiver Request) IsNothing() bool {
-	return !receiver.loaded
+	return receiver.optional.IsNothing()
 }
 
 // String returns the full value of the Mercury request.
@@ -172,11 +167,12 @@ func (receiver Request) IsNothing() bool {
 //
 // String makes Request fit the fmt.Stringer interface.
 func (receiver Request) String() string {
-	if nothing() == receiver {
+	value, found := receiver.optional.Get()
+	if !found {
 		return "⧼nothing⧽"
 	}
 
-	return receiver.value
+	return value
 }
 
 // TCPAddr returns the TCP-address that is embedded in the request.
@@ -213,11 +209,12 @@ func (receiver Request) String() string {
 //	• [DialAndCall]
 //	• [DialAndCallTLS]
 func (receiver Request) TCPAddr() (string, bool) {
-	if nothing() == receiver {
+	value, found := receiver.optional.Get()
+	if !found {
 		return "", false
 	}
 
-	var str string = receiver.value
+	var str string = value
 
 	// Remove the "\r\n" at the end.
 	// We assume it is there without verifying.
@@ -264,11 +261,12 @@ func (receiver Request) TCPAddr() (string, bool) {
 
 // MarshalText makes Request fit the encoding.TextMarshaler interface.
 func (receiver Request) MarshalText() ([]byte, error) {
-	if nothing() == receiver {
+	value, found := receiver.optional.Get()
+	if !found {
 		return nil, errNothing
 	}
 
-	return []byte(receiver.value), nil
+	return []byte(value), nil
 }
 
 // UnmarshalText  makes Request fit the encoding.TextUnmarshaler interface.
@@ -286,14 +284,15 @@ func (receiver *Request) UnmarshalText(text []byte) error {
 // The return value ‘n’ is the number of bytes written.
 // Any error encountered during the write is also returned.
 func (receiver Request) WriteTo(w io.Writer) (int64, error) {
-	if nothing() == receiver {
+	value, found := receiver.optional.Get()
+	if !found {
 		return 0, errNothing
 	}
 	if nil == w {
 		return 0, errNilWriter
 	}
 
-	n, err := io.WriteString(w, receiver.value)
+	n, err := io.WriteString(w, value)
 
 	var n64 int64 = int64(n)
 
