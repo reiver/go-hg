@@ -46,7 +46,7 @@ func someURL(value string) Request {
 	}
 }
 
-// RequestValue returns the of the request without the trailing "\r\n"
+// RequestValue returns the value of the request without the trailing "\r\n"
 //
 // For example, if the full value of the request was:
 //
@@ -236,7 +236,7 @@ func (receiver Request) String() string {
 //	
 //	// ...
 //	
-//	addr, found := request.TCPAddr()
+//	addr, found := req.TCPAddr()
 //	if !found {
 //		return errBadRequest
 //	}
@@ -250,7 +250,7 @@ func (receiver Request) String() string {
 //	
 //	// ...
 //	
-//	addr, found := request.TCPAddr()
+//	addr, found := req.TCPAddr()
 //	if !found {
 //		return errBadRequest
 //	}
