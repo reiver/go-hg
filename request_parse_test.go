@@ -387,3 +387,40 @@ func TestRequest_Parse_failure(t *testing.T) {
 		}
 	}
 }
+
+func TestRequest_Parse_failOffByOne(t *testing.T) {
+
+	var uri string
+	{
+		// "mercury://x.example/" is 20 bytes.
+		// "\r\n" is 2 bytes long
+		// Fill the rest with 'a' to reach a request of exactly 2049 bytes total (and a URL of exactly 2047 bytes in total).
+		const prefix = "mercury://x.example/"
+		const targetLen = 2049
+
+		uri = prefix + strings.Repeat("a", targetLen-len(prefix)-len("\r\n"))
+
+		{
+			actual := len(uri)
+			expected := targetLen-len("\r\n")
+
+			if expected != actual {
+				t.Fatalf("TEST SETUP: the actual URI length is not what was expected")
+				t.Logf("EXPECTED-LENGTH: %d", expected)
+				t.Logf("ACTUAL-LENGTH:   %d", actual)
+				return
+			}
+		}
+	}
+
+	var request hg.Request
+	err := request.Parse(uri)
+
+	// This SHOULD fail because the URI exceeds the 2048-byte limit.
+	// But if there is an off-by-one error, it will succeed.
+	if nil == err {
+		t.Errorf("Expected an error but didn't actually get one")
+		t.Logf("RequestValue length: %d", len(request.RequestValue()))
+		return
+	}
+}

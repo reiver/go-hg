@@ -39,8 +39,8 @@ type Request struct {
 	optional opt.Optional[string]
 }
 
-// something returns a ‘something’ value for hg.Request; hg.Request is an option-type.
-func something(value string) Request {
+// someURL returns a ‘something’ value for hg.Request; hg.Request is an option-type.
+func someURL(value string) Request {
 	return Request{
 		optional: opt.Something(value + requestEOL),
 	}
@@ -145,15 +145,15 @@ func (receiver *Request) parse(reader io.Reader) error {
 				)
 			}
 
-			if maxrequest < storage.Len() {
+			storage.WriteRune(r)
+
+			if (maxrequest-len(requestEOL)) < storage.Len() {
 				return errRequestTooLong
 			}
-
-			storage.WriteRune(r)
 		}
 	}
 
-	*receiver = something(storage.String())
+	*receiver = someURL(storage.String())
 
 	return nil
 }
