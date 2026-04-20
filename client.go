@@ -23,7 +23,7 @@ import (
 // For mercury:// URLs it is ignored.
 // Passing nil means: accept any server certificate, no client cert.
 //
-// A example of using this for a Gemini URL might be:
+// An example of using this for a Gemini URL might be:
 //
 //	var url string = "gemini://example.com/once/twice/thrice/fource.gmni"
 //	
@@ -111,7 +111,7 @@ func DialAndCallURL(ctx context.Context, url string, tlsHandler TLSHandler) (Res
 //
 // What is given by 'request' might be a Request containing something like: "mercury://example.com/path/to/file.txt\r\n"
 //
-// A example of using this might be:
+// An example of using this might be:
 //
 //	var uri string = "mercury://example.com/once/twice/thrice/fource.gmni"
 //	
@@ -195,7 +195,7 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 //
 // What is given by 'request' might be a Request containing something like: "gemini://example.com/path/to/file.txt\r\n"
 //
-// A example of using this might be:
+// An example of using this might be:
 //
 //	var uri string = "gemini://example.com/once/twice/thrice/fource.gmni"
 //	
@@ -323,7 +323,7 @@ func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsHandle
 //
 // What is given by 'request' might be a Request containing something like: "mercury://example.com/path/to/file.txt"
 //
-// A example of using this might be:
+// An example of using this might be:
 //
 //	conn, err := net.Dial("tcp", addr)
 //	if nil != err {

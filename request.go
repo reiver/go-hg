@@ -338,7 +338,7 @@ func (receiver *Request) UnmarshalText(text []byte) error {
 	return receiver.Parse(value)
 }
 
-// WriteTo writers the value of the Mercury request (including the trailing carriage-return and line-feed) to ‘w’ until there's no more to write or when an error occurs.
+// WriteTo writes the value of the Mercury request (including the trailing carriage-return and line-feed) to ‘w’ until there's no more to write or when an error occurs.
 // The return value ‘n’ is the number of bytes written.
 // Any error encountered during the write is also returned.
 func (receiver Request) WriteTo(w io.Writer) (int64, error) {

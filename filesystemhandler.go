@@ -316,7 +316,7 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 			fspath = defaultpath
 		} else {
 			log.Trace(
-				field.S("filesystem-path s NOT a directory"),
+				field.S("filesystem-path is NOT a directory"),
 				field.String("filesystem-path", fspath),
 			)
 		}

@@ -87,7 +87,7 @@ func (defaultVerifier) VerifyServerCertificate(hostname string, rawCerts [][]byt
 		//
 		// This is NOT TOFU (Trust On First Use), but an alternative to it.
 		//
-		// Implementations that wany TOFU should use (or implement) a different [TLSHandler].
+		// Implementations that want TOFU should use (or implement) a different [TLSHandler].
 		return nil
 	}
 

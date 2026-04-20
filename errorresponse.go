@@ -26,7 +26,7 @@ package hg
 //
 // Example With Success
 //
-// Althugh note that calling with the a status-code of 20 (i.e., the status code for Success) would return nil.
+// Although note that calling with a status-code of 20 (i.e., the status code for Success) would return nil.
 // So, for example, this:
 //
 //	hg.ErrorResponse(20, "text/gemini")
