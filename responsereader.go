@@ -269,14 +269,14 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 		/////////////// BREAK
 				break
 			}
+			storage.WriteRune(r)
+
 			if maxmeta < storage.Len() {
 				var err error = ErrResponseHeaderMetaTooBig
 				return n, erorr.Wrap(err, "response header meta too big",
 					field.Uint64("max", maxmeta),
 				)
 			}
-
-			storage.WriteRune(r)
 		}
 
 		if nil != meta {
