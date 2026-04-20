@@ -4,11 +4,11 @@ package hg
 //
 // For example usage:
 //
-//	hg.ServeNotFound(w, hg.DefaultMetaNotFound)
+//	hg.ServeNotFound(ctx, w, hg.DefaultMetaNotFound)
 //
 // Also for another example usage:
 //
-//	hg.ServeTemporaryFailure(w, hg.DefaultMetaTemporaryFailure)
+//	hg.ServeTemporaryFailure(ctx, w, hg.DefaultMetaTemporaryFailure)
 //
 // To understand these —
 //
