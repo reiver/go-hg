@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestInfermediatype(t *testing.T) {
+func TestInferMediaType(t *testing.T) {
 
 	tests := []struct{
 		Path string
@@ -161,7 +161,7 @@ func TestInfermediatype(t *testing.T) {
 
 	for testNumber, test := range tests {
 
-		actual := infermediatype(test.Path)
+		actual := inferMediaType(test.Path)
 
 		if expected := test.Expected; expected != actual {
 			t.Errorf("For test #%d, the actual inferred media-type is not what was expeceted.", testNumber)

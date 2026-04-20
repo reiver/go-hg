@@ -351,7 +351,7 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 			}()
 		}
 
-		var mediatype string = infermediatype(targetpath)
+		var mediatype string = inferMediaType(targetpath)
 
 		if _, headerErr := w.WriteHeader(ctx, StatusSuccess, mediatype); nil != headerErr {
 			log.Error(

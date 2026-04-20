@@ -324,7 +324,7 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 
 	var mediatype string
 	{
-		mediatype = infermediatype(fspath)
+		mediatype = inferMediaType(fspath)
 
 		log.Trace(field.String("media-type", mediatype))
 	}

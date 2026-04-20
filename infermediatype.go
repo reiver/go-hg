@@ -13,12 +13,12 @@ func init() {
 	mime.AddExtensionType(".text", "text/plain")
 }
 
-// infermediatype infers the media-type from the filename or filesystem-path.
+// inferMediaType infers the media-type from the filename or filesystem-path.
 //
 // If it cannot infer it, then it returns:
 //
 //	"application/octet-stream"
-func infermediatype(fileName string) string {
+func inferMediaType(fileName string) string {
 
 	var fileExtension string
 	{
