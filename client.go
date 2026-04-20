@@ -3,6 +3,7 @@ package hg
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"io"
 	"net"
 	"time"
@@ -18,20 +19,34 @@ import (
 // If 'ctx' is nil, context.Background() is used.
 // To apply a timeout, use [context.WithTimeout] or [context.WithDeadline].
 //
-// A example of using this might be:
+// The 'tlsHandler' controls server certificate verification and client certificate selection for gemini:// (TLS) URLs.
+// For mercury:// URLs it is ignored.
+// Passing nil means: accept any server certificate, no client cert.
+//
+// A example of using this for a Gemini URL might be:
+//
+//	var url string = "gemini://example.com/once/twice/thrice/fource.gmni"
+//	
+//	ctx := context.Background()
+//	
+//	rr, err := hg.DialAndCallURL(ctx, url, nil)
+//
+// Using it with a Mercury URL looks the same:
 //
 //	var url string = "mercury://example.com/once/twice/thrice/fource.gmni"
 //	
 //	ctx := context.Background()
 //	
-//	rr, err := hg.DialAndCallURL(ctx, url)
+//	rr, err := hg.DialAndCallURL(ctx, url, nil)
 //
 // See also:
 //
 //	• [Call]
 //	• [DialAndCall]
 //	• [DialAndCallTLS]
-func DialAndCallURL(ctx context.Context, url string) (ResponseReader, error) {
+//	• [TLSConfig]
+//	• [TLSHandler]
+func DialAndCallURL(ctx context.Context, url string, tlsHandler TLSHandler) (ResponseReader, error) {
 	if nil == ctx {
 		ctx = context.Background()
 	}
@@ -73,16 +88,7 @@ func DialAndCallURL(ctx context.Context, url string) (ResponseReader, error) {
 		case Scheme:
 			return DialAndCall(ctx, addr, request)
 		case SchemeTLS:
-			//@TODO: when later have way of persisting TLS keys, should consider checking whether already have one for this TCP-address, and using that instead.
-			tlsConfig, err := GenerateClientTLSConfig()
-			if nil != err {
-				return nil, erorr.Wrap(err, "failed to generate client TLS-config, that would have been used to dial-and-call (TLS) URL",
-					field.String("url", url),
-					field.String("scheme", scheme),
-				)
-			}
-
-			return DialAndCallTLS(ctx, addr, request, tlsConfig)
+			return DialAndCallTLS(ctx, addr, request, tlsHandler)
 		default:
 			var err error = ErrSchemeUnsupported
 
@@ -136,8 +142,8 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 
 	if ctxErr := ctx.Err(); nil != ctxErr {
 		var errs error = erorr.Errors{ErrContextDone, ctxErr}
-		return nil, erorr.Wrap(errs, "could not dial and call for Mercury Protocol",
-			field.String("addr", addr),
+		return nil, erorr.Wrap(errs, "was told not dial-and-call for Mercury Protocol",
+			field.String("tcp-address", addr),
 			field.Stringer("request", request),
 		)
 	}
@@ -148,26 +154,25 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 	if nil != err {
 		if ctxErr := ctx.Err(); nil != ctxErr {
 			var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
-			return nil, erorr.Wrap(errs, "could not dial for Mercury Protocol call",
-				field.String("addr", addr),
+			return nil, erorr.Wrap(errs, "was told not dial for Mercury Protocol call",
+				field.String("tcp-address", addr),
 				field.Stringer("request", request),
 			)
 		}
 		var errs error = erorr.Errors{ErrDialError, err}
 		return nil, erorr.Wrap(errs, "could not dial for Mercury Protocol call",
-			field.String("addr", addr),
+			field.String("tcp-address", addr),
 			field.Stringer("request", request),
 		)
 	}
 
 	rr, err := Call(ctx, conn, request)
 	if nil != err {
-		// The connection is not owned by a ResponseReader on the error path,
-		// so nothing else will close it. Intentionally discarding the error
-		// from Close().
+		// If we got there then the call will never be able to close the net.Conn, so we have to close it ourselves.
+		// Note that we are intentionally discarding the error from the net.Conn.Close() method.
 		conn.Close()
-		return nil, erorr.Wrap(err, "could not dial and call for Mercury Protocol",
-			field.String("addr", addr),
+		return nil, erorr.Wrap(err, "could not dial-and-call for Mercury Protocol",
+			field.String("tcp-address", addr),
 			field.Stringer("request", request),
 		)
 	}
@@ -183,7 +188,8 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 // If 'ctx' is nil, context.Background() is used.
 // To apply a timeout, use [context.WithTimeout] or [context.WithDeadline].
 //
-// If 'tlsConf' is nil, a default tls.Config is used.
+// The 'tlsHandler' controls server certificate verification and client certificate
+// selection. Passing nil means: accept any server certificate, no client cert.
 //
 // What is given by 'addr' might be something like: "11.22.33.44:1965", or "example.com:1965"
 //
@@ -213,7 +219,9 @@ func DialAndCall(ctx context.Context, addr string, request Request) (ResponseRea
 //	• [Call]
 //	• [DialAndCall]
 //	• [DialAndCallURL]
-func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *tls.Config) (ResponseReader, error) {
+//	• [TLSConfig]
+//	• [TLSHandler]
+func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsHandler TLSHandler) (ResponseReader, error) {
 
 	if nil == ctx {
 		ctx = context.Background()
@@ -221,10 +229,34 @@ func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *
 
 	if ctxErr := ctx.Err(); nil != ctxErr {
 		var errs error = erorr.Errors{ErrContextDone, ctxErr}
-		return nil, erorr.Wrap(errs, "could not dial and call over tls",
-			field.String("addr", addr),
+		return nil, erorr.Wrap(errs, "was told not dial-and-call over tls",
+			field.String("tcp-address", addr),
 			field.Stringer("request", request),
 		)
+	}
+
+	hostname, _, err := net.SplitHostPort(addr)
+	if nil != err {
+		return nil, erorr.Wrap(err, "could not parse host-name from TCP-address",
+			field.String("tcp-address", addr),
+		)
+	}
+
+	var tlsConf tls.Config
+	var clientCert *tls.Certificate
+
+	tlsConf.InsecureSkipVerify = true
+	tlsConf.ServerName = hostname
+
+	if nil != tlsHandler {
+		tlsConf.VerifyPeerCertificate = func(rawCerts [][]byte, _ [][]*x509.Certificate) error {
+			return tlsHandler.VerifyServerCertificate(hostname, rawCerts)
+		}
+
+		clientCert = tlsHandler.ClientCertificate(hostname)
+		if nil != clientCert {
+			tlsConf.Certificates = []tls.Certificate{*clientCert}
+		}
 	}
 
 	var dialer net.Dialer
@@ -233,33 +265,53 @@ func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *
 		dialer.Deadline = deadline
 	}
 
-	conn, err := tls.DialWithDialer(&dialer, "tcp", addr, tlsConf)
+	conn, err := dialer.DialContext(ctx, "tcp", addr)
 	if nil != err {
 		if ctxErr := ctx.Err(); nil != ctxErr {
 			var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
-			return nil, erorr.Wrap(errs, "could not dial tls",
-				field.String("addr", addr),
+			return nil, erorr.Wrap(errs, "was told not dial for Gemini Protocol call",
+				field.String("tcp-address", addr),
 				field.Stringer("request", request),
 			)
 		}
 		var errs error = erorr.Errors{ErrDialError, err}
-		return nil, erorr.Wrap(errs, "could not dial tls",
-			field.String("addr", addr),
+		return nil, erorr.Wrap(errs, "could not dial for Gemini Protocol call",
+			field.String("tcp-address", addr),
 			field.Stringer("request", request),
 		)
 	}
 
-	rr, err := Call(ctx, conn, request)
+	tlsConn := tls.Client(conn, &tlsConf)
+	err = tlsConn.HandshakeContext(ctx)
+	if nil != err {
+		conn.Close()
+		if ctxErr := ctx.Err(); nil != ctxErr {
+			var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
+			return nil, erorr.Wrap(errs, "was told not to complete TLS handshake for Gemini Protocol",
+				field.String("tcp-address", addr),
+				field.Stringer("request", request),
+			)
+		}
+		var errs error = erorr.Errors{ErrDialError, err}
+		return nil, erorr.Wrap(errs, "could not complete TLS handshake for Gemini Protocol",
+			field.String("tcp-address", addr),
+			field.Stringer("request", request),
+		)
+	}
+
+	rr, err := call(ctx, tlsConn, request)
 	if nil != err {
 		// The connection is not owned by a ResponseReader on the error path,
 		// so nothing else will close it. Intentionally discarding the error
 		// from Close().
-		conn.Close()
-		return nil, erorr.Wrap(err, "could not dial and call over tls",
-			field.String("addr", addr),
+		tlsConn.Close()
+		return nil, erorr.Wrap(err, "could not dial-and-call over TLS for Gemini Protocol",
+			field.String("tcp-address", addr),
 			field.Stringer("request", request),
 		)
 	}
+
+	rr.clientCert = clientCert
 	return rr, nil
 }
 
@@ -277,9 +329,9 @@ func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *
 //	if nil != err {
 //		return err
 //	}
-//
+//	
 //	ctx := context.Background()
-//
+//	
 //	rr, err := hg.Call(ctx, conn, request)
 //
 // See also:
@@ -288,6 +340,17 @@ func DialAndCallTLS(ctx context.Context, addr string, request Request, tlsConf *
 //	• [DialAndCallURL]
 //	• [DialAndCallTLS]
 func Call(ctx context.Context, conn net.Conn, request Request) (ResponseReader, error) {
+	rr, err := call(ctx, conn, request)
+	if nil != err {
+		return nil, err
+	}
+	return rr, nil
+}
+
+// call is the internal implementation of Call that returns *internalResponseReader
+// directly, allowing callers (such as DialAndCallTLS) to set fields on the struct
+// before returning it as a ResponseReader interface.
+func call(ctx context.Context, conn net.Conn, request Request) (*internalResponseReader, error) {
 	if nil == conn {
 		return nil, ErrNilNetworkConnection
 	}
@@ -301,7 +364,7 @@ func Call(ctx context.Context, conn net.Conn, request Request) (ResponseReader, 
 
 	if ctxErr := ctx.Err(); nil != ctxErr {
 		var errs error = erorr.Errors{ErrContextDone, ctxErr}
-		return nil, erorr.Wrap(errs, "could not make Mercury Protocol call",
+		return nil, erorr.Wrap(errs, "was told not to make Mercury Protocol call",
 			field.Stringer("request", request),
 			field.Stringer("conn-remote-addr", conn.RemoteAddr()),
 		)
@@ -319,7 +382,7 @@ func Call(ctx context.Context, conn net.Conn, request Request) (ResponseReader, 
 	if nil != err {
 		if ctxErr := ctx.Err(); nil != ctxErr {
 			var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
-			return nil, erorr.Wrap(errs, "could not write Mercury Protocol request",
+			return nil, erorr.Wrap(errs, "was told not to write Mercury Protocol request",
 				field.Stringer("request", request),
 				field.Stringer("conn-remote-addr", conn.RemoteAddr()),
 			)

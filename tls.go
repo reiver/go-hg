@@ -11,8 +11,8 @@ import (
 	"codeberg.org/reiver/go-erorr"
 )
 
-// GenerateClientTLSConfig generates a self-signed TLS client certificate and returns
-// a *tls.Config containing it.
+// GenerateClientCertificate generates a self-signed TLS client certificate
+// and returns it directly as a *tls.Certificate (including private-key).
 //
 // This is useful when speaking protocols that use TLS client certificates for identity
 // (such as the Gemini Protocol). In the Gemini Protocol, a server may respond with a
@@ -20,23 +20,23 @@ import (
 // certificate. Gemini clients routinely generate throwaway or per-site self-signed
 // certificates on the fly when this happens.
 //
-// Without this helper, generating a self-signed client certificate requires importing
-// crypto/x509, crypto/ed25519, math/big, time, etc. and writing ~30-40 lines of
-// boilerplate. GenerateClientTLSConfig handles all of that.
-//
 // Example usage:
 //
 //	rr, err := hg.DialAndCallTLS(ctx, addr, request, nil)
 //	// ... get back ResponseCertificateRequired ...
 //
-//	tlsConf, err := hg.GenerateClientTLSConfig()
-//	rr, err = hg.DialAndCallTLS(ctx, addr, request, tlsConf)
+//	cert, err := hg.GenerateClientCertificate()
+//	rr, err = hg.DialAndCallTLS(ctx, addr, request, hg.TLSConfig{
+//	    ClientCertificateFunc: func(host string) *tls.Certificate {
+//	        return cert
+//	    },
+//	})
 //
 // See also:
 //
 //	• [DialAndCallTLS]
 //	• [ResponseCertificateRequired]
-func GenerateClientTLSConfig() (*tls.Config, error) {
+func GenerateClientCertificate() (*tls.Certificate, error) {
 
 	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
 	if nil != err {
@@ -54,12 +54,10 @@ func GenerateClientTLSConfig() (*tls.Config, error) {
 		return nil, erorr.Wrap(err, "could not create self-signed tls client certificate")
 	}
 
-	cert := tls.Certificate{
+	cert := &tls.Certificate{
 		Certificate: [][]byte{certDER},
 		PrivateKey:  privateKey,
 	}
 
-	return &tls.Config{
-		Certificates: []tls.Certificate{cert},
-	}, nil
+	return cert, nil
 }

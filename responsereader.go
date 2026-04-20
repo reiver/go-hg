@@ -2,6 +2,8 @@ package hg
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding"
 	"io"
 	"net"
@@ -35,14 +37,46 @@ type ResponseReader interface {
 	Read(ctx context.Context, data []byte) (int, error)
 	Reader(ctx context.Context) io.Reader
 	ReadHeader(ctx context.Context, statusCode *int, meta any) (int, error)
+
+	// ServerCertificate returns the server's leaf certificate from the TLS handshake.
+	// Returns nil for plain (non-TLS) connections or if no server cert was presented.
+	ServerCertificate() *x509.Certificate
+
+	// ClientCertificate returns the client certificate (including private-key)
+	// that was presented during the TLS handshake.
+	// Returns nil if no client cert was used, or for plain (non-TLS) connections.
+	ClientCertificate() *tls.Certificate
 }
 
 var _ ResponseReader = &internalResponseReader{}
 
 // internalResponseReader is used to create a ResponseReader around a net.Conn.
 type internalResponseReader struct {
-	conn net.Conn
+	conn       net.Conn
+	clientCert *tls.Certificate
 	headerread bool
+}
+
+func (receiver *internalResponseReader) ServerCertificate() *x509.Certificate {
+	if nil == receiver {
+		return nil
+	}
+	tlsConn, casted := receiver.conn.(*tls.Conn)
+	if !casted {
+		return nil
+	}
+	state := tlsConn.ConnectionState()
+	if len(state.PeerCertificates) <= 0 {
+		return nil
+	}
+	return state.PeerCertificates[0]
+}
+
+func (receiver *internalResponseReader) ClientCertificate() *tls.Certificate {
+	if nil == receiver {
+		return nil
+	}
+	return receiver.clientCert
 }
 
 func (receiver *internalResponseReader) Close() error {
