@@ -162,6 +162,59 @@ func (receiver Request) IsNothing() bool {
 	return receiver.optional.IsNothing()
 }
 
+// Scheme returns the Scheme of the URL/URI/IRI in the request.
+//
+// For example, if the request is:
+//
+//	"mercury://example.com/once/twice/thrice/fource.gmni\r\n"
+//
+// Then scheme would return:
+//
+//	"mercury"
+//
+// And, for example, if the request is:
+//
+//	"gemini://example.com/once/twice/thrice/fource.gmni\r\n"
+//
+// Then scheme would return:
+//
+//	"gemini"
+func (receiver Request) Scheme() string {
+	value, found := receiver.optional.Get()
+	if !found {
+		return ""
+	}
+
+	var length int
+	{
+		length = len(Scheme)+len(":")
+		if newLength := len(SchemeTLS)+len(":"); length < newLength {
+			length = newLength
+		}
+	}
+	if length < 0 {
+		return ""
+	}
+
+	if len(value) < length {
+		return ""
+	}
+	var str string = strings.ToLower(value[:length])
+
+	{
+		const needle string = ":"
+
+		var index int = strings.Index(str, needle)
+		if index < len(needle) {
+			return ""
+		}
+
+		str = str[:index]
+	}
+
+	return str
+}
+
 // String returns the full value of the Mercury request.
 // Note that this included the trailing carriage-return and line-feed.
 //
