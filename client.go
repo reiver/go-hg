@@ -364,7 +364,7 @@ func call(ctx context.Context, conn net.Conn, request Request) (*internalRespons
 
 	if ctxErr := ctx.Err(); nil != ctxErr {
 		var errs error = erorr.Errors{ErrContextDone, ctxErr}
-		return nil, erorr.Wrap(errs, "was told not to make Mercury Protocol call",
+		return nil, erorr.Wrap(errs, "was told not to make Mercury Protocol or Gemini Protocol call",
 			field.Stringer("request", request),
 			field.Stringer("conn-remote-addr", conn.RemoteAddr()),
 		)
@@ -382,13 +382,13 @@ func call(ctx context.Context, conn net.Conn, request Request) (*internalRespons
 	if nil != err {
 		if ctxErr := ctx.Err(); nil != ctxErr {
 			var errs error = erorr.Errors{ErrContextDone, ctxErr, err}
-			return nil, erorr.Wrap(errs, "was told not to write Mercury Protocol request",
+			return nil, erorr.Wrap(errs, "was told not to write Mercury Protocol or Gemini Protocol request",
 				field.Stringer("request", request),
 				field.Stringer("conn-remote-addr", conn.RemoteAddr()),
 			)
 		}
 		var errs error = erorr.Errors{ErrWriteError, err}
-		return nil, erorr.Wrap(errs, "could not write Mercury Protocol request",
+		return nil, erorr.Wrap(errs, "could not write Mercury Protocol or Gemini Protocol request",
 			field.Stringer("request", request),
 			field.Stringer("conn-remote-addr", conn.RemoteAddr()),
 		)
