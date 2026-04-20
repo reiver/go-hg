@@ -11,7 +11,7 @@ import (
 // For example:
 //
 //	func ServerMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
-//		w.WriteHeader(hg.StatusNotFound, "uh oh!")
+//		w.WriteHeader(ctx, hg.StatusNotFound, "uh oh!")
 //	}
 const (
 	StatusInput               = 10
