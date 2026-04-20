@@ -90,19 +90,20 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 	}
 
 	{
-		const expectedScheme = "mercury"
 		actualScheme := uri.Scheme
 
 		log.Trace(
-			field.String("expected-URL-scheme", expectedScheme),
+			field.String("expected-URL-scheme", Scheme),
+			field.String("expected-URL-scheme-TLS", SchemeTLS),
 			field.String("actual-URL-scheme", actualScheme),
 			field.Stringer("uri", uri),
 		)
 
-		if expectedScheme != actualScheme  {
+		if Scheme != actualScheme && SchemeTLS != actualScheme {
 			log.Error(
-				field.S("the actual scheme in the URL from the request (%q) is not what was expected"),
-				field.String("expected-scheme", expectedScheme),
+				field.S("the actual scheme in the URL from the request is not what was expected"),
+				field.String("expected-URL-scheme", Scheme),
+				field.String("expected-URL-scheme-TLS", SchemeTLS),
 				field.String("actual-scheme", actualScheme),
 				field.Stringer("uri", uri),
 			)
