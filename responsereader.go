@@ -350,6 +350,7 @@ func (receiver *internalResponseReader) ReadHeader(ctx context.Context, statusCo
 	return n, nil
 }
 
+// Reader exists so that there is a way to make a [internalResponseReader] look like a [io.Reader].
 func (receiver *internalResponseReader) Reader(ctx context.Context) io.Reader {
 	if nil == receiver {
 		return nil
