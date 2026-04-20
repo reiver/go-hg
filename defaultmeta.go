@@ -48,7 +48,9 @@ package hg
 //
 // DefaultMetaSlowDown            = "3"                     // 44
 //
-// This also SHOULD be chosen by the programmer; but again just in case they don't, a default value exists.
+// For status 44, the meta is the number of seconds the client MUST wait before making another request.
+// So "3" means "wait 3 seconds before retrying".
+// This SHOULD be chosen by the programmer; but just in case they don't, a default value exists.
 const (
 	DefaultMetaInput               = StatusTextInput               // 10
 	DefaultMetaSensitiveInput      = StatusTextSensitiveInput      // 11
