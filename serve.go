@@ -57,7 +57,7 @@ func ServeInput(ctx context.Context, w ResponseWriter, a ...any) error {
 //		
 //		// ...
 //		
-//		var prompt string = "Pick enter your password"
+//		var prompt string = "Please enter your password"
 //		
 //		hg.ServeSensitiveInput(ctx, w, prompt)
 //		

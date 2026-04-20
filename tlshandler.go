@@ -69,7 +69,7 @@ func (defaultVerifier) VerifyServerCertificate(hostname string, rawCerts [][]byt
 	if len(rawCerts) <= 0 {
 		var err error = ErrServerCertificateNotFound
 
-		return erorr.Wrap(err, "failed to verify server ceritificates",
+		return erorr.Wrap(err, "failed to verify server certificates",
 			field.String("hostname", hostname),
 		)
 	}

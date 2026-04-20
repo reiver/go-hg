@@ -24,7 +24,7 @@ package hg
 //
 // For most Mercury Protocol response types, the value of the response‐header's ‘meta’ is likely cosmetic.
 // And possibly, no human will ever see them (depending on whether the client software presents them to the user or not).
-// The following constants provide useful default values for these cosmetic meta value's, that can make a programmer's life easier when developing a Mercury Protcol client or server:
+// The following constants provide useful default values for these cosmetic meta value's, that can make a programmer's life easier when developing a Mercury Protocol client or server:
 //
 //	• DefaultMetaSuccess             = "success"               // 20
 //	• DefaultMetaTemporaryFailure    = "temporary-failure"     // 40
@@ -38,7 +38,7 @@ package hg
 //	• DefaultMetaBadRequest          = "bad-request"           // 59
 //
 // Two of the of these default response‐header's ‘meta’ are (not cosmetic but are) shown to the user.
-// The programmer SHOULD create their own message; but just in case the don't, these default values exist:
+// The programmer SHOULD create their own message; but just in case they don't, these default values exist:
 //
 // • DefaultMetaInput               = "input"                 // 10
 //
@@ -48,7 +48,7 @@ package hg
 //
 // DefaultMetaSlowDown            = "3"                     // 44
 //
-// This also SHOULD be chosen by the programmer; but again just in case the don't, a default values exists.
+// This also SHOULD be chosen by the programmer; but again just in case they don't, a default value exists.
 const (
 	DefaultMetaInput               = StatusTextInput               // 10
 	DefaultMetaSensitiveInput      = StatusTextSensitiveInput      // 11
