@@ -81,6 +81,24 @@ func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWrit
 		}
 	}
 
+	{
+		actualScheme := uri.Scheme
+
+		if !hasValidScheme(actualScheme) {
+			if err := ServeBadRequest(ctx, w); nil != err {
+				log.Error(
+					field.S("the actual scheme in the URL from the request is not what was expected"),
+					field.String("expected-URL-scheme", Scheme),
+					field.String("expected-URL-scheme-TLS", SchemeTLS),
+					field.String("actual-scheme", actualScheme),
+					field.Stringer("uri", uri),
+					field.E(err),
+				)
+			}
+			return
+		}
+	}
+
 	var (
 		requestpath string
 		explicitDir  bool
