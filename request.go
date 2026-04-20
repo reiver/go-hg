@@ -206,7 +206,12 @@ func (receiver Request) Scheme() string {
 
 		var index int = strings.Index(str, needle)
 		if index < len(needle) {
-			return ""
+			index = strings.Index(value, needle)
+			if index < 0 {
+				return ""
+			}
+
+			return strings.ToLower(value[:index])
 		}
 
 		str = str[:index]

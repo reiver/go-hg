@@ -247,6 +247,13 @@ func TestRequest_Scheme(t *testing.T) {
 			Link:     "HTTP://host.example/once/twice/thrice/fource.html",
 			Expected: "http",
 		},
+
+
+
+		{
+			Link:     "a-very-very-very-very-very-very-very-very-very-long-scheme://host.example",
+			Expected: "a-very-very-very-very-very-very-very-very-very-long-scheme",
+		},
 	}
 
 	for testNumber, test := range tests {
