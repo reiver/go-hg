@@ -99,7 +99,7 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 			field.Stringer("uri", uri),
 		)
 
-		if Scheme != actualScheme && SchemeTLS != actualScheme {
+		if !hasValidScheme(actualScheme) {
 			log.Error(
 				field.S("the actual scheme in the URL from the request is not what was expected"),
 				field.String("expected-URL-scheme", Scheme),
