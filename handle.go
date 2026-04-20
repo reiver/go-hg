@@ -149,7 +149,7 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, 
 		ctxWithTimeout, cancelTimeout := context.WithTimeout(ctx, timeout)
 		defer cancelTimeout()
 
-		if err := ServeTemporaryFailure(ctxWithTimeout, w, request); nil != err {
+		if err := ServeTemporaryFailure(ctxWithTimeout, w, request.RequestValue()); nil != err {
 			log.Error(
 				field.S("problem sending temporary-failure response for nil handler"),
 				field.Stringer("request", request),
