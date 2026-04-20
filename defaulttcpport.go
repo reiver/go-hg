@@ -15,7 +15,8 @@ const (
 	//	var address string = fmt.Sprintf("%s:%d", domain, hg.DefaultTCPPort)
 	//	
 	//	err := hg.ListenAndServe(address, handler)
-	DefaultTCPPort    = 1961
+	DefaultTCPPort       =  1961
+	DefaultTCPPortString = "1961"
 
 	// A Gemini Protocol server runs over TLS over TCP.
 	// TCP has communications happening over TCP-ports.
@@ -31,5 +32,6 @@ const (
 	//	var address string = fmt.Sprintf("%s:%d", domain, hg.DefaultTCPPortTLS)
 	//	
 	//	err := hg.ListenAndServe(address, handler)
-	DefaultTCPPortTLS = 1965
+	DefaultTCPPortTLS       =  1965
+	DefaultTCPPortTLSString = "1965"
 )
