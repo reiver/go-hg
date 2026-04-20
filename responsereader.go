@@ -12,7 +12,7 @@ import (
 
 	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
-	"github.com/reiver/go-utf8s"
+	"github.com/reiver/go-utf8"
 )
 
 // ResponseReader is used by a Handler to read a Mercury Protocol response.
@@ -228,7 +228,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 
 	var mostSignificant rune
 	{
-		r, size, err := utf8s.ReadRune(reader)
+		r, size, err := utf8.ReadRune(reader)
 		n += size
 		if io.EOF == err {
 			return n, errBadResponse
@@ -236,7 +236,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 		if nil != err {
 			return n, err
 		}
-		if utf8s.RuneError == r {
+		if utf8.RuneError == r {
 			return n, errRuneError
 		}
 
@@ -245,7 +245,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 
 	var leastSignificant rune
 	{
-		r, size, err := utf8s.ReadRune(reader)
+		r, size, err := utf8.ReadRune(reader)
 		n += size
 		if io.EOF == err {
 			return n, errBadResponse
@@ -253,7 +253,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 		if nil != err {
 			return n, err
 		}
-		if utf8s.RuneError == r {
+		if utf8.RuneError == r {
 			return n, errRuneError
 		}
 
@@ -272,7 +272,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 	}
 
 	{
-		r, size, err := utf8s.ReadRune(reader)
+		r, size, err := utf8.ReadRune(reader)
 		n += size
 		if io.EOF == err {
 			return n, errBadResponse
@@ -280,7 +280,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 		if nil != err {
 			return n, err
 		}
-		if utf8s.RuneError == r {
+		if utf8.RuneError == r {
 			return n, errRuneError
 		}
 
@@ -293,7 +293,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 		var storage strings.Builder
 
 		for {
-			r, size, err := utf8s.ReadRune(reader)
+			r, size, err := utf8.ReadRune(reader)
 			n += size
 			if io.EOF == err {
 				return n, errBadResponse
@@ -301,7 +301,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 			if nil != err {
 				return n, err
 			}
-			if utf8s.RuneError == r {
+			if utf8.RuneError == r {
 				return n, errRuneError
 			}
 
@@ -352,7 +352,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 	}
 
 	{
-		r, size, err := utf8s.ReadRune(reader)
+		r, size, err := utf8.ReadRune(reader)
 		n += size
 		if io.EOF == err {
 			return n, errBadResponse
@@ -360,7 +360,7 @@ func (receiver *internalResponseReader) readHeader(statusCode *int, meta any) (n
 		if nil != err {
 			return n, err
 		}
-		if utf8s.RuneError == r {
+		if utf8.RuneError == r {
 			return n, errRuneError
 		}
 

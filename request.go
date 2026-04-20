@@ -10,7 +10,7 @@ import (
 	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
 	"github.com/reiver/go-opt"
-	"github.com/reiver/go-utf8s"
+	"github.com/reiver/go-utf8"
 	"golang.org/x/net/idna"
 )
 
@@ -111,7 +111,7 @@ func (receiver *Request) parse(reader io.Reader) error {
 	var storage strings.Builder
 	{
 		for {
-			r, _, err := utf8s.ReadRune(reader)
+			r, _, err := utf8.ReadRune(reader)
 			if io.EOF == err {
 		/////////////// BREAK
 				break
@@ -119,19 +119,19 @@ func (receiver *Request) parse(reader io.Reader) error {
 			if nil != err {
 				return err
 			}
-			if utf8s.RuneError == r {
+			if utf8.RuneError == r {
 				return errRuneError
 			}
 
 			if '\r' == r {
-				r, _, err := utf8s.ReadRune(reader)
+				r, _, err := utf8.ReadRune(reader)
 				if io.EOF == err {
 					return errExpectedLineFeed
 				}
 				if nil != err {
 					return err
 				}
-				if utf8s.RuneError == r {
+				if utf8.RuneError == r {
 					return errRuneError
 				}
 

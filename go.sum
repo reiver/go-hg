@@ -10,8 +10,8 @@ github.com/reiver/go-lck v0.0.0-20240808133902-b56df221c39f h1:KBVWBoNIM8mHkUR3d
 github.com/reiver/go-lck v0.0.0-20240808133902-b56df221c39f/go.mod h1:PFseSi8S0CBkc+YB6jYWtogPk83LumclnYJZZBQJJhs=
 github.com/reiver/go-opt v0.0.0-20260410151028-cc34d487e508 h1:ETZ2+gKwMCIPbxjoYGqZQUurs/mKEF4Z3/K/ZN0dfOo=
 github.com/reiver/go-opt v0.0.0-20260410151028-cc34d487e508/go.mod h1:wHNwdPLR/veyiWpxj9Vvof0lnHeHNVdU5Vx+rjoY9+o=
-github.com/reiver/go-utf8s v1.0.1 h1:vFthDb1tAMYiKy9bK+2QxMqw6/tdWrvelFHGbtHheZM=
-github.com/reiver/go-utf8s v1.0.1/go.mod h1:icyCK1U+2V7fJJPWTQfWfoE3hVo65EA1dut5f+9Zwjc=
+github.com/reiver/go-utf8 v2.0.2-0.20240825112455-f6c2bd439d4f+incompatible h1:UnOzxDADv3uDI9QB8xh3ZAAmnaWyp7NlV2ny7K8FlG0=
+github.com/reiver/go-utf8 v2.0.2-0.20240825112455-f6c2bd439d4f+incompatible/go.mod h1:tfGntNDUeEZIAsz0mTu0lF7/IlErc+BpQgO6yxYmJig=
 golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39 h1:DHNhtq3sNNzrvduZZIiFyXWOL9IWaDPHqTnLJp+rCBY=
 golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39/go.mod h1:46edojNIoXTNOhySWIWdix628clX9ODXwPsQuG6hsK0=
 golang.org/x/net v0.53.0 h1:d+qAbo5L0orcWAr0a9JweQpjXF19LMXJE8Ey7hwOdUA=
