@@ -38,7 +38,7 @@ import (
 	"github.com/reiver/go-hg"
 
 	"context"
-	"fmt"
+	"io"
 	"os"
 )
 
@@ -248,7 +248,7 @@ import (
 	"github.com/reiver/go-hg"
 
 	"context"
-	"fmt"
+	"io"
 )
 
 func main() {
@@ -278,7 +278,7 @@ import (
 	"github.com/reiver/go-hg"
 
 	"context"
-	"fmt"
+	"io"
 )
 
 func main() {
