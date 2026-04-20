@@ -365,11 +365,25 @@ func (receiver *internalResponseReader) Reader(ctx context.Context) io.Reader {
 	}
 }
 
+// internalResponseReader exists so that there is a way to make a [internalResponseReader] look like a [io.Reader].
+//
+// See also:
+//
+//	• [internalResponseReader.Reader]
+//	• [ResponseReader.Reader]
 type internalReaderAdapter struct {
 	rr  *internalResponseReader
 	ctx context.Context
 }
 
+// Read makes [internalReaderAdapter] fit the [io.Reader] interface.
+//
+// [internalReaderAdapter] returned from [internalResponseReader.Reader] so that there is a way to make a [internalResponseReader] look like a [io.Reader].
+//
+// See also:
+//
+//	• [internalResponseReader.Reader]
+//	• [ResponseReader.Reader]
 func (receiver *internalReaderAdapter) Read(data []byte) (int, error) {
 	if nil == receiver {
 		return 0, ErrNilReceiver
