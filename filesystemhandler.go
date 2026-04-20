@@ -208,7 +208,7 @@ func (receiver FileSystemHandler) ServeMercury(ctx context.Context, w ResponseWr
 					return
 				}
 			}
-			if nil == file || fs.File(nil) == file {
+			if nil == file {
 				log.Error(
 					field.S("file is nil"),
 					field.FormattedString("file", "%#v", file),
