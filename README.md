@@ -58,11 +58,12 @@ func main() {
 }
 
 func serveMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
+	w.WriteHeader(ctx, hg.StatusSuccess, "text/plain")
 	fmt.Fprintln(w.Writer(ctx), "Hello world!")
 }
 ```
 
-In this example, the ☿ **Mercury Protocol** just outputs a _Gemtext_ file with the contents “Hello world!”.
+In this example, the ☿ **Mercury Protocol** server just outputs a file with the contents “Hello world!”.
 
 If you wanted to write your own ☿ **Mercury Protocol** server based on this code, then you would change what is inside the `serveMercury()` function.
 
@@ -151,7 +152,7 @@ func main() {
 	}
 	defer responsereader.Close()
 
-	_, err = io.Copy(os.Stdout, responsereader)
+	_, err = io.Copy(os.Stdout, responsereader.Reader(context.Background()))
 	if nil != err {
 		fmt.Fprintf(os.Stderr, "problem outputing response body for %q to STDOUT: %s", uri, err)
 		os.Exit(1)
@@ -162,7 +163,7 @@ func main() {
 
 ## Hypermedia, Hypertext
 
-The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used  with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
+The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
 
 (The name “gemtext” is short for “gemini text”.)
 
@@ -215,7 +216,7 @@ func main() {
 
 ## Tilde Example Mercury Protocol Server
 
-Another example  ☿ **Mercury Protocol** server is shown in the following code:
+Another example ☿ **Mercury Protocol** server is shown in the following code:
 
 ```go
 package main
@@ -341,7 +342,7 @@ Package **hg** was written by [Charles Iliya Krempeaux](http://reiver.link)
 
 ## Package Name
 
-The package name of this Go package is **hg** rather than **mercury** because **Hg** is often used as a shorthard for **mercury**.
+The package name of this Go package is **hg** rather than **mercury** because **Hg** is often used as a shorthand for **mercury**.
 
 Nowadays the word **mercury** is used to refer to multiple things —
 a Roman god named “Mercury”,

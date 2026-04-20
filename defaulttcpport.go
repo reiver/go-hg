@@ -6,7 +6,7 @@ const (
 	// A client-server protocol (including the Mercury Protocol) typically defines a default-TCP-port for servers.
 	// For the Mercury Protocol, this default-TCP-port is: 1961.
 	//
-	// This constant — ‘DefaultTCPPort’ — can be used when once wants to use the default-TCP-port for a Mercury Protocol server.
+	// This constant — ‘DefaultTCPPort’ — can be used when one wants to use the default-TCP-port for a Mercury Protocol server.
 	//
 	// For example:
 	//
@@ -23,7 +23,7 @@ const (
 	// A client-server protocol (including the Gemini Protocol) typically defines a default-TCP-port for servers.
 	// For the Gemini Protocol, this default-TCP-port is: 1965.
 	//
-	// This constant — ‘DefaultTCPPortTLS’ — can be used when once wants to use the default-TCP-port for a Gemini Protocol server.
+	// This constant — ‘DefaultTCPPortTLS’ — can be used when one wants to use the default-TCP-port for a Gemini Protocol server.
 	//
 	// For example:
 	//

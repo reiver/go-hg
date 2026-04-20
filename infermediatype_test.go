@@ -164,7 +164,7 @@ func TestInferMediaType(t *testing.T) {
 		actual := inferMediaType(test.Path)
 
 		if expected := test.Expected; expected != actual {
-			t.Errorf("For test #%d, the actual inferred media-type is not what was expeceted.", testNumber)
+			t.Errorf("For test #%d, the actual inferred media-type is not what was expected.", testNumber)
 			t.Logf("PATH: %q", test.Path)
 			t.Logf("EXPECTED MEDIA-TYPE: %q", expected)
 			t.Logf("ACTUAL   MEDIA-TYPE: %q", actual)

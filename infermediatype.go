@@ -36,7 +36,7 @@ func inferMediaType(fileName string) string {
 		mediatype = mime.TypeByExtension(fileExtension)
 	}
 
-	//@TODO: should we had a http.DetectContentType() check if the fileExtension check fails?
+	//@TODO: should we add a http.DetectContentType() check if the fileExtension check fails?
 
 	if "" == mediatype {
 		return defaultmediatype

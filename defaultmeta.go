@@ -34,10 +34,10 @@ package hg
 //	• DefaultMetaPermanentFailure    = "permanent-failure"     // 50
 //	• DefaultMetaNotFound            = "not-found"             // 51
 //	• DefaultMetaGone                = "gone"                  // 52
-// 	• DefaultMetaProxyRequestRefused = "proxy-request-refused" // 53
+//	• DefaultMetaProxyRequestRefused = "proxy-request-refused" // 53
 //	• DefaultMetaBadRequest          = "bad-request"           // 59
 //
-// Two of the of these default response‐header's ‘meta’ are (not cosmetic but are) shown to the user.
+// Two of these default response‐header’s ‘meta’ are (not cosmetic but are) shown to the user.
 // The programmer SHOULD create their own message; but just in case they don't, these default values exist:
 //
 // • DefaultMetaInput               = "input"                 // 10
