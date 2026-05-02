@@ -1,8 +1,7 @@
 package hg
 
 import (
-	"path/filepath"
-	"unicode/utf8"
+	paths "path"
 )
 
 // reqpath2fspath takes the path from the URL in a Mercury Protocol request,
@@ -25,29 +24,23 @@ import (
 //	"apple/banana/cherry"
 func reqpath2fspath(reqpath string) (string, bool) {
 
-	var path string = reqpath
+	var p string = reqpath
 	{
-		path = filepath.FromSlash(path)
+		p = paths.Clean(p)
 
-		path = filepath.Clean(path)
-
-		if ! filepath.IsAbs(path) {
+		if !paths.IsAbs(p) {
 			return "", false
 		}
 
-		if string(filepath.Separator) == path {
-			path = filepath.Join(path, defaultfilename)
+		if "/" == p {
+			p = paths.Join(p, defaultfilename)
 		}
 	}
 
 	var fspath string
 	{
-		var size int = utf8.RuneLen(filepath.Separator)
-		if size <= 0 {
-			return "", false
-		}
-
-		fspath = path[size:]
+		// Strip the leading '/'
+		fspath = p[1:]
 	}
 
 	return fspath, true

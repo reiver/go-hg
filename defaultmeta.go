@@ -4,11 +4,11 @@ package hg
 //
 // For example usage:
 //
-//	hg.ServeNotFound(w, hg.DefaultMetaNotFound)
+//	hg.ServeNotFound(ctx, w, hg.DefaultMetaNotFound)
 //
 // Also for another example usage:
 //
-//	hg.ServeTemporaryFailure(w, hg.DefaultMetaTemporaryFailure)
+//	hg.ServeTemporaryFailure(ctx, w, hg.DefaultMetaTemporaryFailure)
 //
 // To understand these —
 //
@@ -24,55 +24,48 @@ package hg
 //
 // For most Mercury Protocol response types, the value of the response‐header's ‘meta’ is likely cosmetic.
 // And possibly, no human will ever see them (depending on whether the client software presents them to the user or not).
-// The following constants provide useful default values for these cosmetic meta value's, that can make a programmer's life easier when developing a Mercury Protcol client or server:
+// The following constants provide useful default values for these cosmetic meta value's, that can make a programmer's life easier when developing a Mercury Protocol client or server:
 //
-// • DefaultMetaSuccess             = "success"               // 20
+//	• DefaultMetaSuccess             = "success"               // 20
+//	• DefaultMetaTemporaryFailure    = "temporary-failure"     // 40
+//	• DefaultMetaServerUnavailable   = "server-unavailable"    // 41
+//	• DefaultMetaCGIError            = "cgi-error"             // 42
+//	• DefaultMetaProxyError          = "proxy-error"           // 43
+//	• DefaultMetaPermanentFailure    = "permanent-failure"     // 50
+//	• DefaultMetaNotFound            = "not-found"             // 51
+//	• DefaultMetaGone                = "gone"                  // 52
+//	• DefaultMetaProxyRequestRefused = "proxy-request-refused" // 53
+//	• DefaultMetaBadRequest          = "bad-request"           // 59
 //
-// • DefaultMetaTemporaryFailure    = "temporary‐failure"     // 40
-//
-// • DefaultMetaServerUnavailable   = "server‐unavailable"    // 41
-//
-// • DefaultMetaCGIError            = "cgi‐error"             // 42
-//
-// • DefaultMetaProxyError          = "proxy‐error"           // 43
-//
-// • DefaultMetaPermanentFailure    = "permanent‐failure"     // 50
-//
-// • DefaultMetaNotFound            = "not‐found"             // 51
-//
-// • DefaultMetaGone                = "gone"                  // 52
-//
-// • DefaultMetaProxyRequestRefused = "proxy‐request‐refused" // 53
-//
-// • DefaultMetaBadRequest          = "bad‐request"           // 59
-//
-// Two of the of these default response‐header's ‘meta’ are (not cosmetic but are) shown to the user.
-// The programmer SHOULD create their own message; but just in case the don't, these default values exist:
+// Two of these default response‐header’s ‘meta’ are (not cosmetic but are) shown to the user.
+// The programmer SHOULD create their own message; but just in case they don't, these default values exist:
 //
 // • DefaultMetaInput               = "input"                 // 10
 //
-// • DefaultMetaSensitiveInput      = "sensitive‐input"       // 11
+// • DefaultMetaSensitiveInput      = "sensitive-input"       // 11
 //
 // In addition to these, one of these default response‐header is functional.
 //
 // DefaultMetaSlowDown            = "3"                     // 44
 //
-// This also SHOULD be chosen by the programmer; but again just in case the don't, a default values exists.
+// For status 44, the meta is the number of seconds the client MUST wait before making another request.
+// So "3" means "wait 3 seconds before retrying".
+// This SHOULD be chosen by the programmer; but just in case they don't, a default value exists.
 const (
-	DefaultMetaInput               = "input"                 // 10
-	DefaultMetaSensitiveInput      = "sensitive‐input"       // 11
+	DefaultMetaInput               = StatusTextInput               // 10
+	DefaultMetaSensitiveInput      = StatusTextSensitiveInput      // 11
 
-	DefaultMetaSuccess             = "success"               // 20
+	DefaultMetaSuccess             = StatusTextSuccess             // 20
 
-	DefaultMetaTemporaryFailure    = "temporary‐failure"     // 40
-	DefaultMetaServerUnavailable   = "server‐unavailable"    // 41
-	DefaultMetaCGIError            = "cgi‐error"             // 42
-	DefaultMetaProxyError          = "proxy‐error"           // 43
-	DefaultMetaSlowDown            = "3"                     // 44
+	DefaultMetaTemporaryFailure    = StatusTextTemporaryFailure    // 40
+	DefaultMetaServerUnavailable   = StatusTextServerUnavailable   // 41
+	DefaultMetaCGIError            = StatusTextCGIError            // 42
+	DefaultMetaProxyError          = StatusTextProxyError          // 43
+	DefaultMetaSlowDown            = "3"                           // 44
 
-	DefaultMetaPermanentFailure    = "permanent‐failure"     // 50
-	DefaultMetaNotFound            = "not‐found"             // 51
-	DefaultMetaGone                = "gone"                  // 52
-	DefaultMetaProxyRequestRefused = "proxy‐request‐refused" // 53
-	DefaultMetaBadRequest          = "bad‐request"           // 59
+	DefaultMetaPermanentFailure    = StatusTextPermanentFailure    // 50
+	DefaultMetaNotFound            = StatusTextNotFound            // 51
+	DefaultMetaGone                = StatusTextGone                // 52
+	DefaultMetaProxyRequestRefused = StatusTextProxyRequestRefused // 53
+	DefaultMetaBadRequest          = StatusTextBadRequest          // 59
 )

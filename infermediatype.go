@@ -13,26 +13,30 @@ func init() {
 	mime.AddExtensionType(".text", "text/plain")
 }
 
-// infermediatype infers the media-type from the filename or filesystem-path.
+// inferMediaType infers the media-type from the filename or filesystem-path.
 //
-// If it cannot infer it, then it returns an empty string ("").
-func infermediatype(s string) string {
+// If it cannot infer it, then it returns:
+//
+//	"application/octet-stream"
+func inferMediaType(fileName string) string {
 
-	var fileextension string
+	var fileExtension string
 	{
-		fileextension  = filepath.Ext(s)
+		fileExtension  = filepath.Ext(fileName)
 	}
 
 	{
-		if "" == fileextension {
+		if "" == fileExtension {
 			return defaultmediatype
 		}
 	}
 
 	var mediatype string
 	{
-		mediatype = mime.TypeByExtension(fileextension)
+		mediatype = mime.TypeByExtension(fileExtension)
 	}
+
+	//@TODO: should we add a http.DetectContentType() check if the fileExtension check fails?
 
 	if "" == mediatype {
 		return defaultmediatype

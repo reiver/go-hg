@@ -4,84 +4,99 @@ import (
 	"fmt"
 )
 
-// ResponseInput represents a Mercury Protocol “10 INPUT” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseInput represents a Mercury Protocol “10 INPUT” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseInput               struct {meta string} // 10
-// ResponseSensitiveInput represents a Mercury Protocol “11 SENSITIVE INPUT” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseSensitiveInput represents a Mercury Protocol “11 SENSITIVE INPUT” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseSensitiveInput      struct {meta string} // 11
 
-// ResponseRedirectTemporary represents a Mercury Protocol “30 REDIRECT ‐ TEMPORARY” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseRedirectTemporary represents a Mercury Protocol “30 REDIRECT - TEMPORARY” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseRedirectTemporary   struct {meta string} // 30
-// ResponseRedirectPermanent represents a Mercury Protocol “31 REDIRECT ‐ PERMANENT” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseRedirectPermanent represents a Mercury Protocol “31 REDIRECT - PERMANENT” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseRedirectPermanent   struct {meta string} // 31
 
-// ResponseTemporaryFailure represents a Mercury Protocol “40 TEMPORARY FAILURE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseTemporaryFailure represents a Mercury Protocol “40 TEMPORARY FAILURE” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseTemporaryFailure    struct {meta string} // 40
-// ResponseServerUnavailable represents a Mercury Protocol “41 SERVER UNAVAILABLE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseServerUnavailable represents a Mercury Protocol “41 SERVER UNAVAILABLE” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseServerUnavailable   struct {meta string} // 41
-// ResponseCGIError represents a Mercury Protocol “42 CGI ERROR” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseCGIError represents a Mercury Protocol “42 CGI ERROR” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseCGIError            struct {meta string} // 42
-// ResponseProxyError represents a Mercury Protocol “43 PROXY ERROR” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseProxyError represents a Mercury Protocol “43 PROXY ERROR” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseProxyError          struct {meta string} // 43
-// ResponseSlowDown represents a Mercury Protocol “44 SLOW DOWN” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseSlowDown represents a Mercury Protocol “44 SLOW DOWN” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseSlowDown            struct {meta string} // 44
 
-// ResponsePermanentFailure represents a Mercury Protocol “50 PERMANENT FAILURE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponsePermanentFailure represents a Mercury Protocol “50 PERMANENT FAILURE” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponsePermanentFailure    struct {meta string} // 50
-// ResponseNotFound represents a Mercury Protocol “51 NOT FOUND” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseNotFound represents a Mercury Protocol “51 NOT FOUND” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseNotFound            struct {meta string} // 51
-// ResponseGone represents a Mercury Protocol “52 GONE” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseGone represents a Mercury Protocol “52 GONE” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseGone                struct {meta string} // 52
-// ResponseProxyRequestRefused represents a Mercury Protocol “53 PROXY REQUEST REFUSED” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseProxyRequestRefused represents a Mercury Protocol “53 PROXY REQUEST REFUSED” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseProxyRequestRefused struct {meta string} // 53
-// ResponseBadRequest represents a Mercury Protocol “59 BAD REQUEST” response. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseBadRequest represents a Mercury Protocol “59 BAD REQUEST” response. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type ResponseBadRequest          struct {meta string} // 59
 
-// UnknownResponse represents a Mercury Protocol unknown response that this package doesn't have a type for. You might get this from hg.ErrorResponse() or called the .Read() method on a hg.ResponseReader
+// ResponseCertificateRequired represents a "60 CLIENT CERTIFICATE REQUIRED" response (Gemini Protocol only). You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
+type ResponseCertificateRequired      struct {meta string} // 60
+// ResponseCertificateNotAuthorized represents a "61 CERTIFICATE NOT AUTHORIZED" response (Gemini Protocol only). You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
+type ResponseCertificateNotAuthorized struct {meta string} // 61
+// ResponseCertificateNotValid represents a "62 CERTIFICATE NOT VALID" response (Gemini Protocol only). You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
+type ResponseCertificateNotValid      struct {meta string} // 62
+
+// UnknownResponse represents an unknown response that this package doesn't have a type for. You might get this from hg.ErrorResponse() or called the .Read(ctx, data) method on a hg.ResponseReader
 type UnknownResponse             struct {meta string ; statusCode int}
 
 
 
-func (receiver ResponseInput)               Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 10
-func (receiver ResponseSensitiveInput)      Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 11
+func (receiver ResponseInput)               Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 10
+func (receiver ResponseSensitiveInput)      Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 11
 
-func (receiver ResponseRedirectTemporary)   Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 30
-func (receiver ResponseRedirectPermanent)   Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 31
+func (receiver ResponseRedirectTemporary)   Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 30
+func (receiver ResponseRedirectPermanent)   Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 31
 
-func (receiver ResponseTemporaryFailure)    Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 40
-func (receiver ResponseServerUnavailable)   Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 41
-func (receiver ResponseCGIError)            Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 42
-func (receiver ResponseProxyError)          Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 43
-func (receiver ResponseSlowDown)            Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 44
+func (receiver ResponseTemporaryFailure)    Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 40
+func (receiver ResponseServerUnavailable)   Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 41
+func (receiver ResponseCGIError)            Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 42
+func (receiver ResponseProxyError)          Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 43
+func (receiver ResponseSlowDown)            Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 44
 
-func (receiver ResponsePermanentFailure)    Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 50
-func (receiver ResponseNotFound)            Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 51
-func (receiver ResponseGone)                Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 52
-func (receiver ResponseProxyRequestRefused) Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 53
-func (receiver ResponseBadRequest)          Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 59
+func (receiver ResponsePermanentFailure)    Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 50
+func (receiver ResponseNotFound)            Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 51
+func (receiver ResponseGone)                Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 52
+func (receiver ResponseProxyRequestRefused) Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 53
+func (receiver ResponseBadRequest)          Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 59
 
-func (receiver UnknownResponse)             Error() string {return fmt.Sprintf("hg: response error — status‐code=%d meta=%q", receiver.statusCode,   receiver.meta)}
+func (receiver ResponseCertificateRequired)      Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 60
+func (receiver ResponseCertificateNotAuthorized) Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 61
+func (receiver ResponseCertificateNotValid)      Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.StatusCode(), receiver.meta)} // 62
+
+func (receiver UnknownResponse)             Error() string {return fmt.Sprintf("hg: response error — status-code=%d meta=%q", receiver.statusCode,   receiver.meta)}
 
 
 
-func (receiver ResponseInput)               StatusCode() int {return 10}
-func (receiver ResponseSensitiveInput)      StatusCode() int {return 11}
+func (receiver ResponseInput)               StatusCode() int {return StatusInput               } // 10
+func (receiver ResponseSensitiveInput)      StatusCode() int {return StatusSensitiveInput      } // 11
 
-func (receiver ResponseRedirectTemporary)   StatusCode() int {return 30}
-func (receiver ResponseRedirectPermanent)   StatusCode() int {return 31}
+func (receiver ResponseRedirectTemporary)   StatusCode() int {return StatusRedirectTemporary   } // 30
+func (receiver ResponseRedirectPermanent)   StatusCode() int {return StatusRedirectPermanent   } // 31
 
-func (receiver ResponseTemporaryFailure)    StatusCode() int {return 40}
-func (receiver ResponseServerUnavailable)   StatusCode() int {return 41}
-func (receiver ResponseCGIError)            StatusCode() int {return 42}
-func (receiver ResponseProxyError)          StatusCode() int {return 43}
-func (receiver ResponseSlowDown)            StatusCode() int {return 44}
+func (receiver ResponseTemporaryFailure)    StatusCode() int {return StatusTemporaryFailure    } // 40
+func (receiver ResponseServerUnavailable)   StatusCode() int {return StatusServerUnavailable   } // 41
+func (receiver ResponseCGIError)            StatusCode() int {return StatusCGIError            } // 42
+func (receiver ResponseProxyError)          StatusCode() int {return StatusProxyError          } // 43
+func (receiver ResponseSlowDown)            StatusCode() int {return StatusSlowDown            } // 44
 
-func (receiver ResponsePermanentFailure)    StatusCode() int {return 50}
-func (receiver ResponseNotFound)            StatusCode() int {return 51}
-func (receiver ResponseGone)                StatusCode() int {return 52}
-func (receiver ResponseProxyRequestRefused) StatusCode() int {return 53}
-func (receiver ResponseBadRequest)          StatusCode() int {return 59}
+func (receiver ResponsePermanentFailure)    StatusCode() int {return StatusPermanentFailure    } // 50
+func (receiver ResponseNotFound)            StatusCode() int {return StatusNotFound            } // 51
+func (receiver ResponseGone)                StatusCode() int {return StatusGone                } // 52
+func (receiver ResponseProxyRequestRefused) StatusCode() int {return StatusProxyRequestRefused } // 53
+func (receiver ResponseBadRequest)          StatusCode() int {return StatusBadRequest          } // 59
 
-func (receiver UnknownResponse)             StatusCode() int {return receiver.statusCode}
+func (receiver ResponseCertificateRequired)      StatusCode() int {return StatusCertificateRequired      } // 60
+func (receiver ResponseCertificateNotAuthorized) StatusCode() int {return StatusCertificateNotAuthorized } // 61
+func (receiver ResponseCertificateNotValid)      StatusCode() int {return StatusCertificateNotValid      } // 62
+
+func (receiver UnknownResponse)             StatusCode() int {return receiver.statusCode       }
 
 
 
@@ -103,6 +118,10 @@ func (receiver ResponseGone)                Meta() string {return receiver.meta}
 func (receiver ResponseProxyRequestRefused) Meta() string {return receiver.meta}
 func (receiver ResponseBadRequest)          Meta() string {return receiver.meta}
 
+func (receiver ResponseCertificateRequired)      Meta() string {return receiver.meta}
+func (receiver ResponseCertificateNotAuthorized) Meta() string {return receiver.meta}
+func (receiver ResponseCertificateNotValid)      Meta() string {return receiver.meta}
+
 func (receiver UnknownResponse)             Meta() string {return receiver.meta}
 
 
@@ -110,17 +129,23 @@ func (receiver UnknownResponse)             Meta() string {return receiver.meta}
 func (receiver ResponseInput)               StatusText() string {return "input"}
 func (receiver ResponseSensitiveInput)      StatusText() string {return "sensitive input"}
 
-func (receiver ResponseRedirectTemporary)   StatusText() string {return "redirect ‐ temporary"}
-func (receiver ResponseRedirectPermanent)   StatusText() string {return "redirect ‐ permanent"}
+func (receiver ResponseRedirectTemporary)   StatusText() string {return "redirect - temporary"}
+func (receiver ResponseRedirectPermanent)   StatusText() string {return "redirect - permanent"}
 
 func (receiver ResponseTemporaryFailure)    StatusText() string {return "temporary failure"}
 func (receiver ResponseServerUnavailable)   StatusText() string {return "server unavailable"}
 func (receiver ResponseCGIError)            StatusText() string {return "cgi error"}
 func (receiver ResponseProxyError)          StatusText() string {return "proxy error"}
 func (receiver ResponseSlowDown)            StatusText() string {return "slow down"}
+
+func (receiver ResponsePermanentFailure)    StatusText() string {return "permanent failure"}
 func (receiver ResponseNotFound)            StatusText() string {return "not found"}
 func (receiver ResponseGone)                StatusText() string {return "gone"}
 func (receiver ResponseProxyRequestRefused) StatusText() string {return "proxy request refused"}
 func (receiver ResponseBadRequest)          StatusText() string {return "bad request"}
+
+func (receiver ResponseCertificateRequired)      StatusText() string {return "certificate required"}
+func (receiver ResponseCertificateNotAuthorized) StatusText() string {return "certificate not authorized"}
+func (receiver ResponseCertificateNotValid)      StatusText() string {return "certificate not valid"}
 
 func (receiver UnknownResponse)             StatusText() string {return ""}

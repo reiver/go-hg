@@ -154,7 +154,7 @@ func TestParsetildedir_success(t *testing.T) {
 		}
 
 		if expected, actual := test.ExpectedUsername, actualUsername; expected != actual  {
-			t.Errorf("For test #%d, the actual usernam is not what was expected.", testNumber)
+			t.Errorf("For test #%d, the actual username is not what was expected.", testNumber)
 			t.Logf("PATH: %q", test.Path)
 			t.Logf("SUCCESSFUL: %t", successful)
 			t.Logf("EXPECTED USERNAME: %q", test.ExpectedUsername)
@@ -165,7 +165,7 @@ func TestParsetildedir_success(t *testing.T) {
 		}
 
 		if expected, actual := test.ExpectedSubPath, actualSubPath; expected != actual  {
-			t.Errorf("For test #%d, the actual usernam is not what was expected.", testNumber)
+			t.Errorf("For test #%d, the actual sub-path is not what was expected.", testNumber)
 			t.Logf("PATH: %q", test.Path)
 			t.Logf("SUCCESSFUL: %t", successful)
 			t.Logf("EXPECTED USERNAME: %q", test.ExpectedUsername)

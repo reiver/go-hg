@@ -26,7 +26,7 @@ package hg
 //
 // Example With Success
 //
-// Althugh note that calling with the a status-code of 20 (i.e., the status code for Success) would return nil.
+// Although note that calling with a status-code of 20 (i.e., the status code for Success) would return nil.
 // So, for example, this:
 //
 //	hg.ErrorResponse(20, "text/gemini")
@@ -43,10 +43,10 @@ package hg
 //		
 //		// ...
 //		
-//		p, err := ioutil.ReadAll(rr)
+//		p, err := io.ReadAll(rr.Reader(ctx))
 //		
 //		if nil != err {
-//			switch casted: err.(type) {
+//			switch casted := err.(type) {
 //			case hg.ResponseInput:
 //				//@TODO
 //			case hg.ResponseSensitiveInput:
@@ -77,6 +77,13 @@ package hg
 //			case hg.ResponseProxyRequestRefused:
 //				//@TODO
 //			case hg.ResponseBadRequest:
+//				//@TODO
+//
+//			case hg.ResponseCertificateRequired:
+//				//@TODO
+//			case hg.ResponseCertificateNotAuthorized:
+//				//@TODO
+//			case hg.ResponseCertificateNotValid:
 //				//@TODO
 //
 //			case hg.UnknownResponse:
@@ -125,6 +132,13 @@ func ErrorResponse(statuscode int, meta string) error {
 		return ResponseProxyRequestRefused{meta}
 	case StatusBadRequest:
 		return ResponseBadRequest{meta}
+
+	case StatusCertificateRequired:
+		return ResponseCertificateRequired{meta}
+	case StatusCertificateNotAuthorized:
+		return ResponseCertificateNotAuthorized{meta}
+	case StatusCertificateNotValid:
+		return ResponseCertificateNotValid{meta}
 
 	default:
 		return UnknownResponse{meta:meta, statusCode:statuscode}

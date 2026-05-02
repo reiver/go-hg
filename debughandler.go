@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -8,9 +9,8 @@ import (
 
 // The DebugHandler can be used as:
 //
-// • a demo Mercury Protocol server,
-//
-// • a debugging tool to use with Mercury Protocol clients.
+//	• a demo Mercury Protocol server,
+//	• a debugging tool to use with Mercury Protocol clients.
 //
 // You can use it with code similar to:
 //
@@ -23,7 +23,7 @@ type internalDebugHandler int
 
 var _ Handler = internalDebugHandler(0)
 
-func (internalDebugHandler) ServeMercury(w ResponseWriter, r Request) {
+func (internalDebugHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
 	var storage strings.Builder
 
 	storage.WriteString("```")
@@ -65,6 +65,8 @@ func (internalDebugHandler) ServeMercury(w ResponseWriter, r Request) {
 	storage.WriteString("\x1B[0m")
 	storage.WriteString("\r\n")
 
-	w.WriteHeader(StatusSuccess, "text/gemini")
-	io.WriteString(w, storage.String())
+	if _, err := w.WriteHeader(ctx, StatusSuccess, "text/gemini"); nil != err {
+		return
+	}
+	io.WriteString(w.Writer(ctx), storage.String())
 }

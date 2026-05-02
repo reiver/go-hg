@@ -1,10 +1,12 @@
 package hg
 
 import (
-	"fmt"
-	"strings"
-
 	"testing"
+
+	"context"
+	"fmt"
+
+	"github.com/reiver/go-hg/internal/io2"
 )
 
 func TestResponseWriter_WriteHeader_success(t *testing.T) {
@@ -224,11 +226,11 @@ func TestResponseWriter_WriteHeader_success(t *testing.T) {
 
 	for testNumber, test := range tests {
 
-		var storage strings.Builder
+		var storage io2.Buffer
 
 		var rw internalResponseWriter
 		{
-			rw.Writer = &storage
+			rw.writer = &storage
 		}
 
 		var responsewriter ResponseWriter = &rw
@@ -240,7 +242,7 @@ func TestResponseWriter_WriteHeader_success(t *testing.T) {
 
 			var err error
 
-			n, err = responsewriter.WriteHeader(statusCode, meta)
+			n, err = responsewriter.WriteHeader(context.Background(), statusCode, meta)
 
 			if nil != err {
 				t.Errorf("For test #%d, did not expect an error but actually got one.", testNumber)
@@ -298,11 +300,11 @@ func TestResponseWriter_WriteHeader_failure(t *testing.T) {
 
 	for testNumber, test := range tests {
 
-		var storage strings.Builder
+		var storage io2.Buffer
 
 		var rw internalResponseWriter
 		{
-			rw.Writer = &storage
+			rw.writer = &storage
 		}
 
 		var responsewriter ResponseWriter = &rw
@@ -314,7 +316,7 @@ func TestResponseWriter_WriteHeader_failure(t *testing.T) {
 			var n int
 			var err error
 
-			n, err = responsewriter.WriteHeader(statusCode, meta)
+			n, err = responsewriter.WriteHeader(context.Background(), statusCode, meta)
 
 			if nil == err {
 				t.Errorf("For test #%d, expected an error but did not actually get one.", testNumber)

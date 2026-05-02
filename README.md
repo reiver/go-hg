@@ -1,10 +1,10 @@
 # go-hg ☿
 
-Package **hg** provides ☿ **Mercury Protocol** client and server implementations, for the Go programming language.
+Package **hg** provides ☿ **Mercury Protocol** and **Gemini Protocol** client and server implementations, for the Go programming-language (golang).
 
-The **hg** package provides an API in a style similar to the `"net/http"` library that is part of the Go standard library, including support for "middleware".
+The **hg** package provides an API in a style similar to the `"net/http"` package that is part of the Go standard library, including support for "middleware".
 
-## Documention
+## Documentation
 
 Online documentation, which includes examples, can be found at: http://godoc.org/github.com/reiver/go-hg
 
@@ -17,7 +17,7 @@ The ☿ **Mercury Protocol** is a simple client-server protocol.
 The ☿ **Mercury Protocol** is derived from the _Gemini Protocol_ — basically the _Mercury Protocol_ is the _Gemini Protocol_ without the TLS encryption.
 In a sense, the ☿ _Mercury Protocol_ is a “naked” form of the _Gemini Protocol_.
 
-The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inpired by the _Gopher Protocol_.
+The ☿ **Mercury Protocol**, through the _Gemini Protocol_, was inspired by the _Gopher Protocol_.
 
 ## Gemini Protocol Server from a ☿ Mercury Protocol Server
 
@@ -30,12 +30,14 @@ and then put a _TLS proxy_ server in front of it (listening at ":1965") that mod
 ## Example ☿ Mercury Protocol Server
 
 A very simple ☿ **Mercury Protocol** server might look like this:
+
 ```go
 package main
 
 import (
 	"github.com/reiver/go-hg"
 
+	"context"
 	"fmt"
 	"os"
 )
@@ -55,24 +57,27 @@ func main() {
 	}
 }
 
-func serveMercury(w hg.ResponseWriter, r hg.Request) {
-	fmt.Fprintln(w, "Hello world!")
+func serveMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
+	w.WriteHeader(ctx, hg.StatusSuccess, "text/plain")
+	fmt.Fprintln(w.Writer(ctx), "Hello world!")
 }
 ```
 
-In this example, the ☿ **Mercury Protocol** just outputs a _Gemtext_ file with the contents “Hello world!”.
+In this example, the ☿ **Mercury Protocol** server just outputs a file with the contents “Hello world!”.
 
 If you wanted to write your own ☿ **Mercury Protocol** server based on this code, then you would change what is inside the `serveMercury()` function.
 
-## Example ☿ *Mercury Protocol Client
+## Example ☿ Mercury Protocol Client
 
 A very simple ☿ **Mercury Protocol** client might look like this:
+
 ```go
 package main
 
 import (
 	"github.com/reiver/go-hg"
 
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -92,7 +97,7 @@ func main() {
 		return
 	}
 
-	responsereader, err := hg.DialAndCall(address, request)
+	responsereader, err := hg.DialAndCall(context.Background(), address, request)
 	if nil != err {
 		fmt.Fprintln(os.Stderr, "problem with request:", err)
 		os.Exit(1)
@@ -100,7 +105,8 @@ func main() {
 	}
 	defer responsereader.Close()
 
-	io.Copy(os.Stdout, responsereader)
+	var ctx context.Context = context.Background()
+	io.Copy(os.Stdout, responsereader.Reader(ctx))
 }
 ```
 
@@ -109,13 +115,15 @@ In this code, the download file is just outputted to STDOUT. You could modify th
 Note that we can do more sophisticated things by inspecting the error that was returned.
 To deal with redirects, etc.
 
-So, we could do tha with code like the following:
+So, we could do that with code like the following:
+
 ```go
 package main
 
 import (
 	"github.com/reiver/go-hg"
 
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -124,77 +132,45 @@ import (
 func main() {
 
 	const address =       "example.com:1961"
-	const uri = "mercury://example.com/apple/banana/cherry.txt"
+	const uri = "mercury://example.com/apple/banana/cherry.gmni"
 
 	var request hg.Request
 	err := request.Parse(uri)
 
 	if nil != err {
-		fmt.Fprintln(os.Stderr, "problem parsing URI:", err)
+		fmt.Fprintf(os.Stderr, "problem parsing URI %q: %s\n", uri, err)
 		os.Exit(1)
 		return
 	}
 
-	responsereader, err := hg.DialAndCall(address, request)
+	ctx := context.Background()
+	responsereader, err := hg.DialAndCall(ctx, address, request)
 	if nil != err {
-
-		switch casted: err.(type) {
-		case hg.ResponseInput:
-			//@TODO
-		case hg.ResponseSensitiveInput:
-			//@TODO
-
-		case hg.ResponseRedirectTemporary:
-			//@TODO
-		case hg.ResponseRedirectPermanent:
-			//@TODO
-
-		case hg.ResponseTemporaryFailure:
-			//@TODO
-		case hg.ResponseServerUnavailable:
-			//@TODO
-		case hg.ResponseCGIError:
-			//@TODO
-		case hg.ResponseProxyError:
-			//@TODO
-		case hg.ResponseSlowDown:
-			//@TODO
-
-		case hg.ResponsePermanentFailure:
-			//@TODO
-		case hg.ResponseNotFound :
-			//@TODO
-		case hg.ResponseGone:
-			//@TODO
-		case hg.ResponseProxyRequestRefused:
-			//@TODO
-		case hg.ResponseBadRequest:
-			//@TODO
-
-		case hg.UnknownResponse:
-			//@TODO
-
-		default:
-			fmt.Fprintln(os.Stderr, "problem with request:", err)
-			os.Exit(1)
-			return
-		}
+		fmt.Fprintf(os.Stderr, "problem dialing and connecting to %q: %s", uri, err)
+		os.Exit(1)
+		return
 	}
 	defer responsereader.Close()
 
-	io.Copy(os.Stdout, responsereader)
+	_, err = io.Copy(os.Stdout, responsereader.Reader(context.Background()))
+	if nil != err {
+		fmt.Fprintf(os.Stderr, "problem outputing response body for %q to STDOUT: %s", uri, err)
+		os.Exit(1)
+		return
+	}
 }
 ```
 
 ## Hypermedia, Hypertext
 
-The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used  with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
+The ☿ **Mercury Protocol** and the _Gemini Protocol_ are often used with a (specific) **hypermedia** & hypertext file data format known as **gemtext**.
 
 (The name “gemtext” is short for “gemini text”.)
 
 **Gemtext** is a **formatted text** file data format similar to _markdown_, and inspired by the line typing convention in Gopher.
 
 Here is an example **gemtext** file:
+
 ```
 # Joe Blow's Capsule
 
@@ -240,7 +216,7 @@ func main() {
 
 ## Tilde Example Mercury Protocol Server
 
-Another example  ☿ **Mercury Protocol** server is shown in the following code:
+Another example ☿ **Mercury Protocol** server is shown in the following code:
 
 ```go
 package main
@@ -251,7 +227,7 @@ import (
 
 func main() {
 
-	var handler hg.Handler = hg.UserDirHandler
+	var handler hg.Handler = &hg.UserDirHandler{}
 
 	err := hg.ListenAndServe(":1961", handler)
 	if nil != err {
@@ -266,11 +242,15 @@ Here the handler — `hg.UserDirHandler` — operates similar to Apache's HTTP S
 ## Example Mercury Protocol Servers With Custom Handler
 
 And finally, here is a custom handler being used in a  ☿ **Mercury Protocol** server:
+
 ```go
 package main
 
 import (
 	"github.com/reiver/go-hg"
+
+	"context"
+	"io"
 )
 
 func main() {
@@ -284,19 +264,23 @@ func main() {
 	}
 }
 
-type myCustomHandler {}
+type myCustomHandler struct{}
 
-func (receiver myCustomHandler) ServeMercury(w hg.ResponseWriter, r hg.Request) {
-	io.WriteString(w, "Hello world!")
+func (receiver myCustomHandler) ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
+	io.WriteString(w.Writer(ctx), "Hello world!")
 }
 ```
 
-Alternatively, this could be made a bit simple it `hg.HandlerFunc()` is used:
+Alternatively, this could be made a bit simpler if `hg.HandlerFunc()` is used:
+
 ```go
 package main
 
 import (
 	"github.com/reiver/go-hg"
+
+	"context"
+	"io"
 )
 
 func main() {
@@ -310,8 +294,8 @@ func main() {
 	}
 }
 
-func helloworld(w hg.ResponseWriter, r *hg.Request) {
-	io.WriteString(w, "Hello world!")
+func helloworld(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
+	io.WriteString(w.Writer(ctx), "Hello world!")
 }
 ```
 
@@ -320,27 +304,45 @@ func helloworld(w hg.ResponseWriter, r *hg.Request) {
 This package provides a number of helper-functions that make responding to a ☿ Mercury Protocol request easier.
 The helper functions are:
 
-| Mercury Protocol Response  | Basic Usage                         | Intermediate Usage                     |
-| -------------------------- | ----------------------------------- | -------------------------------------- |
-| `10 INPUT`                 | `hg.ServeInput(w, prompt)`          |                                        |
-| `11 SENTITIVE INPUT`       | `hg.ServeSensitiveInput(w, prompt)` |                                        |
-| `20 SUCCESS`               |                                     |                                        |
-| `30 REDIRECT - TEMPORARY`  | `hg.ServeRedirectTemporary(w, url)` |                                        |
-| `31 REDIRECT - PERMANENT`  | `hg.ServeRedirectPermanent(w, url)` |                                        |
-| `40 TEMPORARY FAILURE`     | `hg.ServeTemporaryFailure(w)`       | `hg.ServeTemporaryFailure(w, info)`    |
-| `41 SERVER UNAVAILABLE`    | `hg.ServeServerUnavailable(w)`      | `hg.ServeServerUnavailable(w, info)`   |
-| `42 CGI ERROR`             | `hg.ServeCGIError(w)`               | `hg.ServeCGIError(w, info)`            |
-| `43 PROXY ERROR`           | `hg.ServeProxyError(w)`             | `hg.ServeProxyError(w, info)`          |
-| `44 SLOW DOWN`             | `hg.ServeSlowDown(w, retryAfter)`   |                                        |
-| `50 PERMANENT FAILURE`     | `hg.ServePermanentFailure(w)`       | `hg.ServePermanentFail ure(w, info)`   |
-| `51 NOT FOUND`             | `hg.ServeNotFound(w)`               | `hg.ServeNotFound(w, info)`            |
-| `52 GONE`                  | `hg.ServeGone(w)`                   | `hg.ServeGone(w, info)`                |
-| `53 PROXY REQUEST REFUSED` | `hg.ServeProxyRequestRefused(w)`    | `hg.ServeProxyRequestRefused(w, info)` |
-| `59 BAD REQUEST`           | `hg.ServeBadRequest(w)`             | `hg.ServeBadRequest(w, info)`          |
+| Mercury Protocol Response  | Basic Usage                              | Intermediate Usage                          |
+| -------------------------- | ---------------------------------------- | ------------------------------------------- |
+| `10 INPUT`                 | `hg.ServeInput(ctx, w, prompt...)`          |                                             |
+| `11 SENSITIVE INPUT`       | `hg.ServeSensitiveInput(ctx, w, prompt...)` |                                             |
+| `20 SUCCESS`               |                                          |                                             |
+| `30 REDIRECT - TEMPORARY`  | `hg.ServeRedirectTemporary(ctx, w, url)` |                                             |
+| `31 REDIRECT - PERMANENT`  | `hg.ServeRedirectPermanent(ctx, w, url)` |                                             |
+| `40 TEMPORARY FAILURE`     | `hg.ServeTemporaryFailure(ctx, w)`       | `hg.ServeTemporaryFailure(ctx, w, info)`    |
+| `41 SERVER UNAVAILABLE`    | `hg.ServeServerUnavailable(ctx, w)`      | `hg.ServeServerUnavailable(ctx, w, info)`   |
+| `42 CGI ERROR`             | `hg.ServeCGIError(ctx, w)`               | `hg.ServeCGIError(ctx, w, info)`            |
+| `43 PROXY ERROR`           | `hg.ServeProxyError(ctx, w)`             | `hg.ServeProxyError(ctx, w, info)`          |
+| `44 SLOW DOWN`             | `hg.ServeSlowDown(ctx, w, retryAfter)`   |                                             |
+| `50 PERMANENT FAILURE`     | `hg.ServePermanentFailure(ctx, w)`       | `hg.ServePermanentFailure(ctx, w, info)`    |
+| `51 NOT FOUND`             | `hg.ServeNotFound(ctx, w)`               | `hg.ServeNotFound(ctx, w, info)`            |
+| `52 GONE`                  | `hg.ServeGone(ctx, w)`                   | `hg.ServeGone(ctx, w, info)`                |
+| `53 PROXY REQUEST REFUSED` | `hg.ServeProxyRequestRefused(ctx, w)`    | `hg.ServeProxyRequestRefused(ctx, w, info)` |
+| `59 BAD REQUEST`           | `hg.ServeBadRequest(ctx, w)`             | `hg.ServeBadRequest(ctx, w, info)`          |
+
+## Import
+
+To import package **hg** use `import` code like the following:
+```
+import "github.com/reiver/go-hg"
+```
+
+## Installation
+
+To install package **hg** do the following:
+```
+GOPROXY=direct go get github.com/reiver/go-hg
+```
+
+## Author
+
+Package **hg** was written by [Charles Iliya Krempeaux](http://reiver.link)
 
 ## Package Name
 
-The package name of this Go package is **hg** rather than **mercury** because **Hg** is often used as a shorthard for **mercury**.
+The package name of this Go package is **hg** rather than **mercury** because **Hg** is often used as a shorthand for **mercury**.
 
 Nowadays the word **mercury** is used to refer to multiple things —
 a Roman god named “Mercury”,
@@ -377,6 +379,7 @@ And thus this, a package that implements the **Mercury Protocol**, is named  `hg
 ██║░░██║░░░██║░░░██████╔╝██║░░██║██║░░██║██║░░██║╚██████╔╝░░░██║░░░██║░░██║╚██████╔╝██║░╚═╝░██║
 ╚═╝░░╚═╝░░░╚═╝░░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░╚═╝░░╚═╝░╚═════╝░╚═╝░░░░░╚═╝
 ```
+
 ## See Also
 * [The Mercury protocol (gemini)](gemini://gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)
 * [The Mercury protocol (http proxy)](https://portal.mozz.us/gemini/gemini.circumlunar.space/users/solderpunk/gemlog/the-mercury-protocol.gmi)

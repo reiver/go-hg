@@ -1,6 +1,7 @@
 package hg
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -10,24 +11,24 @@ import (
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var prompt string = "Pick a number between 1 and 10"
 //		
-//		hg.ServeInput(w, prompt)
+//		hg.ServeInput(ctx, w, prompt)
 //		
 //		// ...
 //		
 //	}
-func ServeInput(w ResponseWriter, a ...interface{}) {
+func ServeInput(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusInput
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -40,7 +41,8 @@ func ServeInput(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 11 SENSITIVE INPUT
@@ -49,24 +51,24 @@ func ServeInput(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
-//		var prompt string = "Pick enter your password"
+//		var prompt string = "Please enter your password"
 //		
-//		hg.ServeSensitiveInput(w, prompt)
+//		hg.ServeSensitiveInput(ctx, w, prompt)
 //		
 //		// ...
 //		
 //	}
-func ServeSensitiveInput(w ResponseWriter, a ...interface{}) {
+func ServeSensitiveInput(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusSensitiveInput
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -79,7 +81,8 @@ func ServeSensitiveInput(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 30 REDIRECT - TEMPORARY
@@ -88,9 +91,9 @@ func ServeSensitiveInput(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
@@ -98,19 +101,20 @@ func ServeSensitiveInput(w ResponseWriter, a ...interface{}) {
 //		//var url string = "documents/info.txt"
 //		var url string = "mercury://example.com/once/twice/thrice/fource.txt"
 //		
-//		hg.ServeRedirectTemporary(w, url)
+//		hg.ServeRedirectTemporary(ctx, w, url)
 //		
 //		// ...
 //		
 //	}
-func ServeRedirectTemporary(w ResponseWriter, target string) {
+func ServeRedirectTemporary(ctx context.Context, w ResponseWriter, target string) error {
 	const statuscode = StatusRedirectTemporary
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
-	w.WriteHeader(statuscode, target)
+	_, err := w.WriteHeader(ctx, statuscode, target)
+	return err
 }
 
 // 31 REDIRECT - PERMANENT
@@ -119,9 +123,9 @@ func ServeRedirectTemporary(w ResponseWriter, target string) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
@@ -129,19 +133,20 @@ func ServeRedirectTemporary(w ResponseWriter, target string) {
 //		//var url string = "documents/info.txt"
 //		var url string = "mercury://example.com/once/twice/thrice/fource.txt"
 //		
-//		hg.ServeRedirectPermanent(w, url)
+//		hg.ServeRedirectPermanent(ctx, w, url)
 //		
 //		// ...
 //		
 //	}
-func ServeRedirectPermanent(w ResponseWriter, target string) {
+func ServeRedirectPermanent(ctx context.Context, w ResponseWriter, target string) error {
 	const statuscode = StatusRedirectPermanent
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
-	w.WriteHeader(statuscode, target)
+	_, err := w.WriteHeader(ctx, statuscode, target)
+	return err
 }
 
 // 40 TEMPORARY FAILURE
@@ -150,24 +155,24 @@ func ServeRedirectPermanent(w ResponseWriter, target string) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "try again later"
 //		
-//		hg.ServeTemporaryFailure(w, message)
+//		hg.ServeTemporaryFailure(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
+func ServeTemporaryFailure(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusTemporaryFailure
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -180,7 +185,8 @@ func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 41 SERVER UNAVAILABLE
@@ -189,24 +195,24 @@ func ServeTemporaryFailure(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "we are upgrading the server"
 //		
-//		hg.ServeServerUnavailable(w, message)
+//		hg.ServeServerUnavailable(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
+func ServeServerUnavailable(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusServerUnavailable
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -219,7 +225,8 @@ func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 42 CGI ERROR
@@ -228,24 +235,24 @@ func ServeServerUnavailable(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "the program being run just had an unexpected fatal error"
 //		
-//		hg.ServeCGIError(w, message)
+//		hg.ServeCGIError(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeCGIError(w ResponseWriter, a ...interface{}) {
+func ServeCGIError(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusCGIError
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -258,7 +265,8 @@ func ServeCGIError(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 43 PROXY ERROR
@@ -267,24 +275,24 @@ func ServeCGIError(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "the proxy server providing TLS encryption errored out"
 //		
-//		hg.ServeProxyError(w, message)
+//		hg.ServeProxyError(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeProxyError(w ResponseWriter, a ...interface{}) {
+func ServeProxyError(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusProxyError
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -297,7 +305,8 @@ func ServeProxyError(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 44 SLOW DOWN
@@ -306,29 +315,30 @@ func ServeProxyError(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var numberOfSecondsToWait uint = 8
 //		
-//		hg.ServeSlowDown(w, numberOfSecondsToWait)
+//		hg.ServeSlowDown(ctx, w, numberOfSecondsToWait)
 //		
 //		// ...
 //		
 //	}
-func ServeSlowDown(w ResponseWriter, numberOfSecondsToWait uint) {
+func ServeSlowDown(ctx context.Context, w ResponseWriter, numberOfSecondsToWait uint) error {
 	const statuscode = StatusSlowDown
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string = fmt.Sprintf("%d", numberOfSecondsToWait)
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 50 PERMANENT FAILURE
@@ -337,24 +347,24 @@ func ServeSlowDown(w ResponseWriter, numberOfSecondsToWait uint) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "someone deleted the database"
 //		
-//		hg.ServePermanentFailure(w, message)
+//		hg.ServePermanentFailure(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
+func ServePermanentFailure(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusPermanentFailure
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -367,7 +377,8 @@ func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 51 NOT FOUND
@@ -376,24 +387,24 @@ func ServePermanentFailure(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "this is not the gem-page you are looking for"
 //		
-//		hg.ServeNotFound(w, message)
+//		hg.ServeNotFound(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeNotFound(w ResponseWriter, a ...interface{}) {
+func ServeNotFound(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusNotFound
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -406,7 +417,8 @@ func ServeNotFound(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 52 GONE
@@ -415,24 +427,24 @@ func ServeNotFound(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "he's dead jim"
 //		
-//		hg.ServeGone(w, message)
+//		hg.ServeGone(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeGone(w ResponseWriter, a ...interface{}) {
+func ServeGone(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusGone
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -445,7 +457,8 @@ func ServeGone(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 53 PROXY REQUEST REFUSED
@@ -454,24 +467,24 @@ func ServeGone(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "you did not enter a number"
 //		
-//		hg.ServeProxyRequestRefused(w, message)
+//		hg.ServeProxyRequestRefused(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
+func ServeProxyRequestRefused(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusProxyRequestRefused
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -484,7 +497,8 @@ func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }
 
 // 59 BAD REQUEST
@@ -493,24 +507,24 @@ func ServeProxyRequestRefused(w ResponseWriter, a ...interface{}) {
 //
 // Example Usage
 //
-// This is how one might is this helper-function:
+// This is how one might use this helper-function:
 //
-//	func ServeMercury(w hg.ResponseWriter, r hg.Request) {
+//	func ServeMercury(ctx context.Context, w hg.ResponseWriter, r hg.Request) {
 //		
 //		// ...
 //		
 //		var message string = "you did not enter a number"
 //		
-//		hg.ServeBadRequest(w, message)
+//		hg.ServeBadRequest(ctx, w, message)
 //		
 //		// ...
 //		
 //	}
-func ServeBadRequest(w ResponseWriter, a ...interface{}) {
+func ServeBadRequest(ctx context.Context, w ResponseWriter, a ...any) error {
 	const statuscode = StatusBadRequest
 
 	if nil == w {
-		return
+		return ErrNilResponseWriter
 	}
 
 	var meta string
@@ -523,5 +537,6 @@ func ServeBadRequest(w ResponseWriter, a ...interface{}) {
 		}
 	}
 
-	w.WriteHeader(statuscode, meta)
+	_, err := w.WriteHeader(ctx, statuscode, meta)
+	return err
 }

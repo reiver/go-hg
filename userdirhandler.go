@@ -1,16 +1,20 @@
 package hg
 
 import (
-	"net/url"
+	"context"
 	"io"
-	"net/http"
+	"net/url"
 	"os"
 	"os/user"
 	"path"
+	"path/filepath"
+	"strings"
 	"unicode/utf8"
+
+	"codeberg.org/reiver/go-field"
 )
 
-// Mercury based tilde (~) capsule sites.
+// UserDirHandler is a Mercury Protocol handler for tilde (~) capsule sites.
 //
 // Makes things like this:
 //
@@ -27,13 +31,24 @@ import (
 // Get mapped to:
 //
 //	/home/username/mercury_public/once/twice/thrice/fource.txt
-const UserDirHandler internalUserDirHandler = internalUserDirHandler(0)
+type UserDirHandler struct {
+	// AllowSymLinks controls whether symbolic links inside a user's mercury_public
+	// directory are followed. If false (the default), requests that resolve to a
+	// symlink or pass through a symlink are rejected with a not-found response.
+	AllowSymLinks bool
 
-type internalUserDirHandler int
+	Logger Logger
+}
 
-var _ Handler = internalUserDirHandler(0)
+var _ Handler = &UserDirHandler{}
 
-func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
+func (receiver *UserDirHandler) ServeMercury(ctx context.Context, w ResponseWriter, r Request) {
+	if nil == receiver {
+		return
+	}
+
+	log := mustlogger(receiver.Logger).Begin()
+	defer log.End()
 
 	requestValue := r.RequestValue()
 
@@ -43,12 +58,42 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 
 		uri, err = url.Parse(requestValue)
 		if nil != err {
-			ServeBadRequest(w)
+			if serveErr := ServeBadRequest(ctx, w); nil != serveErr {
+				log.Error(
+					field.S("problem sending bad-request response"),
+					field.Stringer("request", r),
+					field.E(serveErr),
+				)
+			}
 			return
 		}
 
 		if nil == uri {
-			ServeTemporaryFailure(w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
+			return
+		}
+	}
+
+	{
+		actualScheme := uri.Scheme
+
+		if !hasValidScheme(actualScheme) {
+			if err := ServeBadRequest(ctx, w); nil != err {
+				log.Error(
+					field.S("the actual scheme in the URL from the request is not what was expected"),
+					field.String("expected-URL-scheme", Scheme),
+					field.String("expected-URL-scheme-TLS", SchemeTLS),
+					field.String("actual-scheme", actualScheme),
+					field.Stringer("uri", uri),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -61,7 +106,13 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		{
 			r, _ := utf8.DecodeLastRuneInString(uri.Path)
 			if utf8.RuneError == r {
-				ServeBadRequest(w)
+				if err := ServeBadRequest(ctx, w); nil != err {
+					log.Error(
+						field.S("problem sending bad-request response"),
+						field.String("request-value", requestValue),
+						field.E(err),
+					)
+				}
 				return
 			}
 
@@ -73,7 +124,13 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		requestpath = path.Clean(uri.Path)
 
 		if "" == requestpath {
-			ServeTemporaryFailure(w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -87,16 +144,34 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 
 		username, subpath, valid = parsetildedir(requestpath)
 		if !valid {
-			ServeNotFound(w)
+			if err := ServeNotFound(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending not-found response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 
 		if "" == username {
-			ServeTemporaryFailure(w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 		if "" == subpath {
-			ServeTemporaryFailure(w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
@@ -107,41 +182,77 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		if nil != err {
 			switch err.(type) {
 			case user.UnknownUserError:
-				ServeNotFound(w)
+				if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending not-found response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			default:
-				ServeTemporaryFailure(w)
+				if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending temporary-failure response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			}
-			return
 		}
 
 		homedir = u.HomeDir
 
 		if "" == homedir {
-			ServeTemporaryFailure(w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
 	}
 
+	const publicDir = "mercury_public"
+
 	var targetpath string
 	{
-		const publicDir = "mercury_public"
+		targetpath = filepath.Join(homedir, publicDir, subpath)
 
-		targetpath = path.Join(homedir, publicDir, subpath)
-
-		targetpath = path.Clean(targetpath)
+		targetpath = filepath.Clean(targetpath)
 
 		if "" == targetpath {
-			ServeTemporaryFailure(w)
+			if err := ServeTemporaryFailure(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending temporary-failure response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
 		}
+	}
+
+	// If symlinks are not allowed, resolve the real path and verify it is still
+	// under the user's mercury_public directory.
+	var allowedPrefix string
+	if nil == receiver || !receiver.AllowSymLinks {
+		allowedPrefix = filepath.Join(homedir, publicDir) + string(filepath.Separator)
 	}
 
 	{
 		fi, err := os.Stat(targetpath)
 		if nil != err {
-			ServeNotFound(w)
+			if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+				log.Error(
+					field.S("problem sending not-found response"),
+					field.Stringer("request", r),
+					field.E(serveErr),
+				)
+			}
 			return
 		}
 
@@ -151,17 +262,65 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 		case mode.IsDir():
 			if !explicitDir {
 				uri.Path += "/"
-				ServeRedirectTemporary(w, uri.String())
+				if err := ServeRedirectTemporary(ctx, w, uri.String()); nil != err {
+					log.Error(
+						field.S("problem sending redirect-temporary response"),
+						field.Stringer("request", r),
+						field.E(err),
+					)
+				}
 				return
 			}
 
-			targetpath = path.Join(targetpath, defaultfilename)
+			targetpath = filepath.Join(targetpath, defaultfilename)
 
 		case mode.IsRegular():
 			// Nothing here.
 		default:
-			ServeNotFound(w)
+			if err := ServeNotFound(ctx, w); nil != err {
+				log.Error(
+					field.S("problem sending not-found response"),
+					field.Stringer("request", r),
+					field.E(err),
+				)
+			}
 			return
+		}
+
+		// Symlink check: resolve the real path and verify it stays within the
+		// user's mercury_public directory.
+		//
+		// Note: there is an inherent TOCTOU (time-of-check-time-of-use) race here —
+		// the filesystem could change between EvalSymlinks and the os.Open below.
+		// The correct fix would be to open the file first, then verify the resolved
+		// path of the already-opened file descriptor (e.g., via fstat + readlink on
+		// /proc/self/fd). However, Go's standard library does not provide a way to
+		// resolve symlinks from an open *os.File — filepath.EvalSymlinks operates on
+		// paths, not file descriptors. The race window is small and exploitation
+		// requires write access to the user's mercury_public directory, which already
+		// grants the ability to serve arbitrary content.
+		if "" != allowedPrefix {
+			resolved, err := filepath.EvalSymlinks(targetpath)
+			if nil != err {
+				if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending not-found response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
+				return
+			}
+			if !strings.HasPrefix(resolved, allowedPrefix) {
+				if serveErr := ServeNotFound(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending not-found response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
+				return
+			}
 		}
 
 		var file *os.File
@@ -170,50 +329,47 @@ func (internalUserDirHandler) ServeMercury(w ResponseWriter, r Request) {
 
 			file, err = os.Open(targetpath)
 			if nil != err {
-				ServeTemporaryFailure(w)
+				if serveErr := ServeTemporaryFailure(ctx, w); nil != serveErr {
+					log.Error(
+						field.S("problem sending temporary-failure response"),
+						field.Stringer("request", r),
+						field.E(serveErr),
+					)
+				}
 				return
 			}
 			defer func() {
 				err := file.Close()
 				if nil != err {
-					
+					log.Error(
+						field.S("could not close file"),
+						field.String("path", targetpath),
+						field.Stringer("request", r),
+						field.E(err),
+					)
 				}
 			}()
 		}
 
-		var mediatype string
-		{
-			var magic [512]byte
+		var mediatype string = inferMediaType(targetpath)
 
-			_, err := file.Read(magic[:])
-			if nil != err {
-				ServeTemporaryFailure(w)
-				return
-			}
-			{
-				_, err := file.Seek(0,0)
-				if nil != err {
-					ServeTemporaryFailure(w)
-					return
-				}
-			}
-
-			mediatype = http.DetectContentType(magic[:])
-
-			switch mediatype {
-			case "application/octet-stream":
-
-				extension := path.Ext(targetpath)
-
-				switch extension {
-				case ".gmi", ".gmni":
-					mediatype = "text/gemini"
-				}
-			}
+		if _, headerErr := w.WriteHeader(ctx, StatusSuccess, mediatype); nil != headerErr {
+			log.Error(
+				field.S("problem writing Mercury Protocol header"),
+				field.Stringer("request", r),
+				field.E(headerErr),
+			)
+			return
 		}
 
-		w.WriteHeader(StatusSuccess, mediatype)
-		io.Copy(w, file)
+		if _, copyErr := io.Copy(w.Writer(ctx), file); nil != copyErr {
+			log.Error(
+				field.S("problem writing Mercury Protocol body by copying file inferred from request"),
+				field.String("path", targetpath),
+				field.Stringer("request", r),
+				field.E(copyErr),
+			)
+		}
 		return
 	}
 }
