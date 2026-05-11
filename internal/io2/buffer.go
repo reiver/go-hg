@@ -5,13 +5,14 @@ import (
 	"strings"
 
 	"codeberg.org/reiver/go-erorr"
+	"github.com/reiver/go-oi"
 )
 
 type Buffer struct {
 	builder strings.Builder
 }
 
-var _ Writer = &Buffer{}
+var _ oi.Writer = &Buffer{}
 
 func (receiver *Buffer) String() string {
 	if nil == receiver {

@@ -8,8 +8,7 @@ import (
 
 	"codeberg.org/reiver/go-erorr"
 	"codeberg.org/reiver/go-field"
-
-	"github.com/reiver/go-hg/internal/io2"
+	"github.com/reiver/go-oi"
 )
 
 // ResponseWriter is used by a Handler to construct a Mercury Protocol response.
@@ -33,7 +32,7 @@ var _ ResponseWriter = &internalResponseWriter{}
 
 // internalResponseWriter is used to create a ResponseWriter around a io.Writer (such as a net.Conn).
 type internalResponseWriter struct {
-	writer        io2.Writer
+	writer        oi.Writer
 	logger        Logger
 	headerwritten bool
 }
@@ -43,7 +42,7 @@ func (receiver *internalResponseWriter) Writer(ctx context.Context) io.Writer {
 		return nil
 	}
 
-	return io2.ClassicWriter(ctx, receiver.writer)
+	return oi.ClassicWriter(ctx, receiver.writer)
 }
 
 func (receiver *internalResponseWriter) Write(ctx context.Context, data []byte) (n int, err error) {
@@ -65,7 +64,7 @@ func (receiver *internalResponseWriter) Write(ctx context.Context, data []byte) 
 		return 0, nil
 	}
 
-	var writer io2.Writer = receiver.writer
+	var writer oi.Writer = receiver.writer
 	if nil == writer {
 		var err error = errNilWriter
 
@@ -184,7 +183,7 @@ func (receiver *internalResponseWriter) WriteHeader(ctx context.Context, statusC
 		return 0, erorr.Wrap(err, msg)
 	}
 
-	var writer io2.Writer = receiver.writer
+	var writer oi.Writer = receiver.writer
 	if nil == writer {
 		var err error = errNilWriter
 

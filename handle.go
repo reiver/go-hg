@@ -7,8 +7,7 @@ import (
 	"time"
 
 	"codeberg.org/reiver/go-field"
-
-	"github.com/reiver/go-hg/internal/io2"
+	"github.com/reiver/go-oi"
 )
 
 // The handle() function handles an incoming Mercury request using the handler passed to it.
@@ -126,7 +125,7 @@ func handle(ctx context.Context, logger Logger, conn net.Conn, handler Handler, 
 	log.Debug(field.Stringer("request", request))
 
 	{
-		writer := io2.CreateWriter(conn)
+		writer := oi.CastDeadLinedWriter(conn)
 		if nil == writer {
 			log.Error(
 				field.S("nil writer"),
